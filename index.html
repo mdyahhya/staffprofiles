@@ -2154,10 +2154,10 @@ function showPWAPopup() {
     if (lastDismissed) {
         const dismissedTime = new Date(lastDismissed).getTime();
         const now = new Date().getTime();
-        const daysSinceDismissed = (now - dismissedTime) / (1000 * 60 * 60 * 24);
+        const hoursSinceDismissed = (now - dismissedTime) / (1000 * 60 * 60);
         
-        // Only show again after 7 days
-        if (daysSinceDismissed < 7) {
+        // Only show again after 24 hours
+        if (hoursSinceDismissed < 24) {
             console.log('PWA popup dismissed recently, waiting...');
             return;
         }
@@ -2181,10 +2181,10 @@ function hidePWAPopup() {
     localStorage.setItem('pwa_dismissed', new Date().toISOString());
 }
 
-// Install PWA with improved handling
+// Install PWA - DIRECT INSTALLATION ONLY
 function installPWA() {
     if (deferredPrompt) {
-        // Use the deferred prompt for proper installation
+        // Use the deferred prompt for direct installation
         deferredPrompt.prompt();
         
         deferredPrompt.userChoice.then((choiceResult) => {
@@ -2203,50 +2203,10 @@ function installPWA() {
             deferredPrompt = null;
         });
     } else {
-        // Fallback for browsers that don't support beforeinstallprompt
-        showManualInstallInstructions();
+        // If no prompt available, just hide popup
+        console.log('Install prompt not available');
+        hidePWAPopup();
     }
-}
-
-// Show manual installation instructions
-function showManualInstallInstructions() {
-    const userAgent = navigator.userAgent.toLowerCase();
-    let instructions = '';
-    
-    if (userAgent.includes('android')) {
-        instructions = `
-            <h4>Install VVPIET Staff App:</h4>
-            <p>1. Tap the menu button (⋮) in Chrome</p>
-            <p>2. Select "Add to Home screen" or "Install app"</p>
-            <p>3. Tap "Add" or "Install"</p>
-        `;
-    } else if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
-        instructions = `
-            <h4>Install VVPIET Staff App:</h4>
-            <p>1. Tap the Share button (↗) in Safari</p>
-            <p>2. Scroll down and tap "Add to Home Screen"</p>
-            <p>3. Tap "Add"</p>
-        `;
-    } else {
-        instructions = `
-            <h4>Install VVPIET Staff App:</h4>
-            <p>1. Look for the install button (⊕) in your browser address bar</p>
-            <p>2. Or use browser menu: "Install app" or "Add to desktop"</p>
-        `;
-    }
-    
-    // Create custom modal
-    const modal = document.createElement('div');
-    modal.innerHTML = `
-        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
-            <div style="background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: 20px;">
-                ${instructions}
-                <button onclick="this.closest('div').remove(); localStorage.setItem('pwa_installed', 'true');" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; cursor: pointer;">Got it!</button>
-            </div>
-        </div>
-    `;
-    document.body.appendChild(modal);
-    hidePWAPopup();
 }
 
 // Enhanced PWA detection and setup
@@ -2276,11 +2236,11 @@ function setupPWA() {
         hidePWAPopup();
     });
     
-    // For browsers that don't fire beforeinstallprompt (like iOS Safari)
+    // For browsers that don't fire beforeinstallprompt
     setTimeout(() => {
         if (!deferredPrompt && !isPWAInstalled()) {
-            console.log('No install prompt available, showing after delay');
-            setTimeout(showPWAPopup, 5000);
+            console.log('No install prompt available');
+            // Don't show popup if no prompt is available
         }
     }, 1000);
 }
