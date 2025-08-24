@@ -1,0 +1,2420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VVPIET Staff Profiles</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#8B5CF6">
+    <!-- Add these libraries -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: white;
+            color: black;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 375px;
+            margin: 0 auto;
+            min-height: 100vh;
+            padding-bottom: 80px;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .header h1 {
+            color: #8B5CF6;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .developer-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: #8B5CF6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        /* Department Buttons */
+        .departments {
+            padding: 20px;
+        }
+
+        .dept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .dept-btn {
+            padding: 15px;
+            background: white;
+            border: 2px solid #8B5CF6;
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .dept-btn:hover {
+            background: #8B5CF6;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        /* College Info */
+        .college-info {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .college-logo {
+            width: 120px;
+            height: 120px;
+            background: #f3f4f6;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+        }
+
+        .college-desc {
+            font-size: 16px;
+            color: #666;
+            margin-top: 15px;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 20px;
+            border-top: 1px solid #e5e5e5;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .footer p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 375px;
+            background: white;
+            border-top: 1px solid #e5e5e5;
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            z-index: 1000;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .taskbar-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 12px;
+            transition: color 0.3s;
+        }
+
+        .taskbar-btn.active {
+            color: #8B5CF6;
+        }
+
+        .taskbar-btn:hover {
+            color: #8B5CF6;
+        }
+
+        .taskbar-btn .icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            animation: modalSlideUp 0.3s ease;
+        }
+
+        @keyframes modalSlideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .developer-img {
+            width: 80px;
+            height: 80px;
+            background: #f3f4f6;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+        }
+
+        .developer-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #8B5CF6;
+        }
+
+        .developer-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .developer-desc {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .contact-icons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .contact-icon {
+            width: 40px;
+            height: 40px;
+            background: #8B5CF6;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            font-size: 16px;
+            transition: transform 0.3s;
+        }
+
+        .contact-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .contact-text {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        /* Department Page */
+        .dept-header {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5e5;
+        }
+
+        .dept-title {
+            color: #8B5CF6;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 25px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #8B5CF6;
+        }
+
+        .hod-section {
+            padding: 20px;
+            background: #f8fafc;
+        }
+
+        .hod-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #8B5CF6;
+        }
+
+        .staff-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+            border: 1px solid #e5e5e5;
+        }
+
+        .staff-name {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .staff-designation {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .check-profile-btn {
+            background: #8B5CF6;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .check-profile-btn:hover {
+            background: #7C3AED;
+        }
+
+        .staff-section {
+            padding: 20px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #8B5CF6;
+        }
+
+        /* Forms */
+        .form-container {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e5e5;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: #8B5CF6;
+        }
+
+        .form-textarea {
+            height: 80px;
+            resize: vertical;
+        }
+
+        .form-btn {
+            width: 100%;
+            background: #8B5CF6;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .form-btn:hover {
+            background: #7C3AED;
+        }
+
+        .form-btn:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+
+        /* PWA Install Popup */
+        .pwa-popup {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 320px;
+            width: 90%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            display: none;
+            z-index: 1500;
+        }
+
+        .pwa-popup.show {
+            display: block;
+            animation: popupSlideUp 0.3s ease;
+        }
+
+        @keyframes popupSlideUp {
+            from { transform: translateX(-50%) translateY(50px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .pwa-popup h3 {
+            color: #8B5CF6;
+            margin-bottom: 10px;
+        }
+
+        .pwa-popup p {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .pwa-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pwa-btn {
+            flex: 1;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #e5e5e5;
+            transition: all 0.3s;
+        }
+
+        .pwa-install {
+            background: #8B5CF6;
+            color: white;
+            border-color: #8B5CF6;
+        }
+
+        .pwa-later {
+            background: white;
+            color: #666;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Profile Page */
+        .profile-header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: white;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: #8B5CF6;
+        }
+
+        .profile-name {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .profile-dept {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .profile-content {
+            padding: 20px;
+        }
+
+        .profile-field {
+            margin-bottom: 20px;
+        }
+
+        .profile-field-label {
+            font-size: 12px;
+            color: #8B5CF6;
+            font-weight: 600;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .profile-field-value {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .profile-actions {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            border: 1px solid #8B5CF6;
+            background: white;
+            color: #8B5CF6;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #8B5CF6;
+            color: white;
+        }
+        .developer-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: transparent;
+  color: white;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 10px;
+  text-align: center;
+  line-height: 1.1;
+  border-radius: 3px;
+  transition: border-color 0.3s ease;
+  min-width: 45px;
+}
+
+.developer-button:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+
+
+.crop-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.crop-content {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    max-width: 90vw;
+    max-height: 90vh;
+}
+
+.crop-area {
+    position: relative;
+    width: 280px;
+    height: 280px;
+    margin: 20px auto;
+    border: 2px solid #8B5CF6;
+    border-radius: 50%;
+    overflow: hidden;
+    touch-action: none;
+}
+
+.crop-image {
+    position: absolute;
+    cursor: move;
+    touch-action: none;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Main Page -->
+        <div id="mainPage" class="page active">
+            <div class="header">
+                <h1>VVPIET Staff Profiles</h1>
+                <button class="developer-link" onclick="showDeveloperModal()">About Developer</button>
+            </div>
+            
+            <div class="departments">
+                <div class="dept-grid">
+                    <div class="dept-btn" onclick="showDepartment('CSE')">
+                        CSE<br><small>Computer Science & Engineering</small>
+                    </div>
+                    <div class="dept-btn" onclick="showDepartment('AIDS')">
+                        AI&DS<br><small>Artificial Intelligence & Data Science</small>
+                    </div>
+                    <div class="dept-btn" onclick="showDepartment('ENTC')">
+                        ENTC<br><small>Electronics & Telecommunications</small>
+                    </div>
+                    <div class="dept-btn" onclick="showDepartment('EE')">
+                        Electrical<br><small>Electrical Engineering</small>
+                    </div>
+                    <div class="dept-btn" onclick="showDepartment('ME')">
+                        Mechanical<br><small>Mechanical Engineering</small>
+                    </div>
+                    <div class="dept-btn" onclick="showDepartment('CE')">
+                        Civil<br><small>Civil Engineering</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="college-logo-section">
+                <img src="c:/Users/SmartCom/Downloads/vvplogo.jpeg" alt="VVPIET Logo" class="college-logo">
+            </div>
+            <p class="college-desc">Here you can check the staff profiles of VVPIET</p>
+        </div>
+
+        <!-- Department Page -->
+        <div id="departmentPage" class="page">
+            <div class="dept-header">
+                <button class="back-btn" onclick="showMainPage()">←</button>
+                <h2 class="dept-title" id="deptTitle">Department</h2>
+            </div>
+
+            <div class="hod-section">
+                <h3 class="hod-title">Head of Department</h3>
+                <div id="hodContainer">
+                    <div class="staff-card">
+                        <div class="staff-name">No HOD assigned</div>
+                        <div class="staff-designation">Position vacant</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="staff-section">
+                <h3 class="section-title">Staff Members</h3>
+                <div id="staffContainer">
+                    <div class="staff-card">
+                        <div class="staff-name">No staff members</div>
+                        <div class="staff-designation">Register to create profiles</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auth Pages -->
+        <div id="loginPage" class="page">
+            <div class="form-container">
+                <button class="back-btn" onclick="showMainPage()">←</button>
+                <h2 style="text-align: center; color: #8B5CF6; margin-bottom: 30px;">Staff Login</h2>
+                
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="loginEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="loginPassword" required>
+                    </div>
+                    
+                    <button type="submit" class="form-btn">Login</button>
+                </form>
+                
+                <p style="text-align: center; margin-top: 20px; font-size: 14px;">
+                    Don't have an account? <a href="#" onclick="showRegisterPage()" style="color: #8B5CF6;">Register here</a>
+                </p>
+            </div>
+        </div>
+
+        <div id="registerPage" class="page">
+            <div class="form-container">
+                <button class="back-btn" onclick="showMainPage()">←</button>
+                <h2 style="text-align: center; color: #8B5CF6; margin-bottom: 30px;">Staff Registration</h2>
+                
+                <form id="registerForm">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-input" id="registerEmail" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="registerPassword" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <select class="form-select" id="registerDepartment" required>
+                            <option value="">Select Department</option>
+                            <option value="1">Computer Science & Engineering</option>
+                            <option value="2">Artificial Intelligence & Data Science</option>
+                            <option value="3">Electronics & Telecommunications</option>
+                            <option value="4">Electrical Engineering</option>
+                            <option value="5">Mechanical Engineering</option>
+                            <option value="6">Civil Engineering</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Department Code</label>
+                        <input type="text" class="form-input" id="registerCode" maxlength="6" placeholder="6-digit code" required>
+                    </div>
+                    
+                    <button type="submit" class="form-btn">Register</button>
+                </form>
+                
+                <p style="text-align: center; margin-top: 20px; font-size: 14px;">
+                    Already have an account? <a href="#" onclick="showLoginPage()" style="color: #8B5CF6;">Login here</a>
+                </p>
+            </div>
+        </div>
+
+        <!-- My Profile Page (LinkedIn-style view) -->
+        <div id="myProfilePage" class="page">
+            <div class="form-container">
+                <button class="back-btn" onclick="showMainPage()">←</button>
+                <h2 style="text-align: center; color: #8B5CF6; margin-bottom: 30px;">My Profile</h2>
+                
+                <div id="profileViewSection" style="display: none;">
+                    <div class="profile-card">
+                        <div class="profile-header">
+                            <div class="profile-img" id="myProfileImg">👤</div>
+                            <div class="profile-info">
+                                <div class="profile-name" id="myProfileName">Name</div>
+                                <div class="profile-dept" id="myProfileDept">Department</div>
+                                <div class="profile-designation" id="myProfileDesignation">Designation</div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-details">
+                            <div class="profile-field">
+                                <div class="profile-field-label">Experience</div>
+                                <div class="profile-field-value" id="myProfileExperience">-</div>
+                            </div>
+                            
+                            <div class="profile-field">
+                                <div class="profile-field-label">Research Papers</div>
+                                <div class="profile-field-value" id="myProfileResearch">-</div>
+                            </div>
+                            
+                            <div class="profile-field">
+                                <div class="profile-field-label">Achievements</div>
+                                <div class="profile-field-value" id="myProfileAchievements">-</div>
+                            </div>
+
+                            <!-- Custom Fields Section -->
+                            <div id="customFieldsSection"></div>
+                        </div>
+                        
+                        <div class="profile-actions">
+                            <button class="action-btn" onclick="editProfile()">✏️ Edit Profile</button>
+                            <button class="action-btn" onclick="downloadMyProfilePDF()">📄 Download PDF</button>
+                            <button class="action-btn" onclick="downloadMyProfileImage()">🖼️ Download Image</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="noProfileSection">
+                    <div style="text-align: center; padding: 40px;">
+                        <p style="margin-bottom: 20px;">You haven't created your profile yet.</p>
+                        <button class="form-btn" onclick="showCreateProfilePage()">Create Profile</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Create/Edit Profile Page -->
+        <div id="createProfilePage" class="page">
+            <div class="form-container">
+                <button class="back-btn" onclick="handleBackFromCreateProfile()">←</button>
+                <h2 style="text-align: center; color: #8B5CF6; margin-bottom: 30px;" id="profileFormTitle">Create Profile</h2>
+                
+                <form id="profileForm">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input type="text" class="form-input" id="profileName" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <select class="form-select" id="profileDepartment" required>
+                            <option value="">Select Department</option>
+                            <option value="1">Computer Science & Engineering</option>
+                            <option value="2">Artificial Intelligence & Data Science</option>
+                            <option value="3">Electronics & Telecommunications</option>
+                            <option value="4">Electrical Engineering</option>
+                            <option value="5">Mechanical Engineering</option>
+                            <option value="6">Civil Engineering</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Designation</label>
+                        <select class="form-select" id="profileDesignation" required>
+                            <option value="">Select Designation</option>
+                            <option value="HOD">Head of Department</option>
+                            <option value="Professor">Professor</option>
+                            <option value="Associate Professor">Associate Professor</option>
+                            <option value="Assistant Professor">Assistant Professor</option>
+                            <option value="Lecturer">Lecturer</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Experience (Years)</label>
+                        <input type="number" class="form-input" id="profileExperience" min="0" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Research Papers</label>
+                        <textarea class="form-textarea" id="profileResearch" placeholder="List your research papers..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Achievements</label>
+                        <textarea class="form-textarea" id="profileAchievements" placeholder="List your achievements..."></textarea>
+                    </div>
+
+                    <!-- Custom Fields Section -->
+                    <div id="customFieldsFormSection">
+                        <div class="form-group">
+                            <label class="form-label">Custom Fields</label>
+                            <div id="customFieldsList"></div>
+                            <button type="button" class="add-field-btn" onclick="addCustomField()">+ Add Custom Field</button>
+                        </div>
+                    </div>
+                    
+                    <input type="file" id="profileImage" accept="image/*" onchange="openCropModal(this)">
+
+<div class="crop-modal" id="cropModal">
+    <div class="crop-content">
+        <h3>Crop Your Image</h3>
+        <div class="crop-area" id="cropArea">
+            <img id="cropImage" class="crop-image">
+        </div>
+        <div>
+            <button type="button" onclick="applyCrop()">Use This Image</button>
+            <button type="button" onclick="closeCropModal()">Cancel</button>
+        </div>
+    </div>
+</div>
+<canvas id="cropCanvas" style="display: none;"></canvas>
+                    
+                    <button type="submit" class="form-btn" id="profileFormSubmitBtn">Create Profile</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Profile View Page (for viewing other profiles) -->
+        <div id="profileViewPage" class="page">
+            <div id="profileForDownload">
+                <button class="back-btn" onclick="goBackFromProfile()" style="position: fixed; top: 20px; left: 20px; z-index: 100; background: rgba(255,255,255,0.9);">←</button>
+                
+                <div class="profile-header">
+                    <div class="college-branding" style="text-align: center; margin-bottom: 20px;">
+                        <img src="c:/Users/SmartCom/Downloads/vvplogo.jpeg" alt="VVPIET Logo" style="height: 60px; margin-bottom: 10px;">
+                        <h3 style="color: #8B5CF6; margin: 0;">VVPIET Staff Profile</h3>
+                    </div>
+                    
+                    <div class="profile-img" id="viewProfileImg">👤</div>
+                    <div class="profile-name" id="viewProfileName">Name</div>
+                    <div class="profile-dept" id="viewProfileDept">Department</div>
+                </div>
+                
+                <div class="profile-content">
+                    <div class="profile-field">
+                        <div class="profile-field-label">Designation</div>
+                        <div class="profile-field-value" id="viewProfileDesignation">-</div>
+                    </div>
+                    
+                    <div class="profile-field">
+                        <div class="profile-field-label">Experience</div>
+                        <div class="profile-field-value" id="viewProfileExperience">-</div>
+                    </div>
+                    
+                    <div class="profile-field">
+                        <div class="profile-field-label">Research Papers</div>
+                        <div class="profile-field-value" id="viewProfileResearch">-</div>
+                    </div>
+                    
+                    <div class="profile-field">
+                        <div class="profile-field-label">Achievements</div>
+                        <div class="profile-field-value" id="viewProfileAchievements">-</div>
+                    </div>
+
+                    <!-- Custom Fields for viewing -->
+                    <div id="viewCustomFieldsSection"></div>
+                </div>
+                
+                <div class="copyright-section" style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666;">© All rights reserved, Staff Profile by Yahya Mundewadi</p>
+                </div>
+            </div>
+            
+            <div class="profile-actions" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
+                <button class="action-btn" onclick="downloadPDF()" style="margin: 0 10px;">📄 Download PDF</button>
+                <button class="action-btn" onclick="downloadImage()" style="margin: 0 10px;">🖼️ Download Image</button>
+            </div>
+        </div>
+
+        <!-- Taskbar -->
+        <div class="taskbar">
+            <button class="taskbar-btn active" onclick="showMainPage()">
+                <div class="icon">🏠</div>
+                <span>Home</span>
+            </button>
+            <button class="taskbar-btn" onclick="handleCreateProfile()">
+                <div class="icon">👤</div>
+                <span>Profile</span>
+            </button>
+            <button class="taskbar-btn" onclick="handleLogout()">
+                <div class="icon">🚪</div>
+                <span id="logoutText">Login</span>
+            </button>
+        </div>
+
+        <!-- PWA Install Popup -->
+        <div class="pwa-popup" id="pwaPopup">
+            <h3>Install VVPIET Staff App</h3>
+            <p>Get quick access to staff profiles with our mobile app!</p>
+            <div class="pwa-buttons">
+                <button class="pwa-btn pwa-install" onclick="installPWA()">Install</button>
+                <button class="pwa-btn pwa-later" onclick="hidePWAPopup()">Later</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Developer Modal -->
+    <div class="modal" id="developerModal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="hideDeveloperModal()">×</button>
+            <div class="developer-img">👨‍💻</div>
+            <div class="developer-name">Yahya Mundewadi</div>
+            <div class="developer-title">Founder of Continental Group</div>
+            <div class="developer-desc">
+                Passionate developer creating innovative solutions for educational institutions and businesses. Specialized in modern web technologies and mobile applications.
+            </div>
+            <div class="contact-icons">
+                <a href="mailto:ctgroupteam@gmail.com" class="contact-icon">✉️</a>
+                <a href="tel:+919307426215" class="contact-icon">📞</a>
+                <a href="https://wa.me/919307426215?text=Hello, I want to discuss a project" class="contact-icon" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.206"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="contact-text">Have a website/app idea? Click here to contact</div>
+        </div>
+    </div>
+
+    <script>
+        // Complete VVPIET Staff Portfolio JavaScript with Enhanced Features
+
+        // ========================================
+        // SUPABASE CONFIGURATION
+        // ========================================
+
+        const SUPABASE_URL = 'https://nsnacwwcrszpjmanskti.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4';
+
+        let supabaseClient = null;
+        if (typeof supabase !== 'undefined') {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
+
+
+
+
+        let selectedImageFile = null;
+
+let isDragging = false;
+let startX, startY;
+let imageX = 0, imageY = 0;
+let croppedImageBlob = null;
+
+function openCropModal(input) {
+    const file = input.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const img = document.getElementById('cropImage');
+        img.src = e.target.result;
+        img.style.left = '0px';
+        img.style.top = '0px';
+        imageX = 0;
+        imageY = 0;
+        
+        img.onload = function() {
+            // Scale image to fit crop area
+            const cropArea = document.getElementById('cropArea');
+            const scale = Math.max(280 / img.naturalWidth, 280 / img.naturalHeight);
+            img.style.width = (img.naturalWidth * scale) + 'px';
+            img.style.height = (img.naturalHeight * scale) + 'px';
+            
+            setupImageDrag();
+        };
+        
+        document.getElementById('cropModal').style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+}
+
+function setupImageDrag() {
+    const img = document.getElementById('cropImage');
+    
+    // Mouse events
+    img.addEventListener('mousedown', startDrag);
+    document.addEventListener('mousemove', drag);
+    document.addEventListener('mouseup', stopDrag);
+    
+    // Touch events
+    img.addEventListener('touchstart', startDragTouch);
+    document.addEventListener('touchmove', dragTouch);
+    document.addEventListener('touchend', stopDrag);
+}
+
+function startDrag(e) {
+    isDragging = true;
+    startX = e.clientX - imageX;
+    startY = e.clientY - imageY;
+    e.preventDefault();
+}
+
+function startDragTouch(e) {
+    isDragging = true;
+    const touch = e.touches[0];
+    startX = touch.clientX - imageX;
+    startY = touch.clientY - imageY;
+    e.preventDefault();
+}
+
+function drag(e) {
+    if (!isDragging) return;
+    
+    imageX = e.clientX - startX;
+    imageY = e.clientY - startY;
+    updateImagePosition();
+    e.preventDefault();
+}
+
+function dragTouch(e) {
+    if (!isDragging) return;
+    
+    const touch = e.touches[0];
+    imageX = touch.clientX - startX;
+    imageY = touch.clientY - startY;
+    updateImagePosition();
+    e.preventDefault();
+}
+
+function stopDrag() {
+    isDragging = false;
+}
+
+function updateImagePosition() {
+    const img = document.getElementById('cropImage');
+    img.style.left = imageX + 'px';
+    img.style.top = imageY + 'px';
+}
+
+function applyCrop() {
+    const img = document.getElementById('cropImage');
+    const canvas = document.getElementById('cropCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = 280;
+    canvas.height = 280;
+    
+    // Create circular clip
+    ctx.beginPath();
+    ctx.arc(140, 140, 140, 0, 2 * Math.PI);
+    ctx.clip();
+    
+    // Draw the image at current position
+    ctx.drawImage(img, imageX, imageY, parseInt(img.style.width), parseInt(img.style.height));
+    
+    // Convert to blob
+    canvas.toBlob(function(blob) {
+        croppedImageBlob = blob;
+        const croppedFile = new File([blob], 'cropped_image.jpg', {
+            type: 'image/jpeg',
+            lastModified: Date.now()
+        });
+        
+        // Update file input
+        const dt = new DataTransfer();
+        dt.items.add(croppedFile);
+        document.getElementById('profileImage').files = dt.files;
+        
+        closeCropModal();
+        alert('Image cropped successfully!');
+    }, 'image/jpeg', 0.9);
+}
+
+function closeCropModal() {
+    document.getElementById('cropModal').style.display = 'none';
+    if (!croppedImageBlob) {
+        document.getElementById('profileImage').value = '';
+    }
+}
+
+
+function handleImageSelect(input) {
+    const file = input.files[0];
+    if (file) {
+        selectedImageFile = file;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('cropImage').src = e.target.result;
+            document.getElementById('cropContainer').style.display = 'block';
+            document.getElementById('cropControls').style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function cropImage() {
+    const img = document.getElementById('cropImage');
+    const canvas = document.getElementById('cropCanvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = 300;
+    canvas.height = 300;
+    
+    // Draw circular crop
+    ctx.beginPath();
+    ctx.arc(150, 150, 150, 0, 2 * Math.PI);
+    ctx.clip();
+    
+    ctx.drawImage(img, 0, 0, 300, 300);
+    
+    // Convert to blob and create new file
+    canvas.toBlob(function(blob) {
+        const croppedFile = new File([blob], selectedImageFile.name, {
+            type: selectedImageFile.type,
+            lastModified: Date.now()
+        });
+        
+        // Update the file input
+        const dt = new DataTransfer();
+        dt.items.add(croppedFile);
+        document.getElementById('profileImage').files = dt.files;
+        
+        // Hide crop interface
+        cancelCrop();
+        
+        alert('Image cropped successfully!');
+    }, selectedImageFile.type);
+}
+
+function cancelCrop() {
+    document.getElementById('cropContainer').style.display = 'none';
+    document.getElementById('cropControls').style.display = 'none';
+    document.getElementById('profileImage').value = '';
+    selectedImageFile = null;
+}
+
+        // ========================================
+        // GLOBAL VARIABLES
+        // ========================================
+
+        let currentUser = null;
+        let currentDepartment = null;
+        let deferredPrompt = null;
+        let isEditMode = false;
+        let currentUserProfile = null;
+
+        const departmentMap = {
+            'CSE': { id: 1, name: 'Computer Science & Engineering' },
+            'AIDS': { id: 2, name: 'Artificial Intelligence & Data Science' },
+            'ENTC': { id: 3, name: 'Electronics & Telecommunications' },
+            'EE': { id: 4, name: 'Electrical Engineering' },
+            'ME': { id: 5, name: 'Mechanical Engineering' },
+            'CE': { id: 6, name: 'Civil Engineering' }
+        };
+
+        // ========================================
+        // AUTHENTICATION FUNCTIONS
+        // ========================================
+
+        async function initializeAuth() {
+            if (!supabaseClient) {
+                console.warn('Supabase not initialized, using mock mode');
+                return;
+            }
+
+            try {
+                const { data: { session } } = await supabaseClient.auth.getSession();
+                if (session) {
+                    currentUser = session.user;
+                    await loadUserProfile();
+                    updateUIForLoggedInUser();
+                }
+
+                supabaseClient.auth.onAuthStateChange(async (event, session) => {
+                    if (session) {
+                        currentUser = session.user;
+                        await loadUserProfile();
+                        updateUIForLoggedInUser();
+                    } else {
+                        currentUser = null;
+                        currentUserProfile = null;
+                        updateUIForLoggedOutUser();
+                    }
+                });
+            } catch (error) {
+                console.error('Auth initialization error:', error);
+            }
+        }
+
+        async function loadUserProfile() {
+    if (!supabaseClient || !currentUser) return;
+
+    try {
+        // Get the integer database user ID by email
+        const { data: dbUser, error: userError } = await supabaseClient
+            .from('users')
+            .select('user_id')
+            .eq('email', currentUser.email)
+            .single();
+
+        if (userError || !dbUser) {
+            console.log('No database user found');
+            currentUserProfile = null;
+            return;
+        }
+
+        // Store for future use
+        localStorage.setItem('db_user_id', dbUser.user_id);
+
+        // Get profile using integer user ID
+        const { data: profileData, error: profileError } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('user_id', dbUser.user_id)
+            .single();
+
+        if (profileError) {
+            console.log('No profile found for user:', profileError);
+            currentUserProfile = null;
+            return;
+        }
+
+        // Get department info separately
+        const { data: deptData, error: deptError } = await supabaseClient
+            .from('departments')
+            .select('dept_name, dept_short_name')
+            .eq('dept_id', profileData.department)
+            .single();
+
+        if (!deptError && deptData) {
+            currentUserProfile = {
+                ...profileData,
+                department_name: deptData.dept_name,
+                department_short: deptData.dept_short_name
+            };
+        } else {
+            currentUserProfile = profileData;
+        }
+        
+        console.log('User profile loaded:', currentUserProfile);
+    } catch (error) {
+        console.error('Error loading user profile:', error);
+        currentUserProfile = null;
+    }
+}
+        // ========================================
+        // PAGE NAVIGATION
+        // ========================================
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+            
+            document.querySelectorAll('.taskbar-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            if (pageId === 'mainPage') {
+                document.querySelectorAll('.taskbar-btn')[0].classList.add('active');
+            }
+        }
+
+        function showMainPage() {
+            showPage('mainPage');
+        }
+
+        async function showDepartment(dept) {
+            currentDepartment = dept;
+            document.getElementById('deptTitle').textContent = departmentMap[dept].name;
+            await loadDepartmentStaff(dept);
+            showPage('departmentPage');
+        }
+
+        function showLoginPage() {
+            showPage('loginPage');
+        }
+
+        function showRegisterPage() {
+            showPage('registerPage');
+        }
+
+        function showCreateProfilePage() {
+            isEditMode = false;
+            clearProfileForm();
+            document.getElementById('profileFormTitle').textContent = 'Create Profile';
+            document.getElementById('profileFormSubmitBtn').textContent = 'Create Profile';
+            showPage('createProfilePage');
+        }
+
+        function showMyProfile() {
+            if (currentUserProfile) {
+                displayMyProfile();
+                document.getElementById('profileViewSection').style.display = 'block';
+                document.getElementById('noProfileSection').style.display = 'none';
+            } else {
+                document.getElementById('profileViewSection').style.display = 'none';
+                document.getElementById('noProfileSection').style.display = 'block';
+            }
+            showPage('myProfilePage');
+        }
+
+        function editProfile() {
+            if (!currentUserProfile) return;
+            
+            isEditMode = true;
+            document.getElementById('profileFormTitle').textContent = 'Edit Profile';
+            document.getElementById('profileFormSubmitBtn').textContent = 'Update Profile';
+            
+            // Populate form with existing data
+            document.getElementById('profileName').value = currentUserProfile.name || '';
+            document.getElementById('profileDepartment').value = currentUserProfile.department || '';
+            document.getElementById('profileDesignation').value = currentUserProfile.designation || '';
+            document.getElementById('profileExperience').value = currentUserProfile.experience || '';
+            document.getElementById('profileResearch').value = currentUserProfile.research_papers || '';
+            document.getElementById('profileAchievements').value = currentUserProfile.achievements || '';
+            
+            // Load custom fields
+            loadCustomFieldsInForm();
+            
+            showPage('createProfilePage');
+        }
+
+        function handleBackFromCreateProfile() {
+            if (isEditMode) {
+                showMyProfile();
+            } else {
+                showMainPage();
+            }
+        }
+
+        function goBackFromProfile() {
+            if (currentDepartment) {
+                showDepartment(currentDepartment);
+            } else {
+                showMainPage();
+            }
+        }
+
+        // ========================================
+        // DEPARTMENT FUNCTIONS
+        // ========================================
+
+        async function loadDepartmentStaff(dept) {
+            const deptInfo = departmentMap[dept];
+            
+            try {
+                let profiles = [];
+                
+                if (supabaseClient) {
+                   const { data, error } = await supabaseClient
+    .from('profiles')
+    .select(`
+        profile_id,
+        user_id,
+        name,
+        designation,
+        experience,
+        research_papers,
+        achievements,
+        custom_fields,
+        profile_image,
+        is_published,
+        departments!inner(dept_name, dept_short_name)
+    `)
+    .eq('departments.dept_short_name', dept)
+    .eq('is_published', true);
+                    if (!error) {
+                        profiles = data || [];
+                    }
+                }
+                
+                // Load HOD
+                const hodContainer = document.getElementById('hodContainer');
+                const hod = profiles.find(p => p.designation === 'HOD');
+                
+                if (hod) {
+                   hodContainer.innerHTML = `
+    <div class="staff-card">
+        <div class="staff-image">${hod.profile_image ? 
+            `<img src="${hod.profile_image}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">` : 
+            '<div style="width: 60px; height: 60px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 24px;">👤</div>'
+        }</div>
+        <div class="staff-name">${hod.name}</div>
+        <div class="staff-designation">Head of Department</div>
+        <button class="check-profile-btn" onclick="showProfileView('${hod.profile_id}')">Check Profile</button>
+    </div>
+`;
+                } else {
+                    hodContainer.innerHTML = `
+                        <div class="staff-card">
+                            <div class="staff-name">No HOD assigned</div>
+                            <div class="staff-designation">Position vacant</div>
+                        </div>
+                    `;
+                }
+                
+                // Load Staff
+                const staffContainer = document.getElementById('staffContainer');
+                const staff = profiles.filter(p => p.designation !== 'HOD');
+                
+                if (staff.length > 0) {
+                  staffContainer.innerHTML = staff.map(s => `
+    <div class="staff-card">
+        <div class="staff-image">${s.profile_image ? 
+            `<img src="${s.profile_image}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">` : 
+            '<div style="width: 60px; height: 60px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 24px;">👤</div>'
+        }</div>
+        <div class="staff-name">${s.name}</div>
+        <div class="staff-designation">${s.designation}</div>
+        <button class="check-profile-btn" onclick="showProfileView('${s.profile_id}')">Check Profile</button>
+    </div>
+`).join('');
+                } else {
+                    staffContainer.innerHTML = `
+                        <div class="staff-card">
+                            <div class="staff-name">No staff members</div>
+                            <div class="staff-designation">Register to create profiles</div>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading department staff:', error);
+                showErrorState();
+            }
+        }
+
+        function showErrorState() {
+            const containers = ['hodContainer', 'staffContainer'];
+            containers.forEach(id => {
+                document.getElementById(id).innerHTML = `
+                    <div class="staff-card">
+                        <div class="staff-name">Error loading data</div>
+                        <div class="staff-designation">Please try again later</div>
+                    </div>
+                `;
+            });
+        }
+
+        // ========================================
+        // PROFILE DISPLAY FUNCTIONS
+        // ========================================
+
+        function displayMyProfile() {
+            if (!currentUserProfile) return;
+
+            document.getElementById('myProfileName').textContent = currentUserProfile.name;
+            document.getElementById('myProfileDept').textContent = currentUserProfile.department_name;
+            document.getElementById('myProfileDesignation').textContent = currentUserProfile.designation;
+            document.getElementById('myProfileExperience').textContent = currentUserProfile.experience + ' years';
+            document.getElementById('myProfileResearch').textContent = currentUserProfile.research_papers || 'No research papers listed';
+            document.getElementById('myProfileAchievements').textContent = currentUserProfile.achievements || 'No achievements listed';
+            
+            if (currentUserProfile.profile_image) {
+                document.getElementById('myProfileImg').innerHTML = `<img src="${currentUserProfile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                document.getElementById('myProfileImg').innerHTML = '👤';
+            }
+
+            // Display custom fields
+            displayCustomFields('customFieldsSection', currentUserProfile.custom_fields);
+        }
+
+        async function showProfileView(profileId) {
+    try {
+        let profile = null;
+        
+        if (supabaseClient) {
+            const { data: profileData, error: profileError } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('profile_id', profileId)
+                .single();
+
+            if (!profileError && profileData) {
+                // Get department info separately
+                const { data: deptData, error: deptError } = await supabaseClient
+                    .from('departments')
+                    .select('dept_name, dept_short_name')
+                    .eq('dept_id', profileData.department)
+                    .single();
+
+                if (!deptError && deptData) {
+                    profile = {
+                        ...profileData,
+                        department_name: deptData.dept_name,
+                        department_short: deptData.dept_short_name
+                    };
+                } else {
+                    profile = profileData;
+                }
+            }
+        }
+        
+        if (profile) {
+            document.getElementById('viewProfileName').textContent = profile.name;
+            document.getElementById('viewProfileDept').textContent = profile.department_name || 'Department not found';
+            document.getElementById('viewProfileDesignation').textContent = profile.designation;
+            document.getElementById('viewProfileExperience').textContent = profile.experience + ' years';
+            document.getElementById('viewProfileResearch').textContent = profile.research_papers || 'No research papers listed';
+            document.getElementById('viewProfileAchievements').textContent = profile.achievements || 'No achievements listed';
+            
+            if (profile.profile_image) {
+                document.getElementById('viewProfileImg').innerHTML = `<img src="${profile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                document.getElementById('viewProfileImg').innerHTML = '👤';
+            }
+
+            // Display custom fields
+            displayCustomFields('viewCustomFieldsSection', profile.custom_fields);
+            
+            showPage('profileViewPage');
+        } else {
+            alert('Profile not found');
+        }
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        alert('Error loading profile: ' + error.message);
+    }
+}
+        // ========================================
+        // CUSTOM FIELDS FUNCTIONS
+        // ========================================
+
+        function displayCustomFields(containerId, customFields) {
+            const container = document.getElementById(containerId);
+            if (!customFields || Object.keys(customFields).length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            Object.entries(customFields).forEach(([key, value]) => {
+                if (value && value.trim() !== '') {
+                    html += `
+                        <div class="profile-field">
+                            <div class="profile-field-label">${key}</div>
+                            <div class="profile-field-value">${value}</div>
+                        </div>
+                    `;
+                }
+            });
+            container.innerHTML = html;
+        }
+
+        function addCustomField() {
+            const container = document.getElementById('customFieldsList');
+            const fieldId = Date.now();
+            
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'custom-field-item';
+            fieldDiv.style.cssText = 'margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;';
+            
+            fieldDiv.innerHTML = `
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <input type="text" placeholder="Field Name (e.g., Skills, Certifications)" 
+                           class="form-input custom-field-name" style="flex: 1;" data-field-id="${fieldId}">
+                    <button type="button" onclick="removeCustomField(this)" 
+                            style="background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">×</button>
+                </div>
+                <textarea placeholder="Field Value" class="form-textarea custom-field-value" 
+                          data-field-id="${fieldId}" style="width: 100%; min-height: 60px;"></textarea>
+            `;
+            
+            container.appendChild(fieldDiv);
+        }
+
+        function removeCustomField(button) {
+            button.closest('.custom-field-item').remove();
+        }
+
+        function loadCustomFieldsInForm() {
+            const container = document.getElementById('customFieldsList');
+            container.innerHTML = '';
+            
+            if (currentUserProfile && currentUserProfile.custom_fields) {
+                Object.entries(currentUserProfile.custom_fields).forEach(([key, value]) => {
+                    if (key && value) {
+                        addCustomField();
+                        const fieldItems = container.querySelectorAll('.custom-field-item');
+                        const lastItem = fieldItems[fieldItems.length - 1];
+                        lastItem.querySelector('.custom-field-name').value = key;
+                        lastItem.querySelector('.custom-field-value').value = value;
+                    }
+                });
+            }
+        }
+
+        function collectCustomFields() {
+            const customFields = {};
+            const fieldNames = document.querySelectorAll('.custom-field-name');
+            const fieldValues = document.querySelectorAll('.custom-field-value');
+            
+            fieldNames.forEach((nameInput, index) => {
+                const name = nameInput.value.trim();
+                const value = fieldValues[index].value.trim();
+                
+                if (name && value) {
+                    customFields[name] = value;
+                }
+            });
+            
+            return customFields;
+        }
+
+        // ========================================
+        // FORM HANDLERS
+        // ========================================
+
+        async function handleRegistration(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const department = document.getElementById('registerDepartment').value;
+    const code = document.getElementById('registerCode').value;
+    
+    if (!supabaseClient) {
+        alert('Database connection not available');
+        return;
+    }
+    
+    if (!email || !password || !department || !code) {
+        alert('Please fill in all fields');
+        return;
+    }
+    
+    try {
+        // Validate department code first
+        const { data: deptData, error: validateError } = await supabaseClient
+            .from('departments')
+            .select('dept_code')
+            .eq('dept_id', parseInt(department))
+            .single();
+
+        if (validateError || !deptData || deptData.dept_code !== code) {
+            alert('Invalid department code!');
+            return;
+        }
+        
+        // Register with Supabase Auth
+        // Register with Supabase Auth
+const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+    email: email,
+    password: password
+});
+
+if (authError) throw authError;
+
+// Insert into users table to get integer ID
+const { data: userData, error: userError } = await supabaseClient
+    .from('users')
+    .insert([{
+        email: email,
+        password: password,
+        department: parseInt(department),
+        role: 'Staff',
+        is_active: true
+    }])
+    .select()
+    .single();
+
+if (userError) throw userError;
+
+// Store the integer user ID
+localStorage.setItem('db_user_id', userData.user_id);
+
+alert('Registration successful! You are now logged in.');
+showMainPage();
+        
+        // Clear form
+        document.getElementById('registerForm').reset();
+        
+    } catch (error) {
+        console.error('Registration error:', error);
+        alert('Registration failed: ' + error.message);
+    }
+}
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!supabaseClient) {
+                alert('Database connection not available');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+                
+                if (error) throw error;
+                
+                alert('Login successful!');
+                showMainPage();
+            } catch (error) {
+                console.error('Login error:', error);
+                alert('Login failed: ' + error.message);
+            }
+        }
+
+        async function handleProfileCreation(e) {
+            e.preventDefault();
+            
+            console.log('Profile form submitted');
+            
+            if (!currentUser) {
+                alert('Please login first!');
+                return;
+            }
+            
+            if (!supabaseClient) {
+                alert('Database connection not available');
+                return;
+            }
+            
+            // Get form values
+            const name = document.getElementById('profileName').value.trim();
+            const department = document.getElementById('profileDepartment').value;
+            const designation = document.getElementById('profileDesignation').value;
+            const experience = document.getElementById('profileExperience').value;
+            const research = document.getElementById('profileResearch').value.trim();
+            const achievements = document.getElementById('profileAchievements').value.trim();
+            const imageFile = document.getElementById('profileImage').files[0];
+            const customFields = collectCustomFields();
+            
+            // Validate required fields
+            if (!name || !department || !designation || !experience) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            console.log('Form data collected:', { name, department, designation, experience });
+            
+            try {
+                // Get current user
+              // Get current user
+const { data: { user } } = await supabaseClient.auth.getUser();
+
+if (!user) {
+    alert('Authentication error. Please login again.');
+    return;
+}
+
+// Get the database user ID
+let dbUserId = localStorage.getItem('db_user_id');
+if (!dbUserId) {
+    // Try to find by email if not in localStorage
+    const { data: dbUser, error: userError } = await supabaseClient
+        .from('users')
+        .select('user_id')
+        .eq('email', user.email)
+        .single();
+    
+    if (userError || !dbUser) {
+        alert('User session error. Please register again.');
+        return;
+    }
+    dbUserId = dbUser.user_id;
+    localStorage.setItem('db_user_id', dbUserId);
+}
+
+console.log('Database user ID:', dbUserId);
+                
+                let imageUrl = null;
+                
+                // Upload image if provided
+                if (imageFile) {
+                    console.log('Uploading image...');
+                    const fileExt = imageFile.name.split('.').pop();
+                    const fileName = `${user.id}/profile.${fileExt}`;
+                    
+                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                        .from('profile-images')
+                        .upload(fileName, imageFile, {
+                            cacheControl: '3600',
+                            upsert: true
+                        });
+                    
+                    if (uploadError) {
+                        console.error('Image upload error:', uploadError);
+                    } else {
+                        const { data: urlData } = supabaseClient.storage
+                            .from('profile-images')
+                            .getPublicUrl(fileName);
+                        
+                        imageUrl = urlData.publicUrl;
+                        console.log('Image uploaded:', imageUrl);
+                    }
+                } else if (isEditMode && currentUserProfile && currentUserProfile.profile_image) {
+                    imageUrl = currentUserProfile.profile_image;
+                }
+                
+                // Prepare profile data
+              // Prepare profile data using database user ID (integer)
+const profileData = {
+    user_id: parseInt(dbUserId),  // Use integer ID
+    name: name,
+    department: parseInt(department),
+    designation: designation,
+    experience: parseInt(experience),
+    research_papers: research || null,
+    achievements: achievements || null,
+    custom_fields: Object.keys(customFields).length > 0 ? customFields : null,
+    profile_image: imageUrl,
+    is_published: true
+};
+                
+                console.log('Profile data to save:', profileData);
+                
+                let result;
+               if (isEditMode && currentUserProfile) {
+    console.log('Updating existing profile...');
+    // Update existing profile
+    result = await supabaseClient
+        .from('profiles')
+        .update(profileData)
+        .eq('user_id', parseInt(dbUserId))
+        .select();
+} else {
+    console.log('Creating new profile...');
+    // Check if profile already exists
+    const { data: existingProfile } = await supabaseClient
+        .from('profiles')
+        .select('profile_id')
+        .eq('user_id', parseInt(dbUserId))
+        .single();     
+                    if (existingProfile) {
+                        alert('Profile already exists! Switching to edit mode.');
+                        isEditMode = true;
+                        await loadUserProfile();
+                        editProfile();
+                        return;
+                    }
+                    
+                    // Create new profile
+                    result = await supabaseClient
+                        .from('profiles')
+                        .insert([profileData])
+                        .select();
+                }
+                
+                const { data, error } = result;
+                
+                if (error) {
+                    console.error('Database error:', error);
+                    throw error;
+                }
+                
+                console.log('Profile saved successfully:', data);
+                
+                alert(isEditMode ? 'Profile updated successfully!' : 'Profile created successfully!');
+                
+                // Reload user profile
+                await loadUserProfile();
+                showMyProfile();
+                
+                // Clear form
+                clearProfileForm();
+                isEditMode = false;
+                
+            } catch (error) {
+                console.error('Profile operation error:', error);
+                alert('Failed to save profile: ' + error.message);
+            }
+        }
+
+        function clearProfileForm() {
+            document.getElementById('profileForm').reset();
+            document.getElementById('customFieldsList').innerHTML = '';
+        }
+
+        // ========================================
+        // UI HELPER FUNCTIONS
+        // ========================================
+
+        function handleCreateProfile() {
+            if (currentUser) {
+                showMyProfile();
+            } else {
+                showLoginPage();
+            }
+        }
+
+        async function handleLogout() {
+    if (currentUser) {
+        if (supabaseClient) {
+            await supabaseClient.auth.signOut();
+        } else {
+            currentUser = null;
+            currentUserProfile = null;
+            updateUIForLoggedOutUser();
+        }
+        // Add this line to clear stored user ID
+        localStorage.removeItem('db_user_id');
+        showMainPage();
+        alert('Logged out successfully!');
+    } else {
+        showLoginPage();
+    }
+    
+}
+
+        function updateUIForLoggedInUser() {
+            document.getElementById('logoutText').textContent = 'Logout';
+        }
+
+        function updateUIForLoggedOutUser() {
+            document.getElementById('logoutText').textContent = 'Login';
+        }
+
+        // ========================================
+        // MODAL FUNCTIONS
+        // ========================================
+
+        function showDeveloperModal() {
+            document.getElementById('developerModal').style.display = 'flex';
+        }
+
+        function hideDeveloperModal() {
+            document.getElementById('developerModal').style.display = 'none';
+        }
+
+        // ========================================
+        // PWA FUNCTIONS
+        // ========================================
+
+        let pwaShown = false;
+
+        function showPWAPopup() {
+            if (!pwaShown) {
+                document.getElementById('pwaPopup').classList.add('show');
+                pwaShown = true;
+            }
+        }
+
+        function hidePWAPopup() {
+            document.getElementById('pwaPopup').classList.remove('show');
+        }
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        hidePWAPopup();
+                    }
+                    deferredPrompt = null;
+                });
+            } else {
+                alert('To install this app, use your browser menu to "Add to Home Screen" or "Install App"');
+                hidePWAPopup();
+            }
+        }
+
+        // ========================================
+        // DOWNLOAD FUNCTIONS
+        // ========================================
+
+        function downloadPDF() {
+            const profileElement = document.getElementById('profileForDownload');
+            
+            html2canvas(profileElement, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+               const { jsPDF } = window.jspdf || window.jsPDF;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const pageHeight = 295;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                const profileName = document.getElementById('viewProfileName').textContent || 'profile';
+                pdf.save(`${profileName}_profile.pdf`);
+            }).catch(error => {
+                console.error('Error generating PDF:', error);
+                alert('Failed to generate PDF. Please try again.');
+            });
+        }
+
+        function downloadImage() {
+            const profileElement = document.getElementById('profileForDownload');
+            
+            html2canvas(profileElement, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${document.getElementById('viewProfileName').textContent || 'profile'}_profile.png`;
+                link.href = canvas.toDataURL('image/png');
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }).catch(error => {
+                console.error('Error generating image:', error);
+                alert('Failed to generate image. Please try again.');
+            });
+        }
+
+        function downloadMyProfilePDF() {
+            if (!currentUserProfile) return;
+            
+            // Create a temporary profile view for download
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px;';
+            
+           tempDiv.innerHTML = `
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h3 style="color: #8B5CF6; margin: 0;">VVPIET Staff Profile</h3>         
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        ${currentUserProfile.profile_image ? 
+                            `<img src="${currentUserProfile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                            '👤'
+                        }
+                    </div>
+                    <h2 style="margin: 0 0 5px 0; color: #333;">${currentUserProfile.name}</h2>
+                    <p style="margin: 0; color: #666; font-size: 16px;">${currentUserProfile.department_name}</p>
+                    <p style="margin: 5px 0 0 0; color: #888; font-size: 14px;">${currentUserProfile.designation}</p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #333;">Experience:</strong>
+                        <span style="margin-left: 10px;">${currentUserProfile.experience} years</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #333;">Research Papers:</strong>
+                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                            ${currentUserProfile.research_papers || 'No research papers listed'}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #333;">Achievements:</strong>
+                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                            ${currentUserProfile.achievements || 'No achievements listed'}
+                        </div>
+                    </div>
+                    
+                    ${getCustomFieldsHTML(currentUserProfile.custom_fields)}
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666; margin: 0;">© All rights reserved, Staff Profile by Yahya Mundewadi</p>
+                </div>
+            `;
+            
+            document.body.appendChild(tempDiv);
+            
+            html2canvas(tempDiv, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+               if (!window.html2canvas || !window.jspdf) {
+    alert('PDF libraries not loaded. Please refresh the page.');
+    return;
+}
+const { jsPDF } = window.jspdf;
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = 210;
+                const pageHeight = 295;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                let heightLeft = imgHeight;
+                
+                let position = 0;
+                
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                heightLeft -= pageHeight;
+                
+                while (heightLeft >= 0) {
+                    position = heightLeft - imgHeight;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+                    heightLeft -= pageHeight;
+                }
+                
+                pdf.save(`${currentUserProfile.name}_profile.pdf`);
+                document.body.removeChild(tempDiv);
+            }).catch(error => {
+                console.error('Error generating PDF:', error);
+                alert('Failed to generate PDF. Please try again.');
+                document.body.removeChild(tempDiv);
+            });
+        }
+
+        function downloadMyProfileImage() {
+            if (!currentUserProfile) return;
+            
+            // Create a temporary profile view for download
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px;';
+            
+            tempDiv.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="c:/Users/SmartCom/Downloads/vvplogo.jpeg" alt="VVPIET Logo" style="height: 60px; margin-bottom: 10px;">
+                    <h3 style="color: #8B5CF6; margin: 0;">VVPIET Staff Profile</h3>
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        ${currentUserProfile.profile_image ? 
+                            `<img src="${currentUserProfile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                            '👤'
+                        }
+                    </div>
+                    <h2 style="margin: 0 0 5px 0; color: #333;">${currentUserProfile.name}</h2>
+                    <p style="margin: 0; color: #666; font-size: 16px;">${currentUserProfile.department_name}</p>
+                    <p style="margin: 5px 0 0 0; color: #888; font-size: 14px;">${currentUserProfile.designation}</p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #333;">Experience:</strong>
+                        <span style="margin-left: 10px;">${currentUserProfile.experience} years</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #333;">Research Papers:</strong>
+                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                            ${currentUserProfile.research_papers || 'No research papers listed'}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #333;">Achievements:</strong>
+                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                            ${currentUserProfile.achievements || 'No achievements listed'}
+                        </div>
+                    </div>
+                    
+                    ${getCustomFieldsHTML(currentUserProfile.custom_fields)}
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666; margin: 0;">© All rights reserved, Staff Profile by Yahya Mundewadi</p>
+                </div>
+            `;
+            
+            document.body.appendChild(tempDiv);
+            
+            html2canvas(tempDiv, {
+                scale: 2,
+                useCORS: true,
+                allowTaint: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `${currentUserProfile.name}_profile.png`;
+                link.href = canvas.toDataURL('image/png');
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                document.body.removeChild(tempDiv);
+            }).catch(error => {
+                console.error('Error generating image:', error);
+                alert('Failed to generate image. Please try again.');
+                document.body.removeChild(tempDiv);
+            });
+        }
+
+        function getCustomFieldsHTML(customFields) {
+            if (!customFields || Object.keys(customFields).length === 0) {
+                return '';
+            }
+
+            let html = '';
+            Object.entries(customFields).forEach(([key, value]) => {
+                if (value && value.trim() !== '') {
+                    html += `
+                        <div style="margin-bottom: 15px;">
+                            <strong style="color: #333;">${key}:</strong>
+                            <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                                ${value}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            return html;
+        }
+
+        // ========================================
+        // INITIALIZATION
+        // ========================================
+
+        async function initApp() {
+            console.log('Initializing app...');
+            try {
+                await initializeAuth();
+                await loadDepartments();
+                setupEventListeners();
+                
+                // Show PWA popup after 3 seconds
+                setTimeout(showPWAPopup, 3000);
+                
+                console.log('App initialized successfully');
+            } catch (error) {
+                console.error('App initialization error:', error);
+            }
+        }
+
+        async function loadDepartments() {
+            try {
+                let departments = [];
+                
+                if (supabaseClient) {
+                    const { data, error } = await supabaseClient
+                        .from('departments')
+                        .select('*')
+                        .order('dept_name');
+                    
+                    if (!error) {
+                        departments = data || [];
+                    }
+                } else {
+                    departments = Object.entries(departmentMap).map(([key, value]) => ({
+                        dept_id: value.id,
+                        dept_name: value.name
+                    }));
+                }
+                
+                const deptSelects = document.querySelectorAll('#registerDepartment, #profileDepartment');
+                deptSelects.forEach(select => {
+                    while (select.children.length > 1) {
+                        select.removeChild(select.lastChild);
+                    }
+                    
+                    departments.forEach(dept => {
+                        const option = document.createElement('option');
+                        option.value = dept.dept_id;
+                        option.textContent = dept.dept_name;
+                        select.appendChild(option);
+                    });
+                });
+            } catch (error) {
+                console.error('Error loading departments:', error);
+            }
+        }
+
+        function setupEventListeners() {
+            // Register form
+            const registerForm = document.getElementById('registerForm');
+            if (registerForm) {
+                registerForm.addEventListener('submit', handleRegistration);
+            }
+            
+            // Login form  
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+            
+            // Profile form
+            const profileForm = document.getElementById('profileForm');
+            if (profileForm) {
+                profileForm.addEventListener('submit', handleProfileCreation);
+            }
+            
+            // Developer modal
+            const developerModal = document.getElementById('developerModal');
+            if (developerModal) {
+                developerModal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        hideDeveloperModal();
+                    }
+                });
+            }
+
+            console.log('Event listeners set up successfully');
+        }
+
+        // ========================================
+        // PWA EVENT LISTENERS
+        // ========================================
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+        // Make sure DOM is fully loaded before initializing
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initApp);
+        } else {
+            // DOM is already loaded
+            initApp();
+        }
+    </script>
+</body>
+</html>
