@@ -260,17 +260,24 @@
             color: #666;
         }
 
-        .developer-img {
-            width: 80px;
-            height: 80px;
-            background: #f3f4f6;
-            border-radius: 50%;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-        }
+        /* Developer image container - THIS IS THE KEY PART */
+.developer-img {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 15px auto;
+    border-radius: 50%;
+    overflow: hidden; /* This prevents image from expanding outside */
+    border: 3px solid #8B5CF6;
+}
+
+/* Developer image itself */
+.developer-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* This keeps image proportional and fills the circle */
+    display: block; /* Removes default inline spacing */
+}
+
 
         .developer-name {
             font-size: 18px;
@@ -1047,7 +1054,7 @@
             <button class="modal-close" onclick="hideDeveloperModal()">×</button>
            <div class="developer-img">
     <img src="yahyadp.jpg" alt="Developer" class="developer-img">
-</div>
+        </div>
 
             <div class="developer-name">Yahya Mundewadi</div>
             <div class="developer-title">Founder of Continental Group</div>
