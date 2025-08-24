@@ -2047,15 +2047,70 @@ const profileData = {
         // ========================================
 
         function downloadPDF() {
-            const profileElement = document.getElementById('profileForDownload');
+             if (!currentUserProfile) return;
             
-            html2canvas(profileElement, {
+            // Create a temporary profile view for download
+            const tempDiv = document.createElement('div');
+            tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px;';
+            
+           tempDiv.innerHTML = `
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h3 style="color: #8B5CF6; margin: 0;">VVPIET Staff Profile</h3>         
+                </div>
+                
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px;">
+                        ${currentUserProfile.profile_image ? 
+                            `<img src="${currentUserProfile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                            '👤'
+                        }
+                    </div>
+                    <h2 style="margin: 0 0 5px 0; color: #333;">${currentUserProfile.name}</h2>
+                    <p style="margin: 0; color: #666; font-size: 16px;">${currentUserProfile.department_name}</p>
+                    <p style="margin: 5px 0 0 0; color: #888; font-size: 14px;">${currentUserProfile.designation}</p>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #333;">Experience:</strong>
+                        <span style="margin-left: 10px;">${currentUserProfile.experience} years</span>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #333;">Research Papers:</strong>
+                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                            ${currentUserProfile.research_papers || 'No research papers listed'}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom: 15px;">
+                        <strong style="color: #333;">Achievements:</strong>
+                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
+                            ${currentUserProfile.achievements || 'No achievements listed'}
+                        </div>
+                    </div>
+                    
+                    ${getCustomFieldsHTML(currentUserProfile.custom_fields)}
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
+                    <p style="font-size: 12px; color: #666; margin: 0;">© All rights reserved, Staff Profile by Yahya Mundewadi</p>
+                </div>
+            `;
+            
+            document.body.appendChild(tempDiv);
+            
+            html2canvas(tempDiv, {
                 scale: 2,
                 useCORS: true,
                 allowTaint: false,
                 backgroundColor: '#ffffff'
             }).then(canvas => {
-               const { jsPDF } = window.jspdf || window.jsPDF;
+               if (!window.html2canvas || !window.jspdf) {
+    alert('PDF libraries not loaded. Please refresh the page.');
+    return;
+}
+const { jsPDF } = window.jspdf;
                 const pdf = new jsPDF('p', 'mm', 'a4');
                 
                 const imgData = canvas.toDataURL('image/png');
@@ -2076,11 +2131,12 @@ const profileData = {
                     heightLeft -= pageHeight;
                 }
                 
-                const profileName = document.getElementById('viewProfileName').textContent || 'profile';
-                pdf.save(`${profileName}_profile.pdf`);
+                pdf.save(`${currentUserProfile.name}_profile.pdf`);
+                document.body.removeChild(tempDiv);
             }).catch(error => {
                 console.error('Error generating PDF:', error);
                 alert('Failed to generate PDF. Please try again.');
+                document.body.removeChild(tempDiv);
             });
         }
 
