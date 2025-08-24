@@ -976,15 +976,26 @@
             </button>
         </div>
 
-        <!-- PWA Install Popup -->
-        <div class="pwa-popup" id="pwaPopup">
+        <!-- Enhanced PWA Install Popup -->
+<div class="pwa-popup" id="pwaPopup">
+    <div class="pwa-popup-content">
+        <div class="pwa-header">
+            <img src="https://example.com/your-icon.png" alt="VVPIET Logo" class="pwa-icon">
             <h3>Install VVPIET Staff App</h3>
-            <p>Get quick access to staff profiles with our mobile app!</p>
-            <div class="pwa-buttons">
-                <button class="pwa-btn pwa-install" onclick="installPWA()">Install</button>
-                <button class="pwa-btn pwa-later" onclick="hidePWAPopup()">Later</button>
-            </div>
         </div>
+        <p>Get quick access to staff profiles anytime, anywhere!</p>
+        <div class="pwa-features">
+            <div class="pwa-feature">✓ Works offline</div>
+            <div class="pwa-feature">✓ Fast loading</div>
+            <div class="pwa-feature">✓ Home screen access</div>
+        </div>
+        <div class="pwa-buttons">
+            <button class="pwa-btn pwa-install" onclick="installPWA()">Install App</button>
+            <button class="pwa-btn pwa-later" onclick="hidePWAPopup()">Maybe Later</button>
+        </div>
+    </div>
+</div>
+
     </div>
 
     <!-- Developer Modal -->
@@ -1224,7 +1235,7 @@ function cancelCrop() {
 
         let currentUser = null;
         let currentDepartment = null;
-        let deferredPrompt = null;
+        
         let isEditMode = false;
         let currentUserProfile = null;
 
@@ -2013,34 +2024,219 @@ const profileData = {
         // ========================================
         // PWA FUNCTIONS
         // ========================================
+// PWA Variables
+let deferredPrompt = null;
+let pwaInstalled = false;
 
-        let pwaShown = false;
+// Check if app is already installed or running as PWA
+function isPWAInstalled() {
+    // Check if running in standalone mode (installed PWA)
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+        return true;
+    }
+    // Check if installed on iOS Safari
+    if (window.navigator.standalone === true) {
+        return true;
+    }
+    // Check localStorage flag
+    if (localStorage.getItem('pwa_installed') === 'true') {
+        return true;
+    }
+    return false;
+}
 
-        function showPWAPopup() {
-            if (!pwaShown) {
-                document.getElementById('pwaPopup').classList.add('show');
-                pwaShown = true;
-            }
+// Show PWA popup only if not installed and criteria met
+function showPWAPopup() {
+    // Don't show if already installed
+    if (isPWAInstalled()) {
+        console.log('PWA already installed, not showing popup');
+        return;
+    }
+    
+    // Don't show if user dismissed recently
+    const lastDismissed = localStorage.getItem('pwa_dismissed');
+    if (lastDismissed) {
+        const dismissedTime = new Date(lastDismissed).getTime();
+        const now = new Date().getTime();
+        const daysSinceDismissed = (now - dismissedTime) / (1000 * 60 * 60 * 24);
+        
+        // Only show again after 7 days
+        if (daysSinceDismissed < 7) {
+            console.log('PWA popup dismissed recently, waiting...');
+            return;
         }
+    }
+    
+    // Show the popup
+    const popup = document.getElementById('pwaPopup');
+    if (popup) {
+        popup.classList.add('show');
+    }
+}
 
-        function hidePWAPopup() {
-            document.getElementById('pwaPopup').classList.remove('show');
-        }
+// Hide PWA popup and track dismissal
+function hidePWAPopup() {
+    const popup = document.getElementById('pwaPopup');
+    if (popup) {
+        popup.classList.remove('show');
+    }
+    
+    // Track dismissal time
+    localStorage.setItem('pwa_dismissed', new Date().toISOString());
+}
 
-        function installPWA() {
-            if (deferredPrompt) {
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        hidePWAPopup();
-                    }
-                    deferredPrompt = null;
-                });
+// Install PWA with improved handling
+function installPWA() {
+    if (deferredPrompt) {
+        // Use the deferred prompt for proper installation
+        deferredPrompt.prompt();
+        
+        deferredPrompt.userChoice.then((choiceResult) => {
+            console.log('PWA install choice:', choiceResult.outcome);
+            
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted PWA installation');
+                localStorage.setItem('pwa_installed', 'true');
+                pwaInstalled = true;
+                hidePWAPopup();
             } else {
-                alert('To install this app, use your browser menu to "Add to Home Screen" or "Install App"');
+                console.log('User dismissed PWA installation');
                 hidePWAPopup();
             }
+            
+            deferredPrompt = null;
+        });
+    } else {
+        // Fallback for browsers that don't support beforeinstallprompt
+        showManualInstallInstructions();
+    }
+}
+
+// Show manual installation instructions
+function showManualInstallInstructions() {
+    const userAgent = navigator.userAgent.toLowerCase();
+    let instructions = '';
+    
+    if (userAgent.includes('android')) {
+        instructions = `
+            <h4>Install VVPIET Staff App:</h4>
+            <p>1. Tap the menu button (⋮) in Chrome</p>
+            <p>2. Select "Add to Home screen" or "Install app"</p>
+            <p>3. Tap "Add" or "Install"</p>
+        `;
+    } else if (userAgent.includes('iphone') || userAgent.includes('ipad')) {
+        instructions = `
+            <h4>Install VVPIET Staff App:</h4>
+            <p>1. Tap the Share button (↗) in Safari</p>
+            <p>2. Scroll down and tap "Add to Home Screen"</p>
+            <p>3. Tap "Add"</p>
+        `;
+    } else {
+        instructions = `
+            <h4>Install VVPIET Staff App:</h4>
+            <p>1. Look for the install button (⊕) in your browser address bar</p>
+            <p>2. Or use browser menu: "Install app" or "Add to desktop"</p>
+        `;
+    }
+    
+    // Create custom modal
+    const modal = document.createElement('div');
+    modal.innerHTML = `
+        <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: 20px;">
+                ${instructions}
+                <button onclick="this.closest('div').remove(); localStorage.setItem('pwa_installed', 'true');" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; margin-top: 15px; cursor: pointer;">Got it!</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    hidePWAPopup();
+}
+
+// Enhanced PWA detection and setup
+function setupPWA() {
+    // Check if already installed
+    if (isPWAInstalled()) {
+        pwaInstalled = true;
+        console.log('PWA is already installed');
+        return;
+    }
+    
+    // Listen for install prompt
+    window.addEventListener('beforeinstallprompt', (e) => {
+        console.log('beforeinstallprompt event fired');
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show custom install prompt after 3 seconds
+        setTimeout(showPWAPopup, 3000);
+    });
+    
+    // Listen for successful installation
+    window.addEventListener('appinstalled', (e) => {
+        console.log('PWA was installed successfully');
+        localStorage.setItem('pwa_installed', 'true');
+        pwaInstalled = true;
+        hidePWAPopup();
+    });
+    
+    // For browsers that don't fire beforeinstallprompt (like iOS Safari)
+    setTimeout(() => {
+        if (!deferredPrompt && !isPWAInstalled()) {
+            console.log('No install prompt available, showing after delay');
+            setTimeout(showPWAPopup, 5000);
         }
+    }, 1000);
+}
+
+// Service Worker registration with error handling
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then((registration) => {
+                    console.log('Service Worker registered successfully:', registration);
+                    
+                    // Check for updates
+                    registration.addEventListener('updatefound', () => {
+                        console.log('New service worker version available');
+                    });
+                })
+                .catch((error) => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+    } else {
+        console.log('Service Worker not supported');
+    }
+}
+
+// Updated initialization
+async function initApp() {
+    console.log('Initializing app...');
+    try {
+        await initializeAuth();
+        await loadDepartments();
+        setupEventListeners();
+        
+        // Setup PWA functionality
+        setupPWA();
+        
+        console.log('App initialized successfully');
+    } catch (error) {
+        console.error('App initialization error:', error);
+    }
+}
+
+// Initialize service worker
+registerServiceWorker();
+
+// Initialize app when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
 
         // ========================================
         // DOWNLOAD FUNCTIONS
@@ -2357,21 +2553,7 @@ const { jsPDF } = window.jspdf;
         // INITIALIZATION
         // ========================================
 
-        async function initApp() {
-            console.log('Initializing app...');
-            try {
-                await initializeAuth();
-                await loadDepartments();
-                setupEventListeners();
-                
-                // Show PWA popup after 3 seconds
-                setTimeout(showPWAPopup, 3000);
-                
-                console.log('App initialized successfully');
-            } catch (error) {
-                console.error('App initialization error:', error);
-            }
-        }
+        
 
         async function loadDepartments() {
             try {
