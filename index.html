@@ -41,17 +41,58 @@
 
         /* Header */
         .header {
-            padding: 20px;
-            text-align: center;
-            position: relative;
-            border-bottom: 1px solid #e5e5e5;
-        }
+    padding: 20px;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid #e5e5e5;
+}
 
-        .header h1 {
-            color: #8B5CF6;
-            font-size: 24px;
-            font-weight: 600;
-        }
+.header h1 {
+    color: #8B5CF6;
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0; /* Remove default margin */
+}
+
+.developer-link {
+    background: transparent;
+    color: #8B5CF6;
+    border: 1px solid #8B5CF6;
+    padding: 3px 8px;
+    font-size: 10px;
+    font-weight: 500;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+}
+
+.developer-link:hover {
+    background: #8B5CF6;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+}
+
+.developer-link:active {
+    transform: translateY(0);
+}
+
+/* For mobile responsiveness */
+@media (max-width: 480px) {
+    
+    .developer-link {
+        font-size: 8px;
+        padding: 2px 6px;
+        top: 10px;
+        right: 10px;
+    }
+}
+
 
         .developer-icon {
             position: absolute;
@@ -635,6 +676,8 @@
     touch-action: none;
 }
 
+
+
     </style>
 </head>
 <body>
@@ -796,7 +839,7 @@
                             </div>
                             
                             <div class="profile-field">
-                                <div class="profile-field-label">Research Papers</div>
+                                <div class="profile-field-label">Expertise</div>
                                 <div class="profile-field-value" id="myProfileResearch">-</div>
                             </div>
                             
@@ -869,8 +912,8 @@
                     </div>
                     
                     <div class="form-group">
-                        <label class="form-label">Research Papers</label>
-                        <textarea class="form-textarea" id="profileResearch" placeholder="List your research papers..."></textarea>
+                        <label class="form-label">Expertise</label>
+                        <textarea class="form-textarea" id="profileResearch" placeholder="List your Expertise..."></textarea>
                     </div>
                     
                     <div class="form-group">
@@ -936,7 +979,7 @@
                     </div>
                     
                     <div class="profile-field">
-                        <div class="profile-field-label">Research Papers</div>
+                        <div class="profile-field-label">Expertise</div>
                         <div class="profile-field-value" id="viewProfileResearch">-</div>
                     </div>
                     
@@ -1439,8 +1482,8 @@ async function showProfileView(profileId) {
             document.getElementById('viewProfileDept').textContent = profile.department_name || 'Department not found';
             document.getElementById('viewProfileDesignation').textContent = profile.designation;
             document.getElementById('viewProfileExperience').textContent = profile.experience + ' years';
-            document.getElementById('viewProfileResearch').textContent = profile.research_papers || 'No research papers listed';
-            document.getElementById('viewProfileAchievements').textContent = profile.achievements || 'No achievements listed';
+            document.getElementById('viewProfileResearch').textContent = profile.research_papers || 'No Expertise listed yet';
+            document.getElementById('viewProfileAchievements').textContent = profile.achievements || 'No achievements listed yet';
             
             if (profile.profile_image) {
                 document.getElementById('viewProfileImg').innerHTML = `<img src="${profile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
@@ -1601,8 +1644,8 @@ function goBackFromProfile() {
             document.getElementById('myProfileDept').textContent = currentUserProfile.department_name;
             document.getElementById('myProfileDesignation').textContent = currentUserProfile.designation;
             document.getElementById('myProfileExperience').textContent = currentUserProfile.experience + ' years';
-            document.getElementById('myProfileResearch').textContent = currentUserProfile.research_papers || 'No research papers listed';
-            document.getElementById('myProfileAchievements').textContent = currentUserProfile.achievements || 'No achievements listed';
+            document.getElementById('myProfileResearch').textContent = currentUserProfile.research_papers || 'No Expertise listed yet';
+            document.getElementById('myProfileAchievements').textContent = currentUserProfile.achievements || 'No achievements listed yet';
             
             if (currentUserProfile.profile_image) {
                 document.getElementById('myProfileImg').innerHTML = `<img src="${currentUserProfile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
@@ -2329,9 +2372,9 @@ if (document.readyState === 'loading') {
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Research Papers:</strong>
+                        <strong style="color: #333;">Expertise:</strong>
                         <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                            ${currentUserProfile.research_papers || 'No research papers listed'}
+                            ${currentUserProfile.research_papers || 'No Expertise listed yet'}
                         </div>
                     </div>
                     
@@ -2445,9 +2488,9 @@ const { jsPDF } = window.jspdf;
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Research Papers:</strong>
+                        <strong style="color: #333;">Expertise:</strong>
                         <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                            ${currentUserProfile.research_papers || 'No research papers listed'}
+                            ${currentUserProfile.research_papers || 'No Expertise listed yet'}
                         </div>
                     </div>
                     
@@ -2540,9 +2583,9 @@ const { jsPDF } = window.jspdf;
                     </div>
                     
                     <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Research Papers:</strong>
+                        <strong style="color: #333;">Expertise:</strong>
                         <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                            ${currentUserProfile.research_papers || 'No research papers listed'}
+                            ${currentUserProfile.research_papers || 'No Expertise listed yet'}
                         </div>
                     </div>
                     
