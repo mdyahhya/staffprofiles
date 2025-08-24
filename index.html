@@ -1368,12 +1368,13 @@ function cancelCrop() {
     currentDepartment = null;
 }
         async function showDepartment(dept) {
-    currentDepartment = dept;
-    document.getElementById('deptTitle').textContent = departmentMap[dept].name;
-    await loadDepartmentStaff(dept);
-    showPage('departmentPage');
-}
+            currentDepartment = dept;
+            document.getElementById('deptTitle').textContent = departmentMap[dept].name;
+            await loadDepartmentStaff(dept);
+            showPage('departmentPage');
+        }
 
+        
         function showLoginPage() {
     showPage('loginPage');
 }
@@ -1459,6 +1460,7 @@ async function showProfileView(profileId) {
         alert('Error loading profile: ' + error.message);
     }
 }
+
         function editProfile() {
             if (!currentUserProfile) return;
             
@@ -1612,63 +1614,7 @@ function goBackFromProfile() {
             displayCustomFields('customFieldsSection', currentUserProfile.custom_fields);
         }
 
-        async function showProfileView(profileId) {
-    try {
-        let profile = null;
-        
-        if (supabaseClient) {
-            const { data: profileData, error: profileError } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('profile_id', profileId)
-                .single();
-
-            if (!profileError && profileData) {
-                // Get department info separately
-                const { data: deptData, error: deptError } = await supabaseClient
-                    .from('departments')
-                    .select('dept_name, dept_short_name')
-                    .eq('dept_id', profileData.department)
-                    .single();
-
-                if (!deptError && deptData) {
-                    profile = {
-                        ...profileData,
-                        department_name: deptData.dept_name,
-                        department_short: deptData.dept_short_name
-                    };
-                } else {
-                    profile = profileData;
-                }
-            }
-        }
-        
-        if (profile) {
-            document.getElementById('viewProfileName').textContent = profile.name;
-            document.getElementById('viewProfileDept').textContent = profile.department_name || 'Department not found';
-            document.getElementById('viewProfileDesignation').textContent = profile.designation;
-            document.getElementById('viewProfileExperience').textContent = profile.experience + ' years';
-            document.getElementById('viewProfileResearch').textContent = profile.research_papers || 'No research papers listed';
-            document.getElementById('viewProfileAchievements').textContent = profile.achievements || 'No achievements listed';
-            
-            if (profile.profile_image) {
-                document.getElementById('viewProfileImg').innerHTML = `<img src="${profile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-            } else {
-                document.getElementById('viewProfileImg').innerHTML = '👤';
-            }
-
-            // Display custom fields
-            displayCustomFields('viewCustomFieldsSection', profile.custom_fields);
-            
-            showPage('profileViewPage');
-        } else {
-            alert('Profile not found');
-        }
-    } catch (error) {
-        console.error('Error loading profile:', error);
-        alert('Error loading profile: ' + error.message);
-    }
-}
+       
         // ========================================
         // CUSTOM FIELDS FUNCTIONS
         // ========================================
