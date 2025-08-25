@@ -2023,7 +2023,6 @@ const profileData = {
             document.getElementById('profileForm').reset();
             document.getElementById('customFieldsList').innerHTML = '';
         }
-
 function toggleDeveloperImage() {
     const img = document.querySelector('.developer-img img');
     const modalContent = document.querySelector('.modal-content');
@@ -2036,16 +2035,34 @@ function toggleDeveloperImage() {
         img.classList.remove('expanded');
         modalContent.classList.remove('image-expanded');
         
+        // COMPLETELY RESET IMAGE STYLES
+        img.removeAttribute('style'); // Remove all inline styles
+        img.style.cssText = `
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        `;
+        
         // Remove close button and overlay
         const overlay = modal.querySelector('.image-overlay');
         const closeBtn = modal.querySelector('.image-close-btn');
         if (overlay) overlay.remove();
         if (closeBtn) closeBtn.remove();
         
-        // Reset modal styles
+        // Reset modal styles completely
         modal.style.zIndex = '2000';
-        modalContent.style.maxWidth = '320px';
-        modalContent.style.width = '90%';
+        modalContent.removeAttribute('style'); // Remove all inline styles
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            animation: modalSlideUp 0.3s ease;
+        `;
         
     } else {
         // Expand image to fill modal area
@@ -2054,10 +2071,16 @@ function toggleDeveloperImage() {
         
         // Expand modal content
         modal.style.zIndex = '3000';
-        modalContent.style.maxWidth = '90vw';
-        modalContent.style.width = '90vw';
-        modalContent.style.maxHeight = '90vh';
-        modalContent.style.position = 'relative';
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 90vw;
+            width: 90vw;
+            max-height: 90vh;
+            position: relative;
+            text-align: center;
+        `;
         
         // Create overlay for better visibility
         const overlay = document.createElement('div');
@@ -2139,45 +2162,53 @@ function toggleDeveloperImage() {
     }
 }
 
-// Enhanced hideDeveloperModal function
+// ENHANCED hideDeveloperModal function with complete cleanup
 function hideDeveloperModal() {
     const modal = document.getElementById('developerModal');
     if (!modal) return;
     
     modal.style.display = 'none';
     
-    // Reset expanded image state completely
+    // FORCE RESET everything
     const img = modal.querySelector('.developer-img img');
     const modalContent = modal.querySelector('.modal-content');
     const overlay = modal.querySelector('.image-overlay');
     const closeBtn = modal.querySelector('.image-close-btn');
     
-    if (img && img.classList.contains('expanded')) {
+    // Remove expanded state
+    if (img) {
         img.classList.remove('expanded');
-        img.style.cssText = ''; // Reset all inline styles
+        img.removeAttribute('style'); // Complete reset
+        img.style.cssText = `
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            cursor: pointer;
+        `;
     }
     
-    if (modalContent && modalContent.classList.contains('image-expanded')) {
+    // Reset modal content
+    if (modalContent) {
         modalContent.classList.remove('image-expanded');
-        modalContent.style.maxWidth = '320px';
-        modalContent.style.width = '90%';
-        modalContent.style.maxHeight = '';
-        modalContent.style.position = '';
+        modalContent.removeAttribute('style'); // Complete reset
+        modalContent.style.cssText = `
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 320px;
+            width: 90%;
+            text-align: center;
+            animation: modalSlideUp 0.3s ease;
+        `;
     }
     
+    // Remove overlay and close button
     if (overlay) overlay.remove();
     if (closeBtn) closeBtn.remove();
     
     // Reset modal z-index
     modal.style.zIndex = '2000';
-}
-
-// Show developer modal function (if you need it)
-function showDeveloperModal() {
-    const modal = document.getElementById('developerModal');
-    if (modal) {
-        modal.style.display = 'flex';
-    }
 }
 
 
