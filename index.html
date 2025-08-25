@@ -683,7 +683,32 @@
     touch-action: none;
 }
 
+/* Expanded image styles */
+.developer-img img.expanded {
+    position: absolute;
+    top: -20px;
+    left: -20px;
+    width: calc(100% + 40px) !important;
+    height: auto !important;
+    max-width: 360px;
+    max-height: 400px;
+    object-fit: contain !important;
+    border-radius: 8px;
+    border: 3px solid #8B5CF6;
+    background: white;
+    z-index: 1000;
+    cursor: zoom-out;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+}
 
+/* Hover effect */
+.developer-img img:hover {
+    transform: scale(1.05);
+}
+
+.developer-img img.expanded:hover {
+    transform: scale(1);
+}
 
     </style>
 </head>
@@ -1053,8 +1078,8 @@
         <div class="modal-content">
             <button class="modal-close" onclick="hideDeveloperModal()">×</button>
            <div class="developer-img">
-    <img src="yahyadp.jpg" alt="Developer" class="developer-img">
-        </div>
+        <img src="yahyadp.jpg" alt="Developer" class="developer-img" onclick="toggleDeveloperImage()">
+    </div>
 
             <div class="developer-name">Yahya Mundewadi</div>
             <div class="developer-title">Founder of Continental Group</div>
@@ -1442,6 +1467,26 @@ function showCreateProfilePage() {
     document.getElementById('profileFormTitle').textContent = 'Create Profile';
     document.getElementById('profileFormSubmitBtn').textContent = 'Create Profile';
     showPage('createProfilePage');
+}
+
+function toggleDeveloperImage() {
+    const img = document.querySelector('.developer-img img'); // Fixed selector
+    const modalContent = document.querySelector('.modal-content');
+    const developerImgContainer = document.querySelector('.developer-img');
+    
+    if (!img) return;
+    
+    if (img.classList.contains('expanded')) {
+        // Collapse image back to original size
+        img.classList.remove('expanded');
+        modalContent.classList.remove('image-expanded');
+        developerImgContainer.style.zIndex = 'auto';
+    } else {
+        // Expand image to fill modal content
+        img.classList.add('expanded');
+        modalContent.classList.add('image-expanded');
+        developerImgContainer.style.zIndex = '1000';
+    }
 }
 
 function showMyProfile() {
