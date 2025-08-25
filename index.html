@@ -682,72 +682,69 @@
     cursor: move;
     touch-action: none;
 }
+/* Add to your existing CSS - Image expansion styles */
 
-/* Modal content when image is expanded */
+/* When modal content has expanded image */
 .modal-content.image-expanded {
-    position: relative;
-    overflow: hidden;
+    overflow: visible;
+    max-width: 90vw; /* Allow modal to grow wider */
+    max-height: 90vh; /* Allow modal to grow taller */
 }
 
-/* Expanded image stays within modal */
+/* Expanded image styles */
 .developer-img img.expanded {
     position: absolute;
-    top: 50px; /* Below the modal close button */
+    top: 20px;
     left: 20px;
     right: 20px;
+    bottom: 60px; /* Leave space for close button */
     width: calc(100% - 40px) !important;
-    height: auto !important;
-    max-height: calc(100% - 100px); /* Leave space for title and buttons */
-    object-fit: contain !important;
-    border-radius: 8px !important;
-    background: rgba(255, 255, 255, 0.95);
-    z-index: 100;
+    height: calc(100% - 80px) !important;
+    max-height: 400px !important;
+    object-fit: contain !important; /* Show full image */
+    border-radius: 8px !important; /* Remove circular shape */
+    background: white;
+    z-index: 50;
     cursor: zoom-out;
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
-    border: 2px solid #8B5CF6;
-}
-/* Close button positioned on top of expanded image */
-.image-close-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1002; /* Higher than image */
-    pointer-events: none; /* Allow clicking through overlay */
+    border: 2px solid #8B5CF6 !important;
+    animation: imageExpand 0.3s ease;
 }
 
+/* Animation for image expansion */
+@keyframes imageExpand {
+    from { 
+        transform: scale(0.3);
+        opacity: 0.5;
+    }
+    to { 
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Close button for expanded image */
 .image-close-btn {
     position: absolute;
-    top: 50%;
+    bottom: 20px;
     right: 50%;
-    transform: translate(170px, -180px); /* Adjust these values to position over image */
-    background: rgba(255, 255, 255, 0.95);
-    border: 2px solid #8B5CF6;
-    border-radius: 50%;
-    width: 32px;
-    height: 32px;
-    font-size: 16px;
-    font-weight: bold;
+    transform: translateX(50%);
+    background: #8B5CF6;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #8B5CF6;
-    transition: all 0.2s ease;
-    pointer-events: auto; /* Enable clicking on button */
+    z-index: 51; /* Above expanded image */
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    transition: all 0.2s ease;
 }
 
 .image-close-btn:hover {
-    background: #8B5CF6;
-    color: white;
-    transform: translate(170px, -180px) scale(1.1);
-}
-
-/* Hover effect for clickable image */
-.developer-img img:hover:not(.expanded) {
-    transform: scale(1.05);
+    background: #6D28D9;
+    transform: translateX(50%) scale(1.05);
 }
 
 /* Hide other content when image is expanded */
@@ -756,8 +753,19 @@
 .modal-content.image-expanded .developer-desc,
 .modal-content.image-expanded .contact-icons,
 .modal-content.image-expanded .contact-text {
-    opacity: 0.3;
+    opacity: 0.2;
     pointer-events: none;
+}
+
+/* Add cursor pointer to original image */
+.developer-img img {
+    cursor: pointer;
+}
+
+/* Hover effect for original image */
+.developer-img img:hover:not(.expanded) {
+    transform: scale(1.05);
+    transition: transform 0.2s ease;
 }
 
     </style>
@@ -2104,29 +2112,58 @@ function toggleDeveloperImage() {
     const img = document.querySelector('.developer-img img');
     const modalContent = document.querySelector('.modal-content');
     
-    if (!img) return;
+    if (!img || !modalContent) return;
     
     if (img.classList.contains('expanded')) {
-        // Collapse image
+        // Collapse image back to original size
         img.classList.remove('expanded');
         modalContent.classList.remove('image-expanded');
         
-        // Remove close button
-        const closeBtn = document.querySelector('.image-close-btn');
-        if (closeBtn) closeBtn.remove();
+        // Remove close button from modal-content only
+        const closeBtn = modalContent.querySelector('.image-close-btn');
+        if (closeBtn) {
+            closeBtn.remove();
+        }
     } else {
-        // Expand image
+        // Expand image within modal bounds
         img.classList.add('expanded');
         modalContent.classList.add('image-expanded');
         
-        // Add visible close button
+        // Add close button inside modal-content
         const closeBtn = document.createElement('button');
         closeBtn.className = 'image-close-btn';
         closeBtn.innerHTML = '×';
-        closeBtn.onclick = toggleDeveloperImage;
-        document.body.appendChild(closeBtn);
+        closeBtn.onclick = function(e) {
+            e.stopPropagation(); // Prevent event bubbling
+            toggleDeveloperImage();
+        };
+        modalContent.appendChild(closeBtn);
     }
 }
+
+// Fix modal close behavior
+function hideDeveloperModal() {
+    const modal = document.getElementById('developerModal');
+    if (modal) {
+        modal.style.display = 'none';
+        
+        // Reset expanded image state
+        const img = modal.querySelector('.developer-img img');
+        const modalContent = modal.querySelector('.modal-content');
+        
+        if (img && img.classList.contains('expanded')) {
+            img.classList.remove('expanded');
+            modalContent.classList.remove('image-expanded');
+            
+            // Remove close button
+            const closeBtn = modalContent.querySelector('.image-close-btn');
+            if (closeBtn) {
+                closeBtn.remove();
+            }
+        }
+    }
+}
+
 
 function addImageCloseButton() {
     // Remove existing overlay if any
