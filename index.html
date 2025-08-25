@@ -706,29 +706,28 @@
     box-shadow: 0 4px 20px rgba(0,0,0,0.3);
     border: 2px solid #8B5CF6;
 }
-
-/* Close button overlay for expanded image */
+/* Close button positioned on top of expanded image */
 .image-close-overlay {
-    position: absolute;
+    position: fixed;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.3);
-    z-index: 99;
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding: 60px 30px 20px 20px;
+    z-index: 1002; /* Higher than image */
+    pointer-events: none; /* Allow clicking through overlay */
 }
 
 .image-close-btn {
-    background: rgba(255, 255, 255, 0.9);
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    transform: translate(170px, -180px); /* Adjust these values to position over image */
+    background: rgba(255, 255, 255, 0.95);
     border: 2px solid #8B5CF6;
     border-radius: 50%;
-    width: 35px;
-    height: 35px;
-    font-size: 18px;
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
     display: flex;
@@ -736,12 +735,14 @@
     justify-content: center;
     color: #8B5CF6;
     transition: all 0.2s ease;
+    pointer-events: auto; /* Enable clicking on button */
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .image-close-btn:hover {
     background: #8B5CF6;
     color: white;
-    transform: scale(1.1);
+    transform: translate(170px, -180px) scale(1.1);
 }
 
 /* Hover effect for clickable image */
@@ -2106,22 +2107,24 @@ function toggleDeveloperImage() {
     if (!img) return;
     
     if (img.classList.contains('expanded')) {
-        // Collapse image back to original size
+        // Collapse image
         img.classList.remove('expanded');
         modalContent.classList.remove('image-expanded');
         
-        // Remove the close button overlay
-        const closeOverlay = document.querySelector('.image-close-overlay');
-        if (closeOverlay) {
-            closeOverlay.remove();
-        }
+        // Remove close button
+        const closeBtn = document.querySelector('.image-close-btn');
+        if (closeBtn) closeBtn.remove();
     } else {
-        // Expand image within modal bounds
+        // Expand image
         img.classList.add('expanded');
         modalContent.classList.add('image-expanded');
         
-        // Add close button overlay
-        addImageCloseButton();
+        // Add visible close button
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'image-close-btn';
+        closeBtn.innerHTML = '×';
+        closeBtn.onclick = toggleDeveloperImage;
+        document.body.appendChild(closeBtn);
     }
 }
 
