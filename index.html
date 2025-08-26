@@ -1822,7 +1822,12 @@ if (userError) throw userError;
 localStorage.setItem('db_user_id', userData.user_id);
 
 alert('Registration successful! You are now logged in.');
-showMainPage();
+// Wait for auth state to update, then redirect
+setTimeout(async () => {
+    await loadUserProfile();
+    updateUIForLoggedInUser();
+    showMainPage();
+}, 500);
         
         // Clear form
         document.getElementById('registerForm').reset();
