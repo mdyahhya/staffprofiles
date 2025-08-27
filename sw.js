@@ -126,3 +126,16 @@ self.addEventListener('notificationclick', (event) => {
 });
 
 console.log('[ServiceWorker] Loaded');
+
+// Add this to your sw.js after the existing code
+self.addEventListener('message', (event) => {
+  if (event.data.action === 'forceRefresh') {
+    // Clear all caches and force refresh
+    caches.keys().then(names => {
+      names.forEach(name => caches.delete(name));
+    });
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => client.postMessage({type: 'REFRESH'}));
+    });
+  }
+});
