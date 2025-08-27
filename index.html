@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VVPIET Staff Profiles</title>
     <link rel="manifest" href="manifest.json">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
     <meta name="theme-color" content="#8B5CF6">
     <!-- Add these libraries -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -689,7 +692,14 @@
     touch-action: none;
 }
 /* Add to your existing CSS - Image expansion styles */
+.delete-btn {
+    background-color: #dc2626 !important;
+    color: white !important;
+}
 
+.delete-btn:hover {
+    background-color: #b91c1c !important;
+}
     </style>
 </head>
 <body>
@@ -779,7 +789,7 @@
                 </form>
                 
                 <p style="text-align: center; margin-top: 20px; font-size: 14px;">
-                    Don't have an account? <a href="#" onclick="showRegisterPage()" style="color: #8B5CF6;">Register here</a>
+                    Don't have an account? <a href="javascript:void(0)" onclick="showRegisterPage()" style="color: #8B5CF6;">Register here</a>
                 </p>
             </div>
         </div>
@@ -822,7 +832,7 @@
                 </form>
                 
                 <p style="text-align: center; margin-top: 20px; font-size: 14px;">
-                    Already have an account? <a href="#" onclick="showLoginPage()" style="color: #8B5CF6;">Login here</a>
+                    Already have an account? <a href="javascript:void(0)" onclick="showLoginPage()" style="color: #8B5CF6;">Login here</a>
                 </p>
             </div>
         </div>
@@ -868,6 +878,7 @@
                             <button class="action-btn" onclick="editProfile()">✏️ Edit Profile</button>
                             <button class="action-btn" onclick="downloadMyProfilePDF()">📄 Download PDF</button>
                             <button class="action-btn" onclick="downloadMyProfileImage()">🖼️ Download Image</button>
+                            <button class="action-btn delete-btn" onclick="deleteProfile()">🗑️ Delete Profile</button>
                         </div>
                     </div>
                 </div>
@@ -1015,22 +1026,20 @@
             </div>
         </div>
 
-        <!-- Taskbar -->
         <div class="taskbar">
-            <button class="taskbar-btn active" onclick="showMainPage()">
-                <div class="icon">🏠</div>
-                <span>Home</span>
-            </button>
-            <button class="taskbar-btn" onclick="handleCreateProfile()">
-                <div class="icon">👤</div>
-                <span>Profile</span>
-            </button>
-            <button class="taskbar-btn" onclick="handleLogout()">
-                <div class="icon">🚪</div>
-                <span id="logoutText">Login</span>
-            </button>
-        </div>
-
+    <button class="taskbar-btn active" onclick="showMainPage()">
+        <div class="icon">🏠</div>
+        <span>Home</span>
+    </button>
+    <button class="taskbar-btn" onclick="handleCreateProfile()">
+        <div class="icon">👤</div>
+        <span>Profile</span>
+    </button>
+    <button class="taskbar-btn" onclick="handleAuthAction()">
+        <div class="icon">🚪</div>
+        <span id="logoutText">Login</span>
+    </button>
+</div>
         <!-- Enhanced PWA Install Popup -->
 <div class="pwa-popup" id="pwaPopup">
     <div class="pwa-popup-content">
@@ -1549,106 +1558,44 @@ function goBackFromProfile() {
     handleBackNavigation();
 }
 
+function cleanupUserData() {
+    currentUser = null;
+    currentUserProfile = null;
+    localStorage.removeItem('db_user_id');
+}
+
+
+function validateRegistrationForm() {
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    
+    if (!email.includes('@')) {
+        alert('Please enter a valid email');
+        return false;
+    }
+    if (password.length < 6) {
+        alert('Password must be at least 6 characters');
+        return false;
+    }
+    return true;
+}
+
+// Add loading state to buttons
+function setButtonLoading(buttonId, isLoading) {
+    const btn = document.getElementById(buttonId);
+    if (btn) {
+        btn.disabled = isLoading;
+        btn.textContent = isLoading ? 'Loading...' : btn.getAttribute('data-original-text');
+    }
+}
+
+
+
         // ========================================
         // DEPARTMENT FUNCTIONS
         // ========================================
 
-        async function loadDepartmentStaff(dept) {
-            const deptInfo = departmentMap[dept];
-            
-            try {
-                let profiles = [];
-                
-                if (supabaseClient) {
-                   const { data, error } = await supabaseClient
-    .from('profiles')
-    .select(`
-        profile_id,
-        user_id,
-        name,
-        designation,
-        experience,
-        research_papers,
-        achievements,
-        custom_fields,
-        profile_image,
-        is_published,
-        departments!inner(dept_name, dept_short_name)
-    `)
-    .eq('departments.dept_short_name', dept)
-    .eq('is_published', true);
-                    if (!error) {
-                        profiles = data || [];
-                    }
-                }
-                
-                // Load HOD
-                const hodContainer = document.getElementById('hodContainer');
-                const hod = profiles.find(p => p.designation === 'HOD');
-                
-                if (hod) {
-                   hodContainer.innerHTML = `
-    <div class="staff-card">
-        <div class="staff-image">${hod.profile_image ? 
-            `<img src="${hod.profile_image}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">` : 
-            '<div style="width: 60px; height: 60px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 24px;">👤</div>'
-        }</div>
-        <div class="staff-name">${hod.name}</div>
-        <div class="staff-designation">Head of Department</div>
-        <button class="check-profile-btn" onclick="showProfileView('${hod.profile_id}')">Check Profile</button>
-    </div>
-`;
-                } else {
-                    hodContainer.innerHTML = `
-                        <div class="staff-card">
-                            <div class="staff-name">No HOD assigned</div>
-                            <div class="staff-designation">Position vacant</div>
-                        </div>
-                    `;
-                }
-                
-                // Load Staff
-                const staffContainer = document.getElementById('staffContainer');
-                const staff = profiles.filter(p => p.designation !== 'HOD');
-                
-                if (staff.length > 0) {
-                  staffContainer.innerHTML = staff.map(s => `
-    <div class="staff-card">
-        <div class="staff-image">${s.profile_image ? 
-            `<img src="${s.profile_image}" style="width: 60px; height: 60px; border-radius: 50%; object-fit: cover;">` : 
-            '<div style="width: 60px; height: 60px; border-radius: 50%; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 24px;">👤</div>'
-        }</div>
-        <div class="staff-name">${s.name}</div>
-        <div class="staff-designation">${s.designation}</div>
-        <button class="check-profile-btn" onclick="showProfileView('${s.profile_id}')">Check Profile</button>
-    </div>
-`).join('');
-                } else {
-                    staffContainer.innerHTML = `
-                        <div class="staff-card">
-                            <div class="staff-name">No staff members</div>
-                            <div class="staff-designation">Register to create profiles</div>
-                        </div>
-                    `;
-                }
-            } catch (error) {
-                console.error('Error loading department staff:', error);
-                showErrorState();
-            }
-        }
-
-        function showErrorState() {
-            const containers = ['hodContainer', 'staffContainer'];
-            containers.forEach(id => {
-                document.getElementById(id).innerHTML = `
-                    <div class="staff-card">
-                        <div class="staff-name">Error loading data</div>
-                        <div class="staff-designation">Please try again later</div>
-                    </div>
-                `;
-            });
-        }
-
+        
         // ========================================
         // PROFILE DISPLAY FUNCTIONS
         // ========================================
@@ -1764,6 +1711,13 @@ function goBackFromProfile() {
         // ========================================
 
         async function handleRegistration(e) {
+
+        // Add this at the very beginning, before any other code
+document.getElementById('registerForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
+});
+
     e.preventDefault();
     
     const email = document.getElementById('registerEmail').value;
@@ -1822,12 +1776,7 @@ if (userError) throw userError;
 localStorage.setItem('db_user_id', userData.user_id);
 
 alert('Registration successful! You are now logged in.');
-// Wait for auth state to update, then redirect
-setTimeout(async () => {
-    await loadUserProfile();
-    updateUIForLoggedInUser();
-    showMainPage();
-}, 500);
+showMainPage();
         
         // Clear form
         document.getElementById('registerForm').reset();
@@ -1838,31 +1787,40 @@ setTimeout(async () => {
     }
 }
         async function handleLogin(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            if (!supabaseClient) {
-                alert('Database connection not available');
-                return;
-            }
-            
-            try {
-                const { data, error } = await supabaseClient.auth.signInWithPassword({
-                    email: email,
-                    password: password
-                });
-                
-                if (error) throw error;
-                
-                alert('Login successful!');
-                showMainPage();
-            } catch (error) {
-                console.error('Login error:', error);
-                alert('Login failed: ' + error.message);
-            }
-        }
+    e.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    
+    if (!supabaseClient) {
+        alert('Database connection not available');
+        return;
+    }
+    
+    try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+        
+        if (error) throw error;
+        
+        // ADD THESE LINES - Set user state immediately
+        currentUser = data.user;
+        await loadUserProfile();
+        updateUIForLoggedInUser();
+        
+        alert('Login successful!');
+        showMainPage();
+        
+        // Clear the login form
+        document.getElementById('loginForm').reset();
+        
+    } catch (error) {
+        console.error('Login error:', error);
+        alert('Login failed: ' + error.message);
+    }
+}
 
         async function handleProfileCreation(e) {
             e.preventDefault();
@@ -1980,7 +1938,7 @@ const profileData = {
     result = await supabaseClient
         .from('profiles')
         .update(profileData)
-        .eq('user_id', parseInt(dbUserId))
+        .eq('profile_id', currentUserProfile.profile_id) // Use profile_id instead
         .select();
 } else {
     console.log('Creating new profile...');
@@ -2034,6 +1992,17 @@ const profileData = {
             document.getElementById('profileForm').reset();
             document.getElementById('customFieldsList').innerHTML = '';
         }
+
+
+        function handleAuthAction() {
+    if (currentUser) {
+        handleLogout();
+    } else {
+        showLoginPage();
+    }
+}
+
+
 function toggleDeveloperImage() {
     const img = document.querySelector('.developer-img img');
     const modalContent = document.querySelector('.modal-content');
@@ -2319,40 +2288,107 @@ window.addEventListener('load', function() {
         // UI HELPER FUNCTIONS
         // ========================================
 
-        function handleCreateProfile() {
-            if (currentUser) {
-                showMyProfile();
-            } else {
-                showLoginPage();
-            }
-        }
-
-        async function handleLogout() {
-    if (currentUser) {
-        if (supabaseClient) {
-            await supabaseClient.auth.signOut();
+        async function handleCreateProfile() {
+    // Force refresh auth state
+    if (supabaseClient) {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (session) {
+            currentUser = session.user;
+            await loadUserProfile();
+            updateUIForLoggedInUser();
         } else {
             currentUser = null;
             currentUserProfile = null;
             updateUIForLoggedOutUser();
         }
-        // Add this line to clear stored user ID
+    }
+    
+    if (currentUser) {
+        showMyProfile();
+    } else {
+        showLoginPage();
+    }
+}
+
+async function deleteProfile() {
+    if (!currentUserProfile || !currentUser || !supabaseClient) {
+        alert('Unable to delete profile');
+        return;
+    }
+    
+    // Confirm deletion
+    if (!confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        // Delete profile image from storage if exists
+        if (currentUserProfile.profile_image) {
+            const fileName = `${currentUser.id}/profile.jpg`;
+            await supabaseClient.storage
+                .from('profile-images')
+                .remove([fileName]);
+        }
+        
+        // Delete profile from database
+        const { error } = await supabaseClient
+            .from('profiles')
+            .delete()
+            .eq('profile_id', currentUserProfile.profile_id);
+            
+        if (error) throw error;
+        
+        // Clear profile data
+        currentUserProfile = null;
+        
+        alert('Profile deleted successfully!');
+        showMyProfile(); // This will show the "no profile" section
+        
+    } catch (error) {
+        console.error('Delete profile error:', error);
+        alert('Failed to delete profile: ' + error.message);
+    }
+}
+
+
+       async function handleLogout() {
+    if (currentUser) {
+        if (supabaseClient) {
+            await supabaseClient.auth.signOut();
+        }
+        
+        // Clear all user data
+        currentUser = null;
+        currentUserProfile = null;
         localStorage.removeItem('db_user_id');
+        
+        // Update UI BEFORE showing main page
+        updateUIForLoggedOutUser();
+        
         showMainPage();
         alert('Logged out successfully!');
     } else {
         showLoginPage();
     }
-    
 }
 
         function updateUIForLoggedInUser() {
-            document.getElementById('logoutText').textContent = 'Logout';
-        }
+    document.getElementById('logoutText').textContent = 'Logout';
+    // Make sure the button calls the right function
+    const authBtn = document.querySelectorAll('.taskbar-btn')[2];
+    if (authBtn) {
+        authBtn.setAttribute('onclick', 'handleLogout()');
+    }
+}
 
-        function updateUIForLoggedOutUser() {
-            document.getElementById('logoutText').textContent = 'Login';
-        }
+function updateUIForLoggedOutUser() {
+    document.getElementById('logoutText').textContent = 'Login';
+    // Make sure the button calls the right function
+    const authBtn = document.querySelectorAll('.taskbar-btn')[2];
+    if (authBtn) {
+        authBtn.setAttribute('onclick', 'showLoginPage()');
+    }
+}
 
         // ========================================
         // MODAL FUNCTIONS
@@ -2502,37 +2538,108 @@ function registerServiceWorker() {
                 .then((registration) => {
                     console.log('Service Worker registered successfully:', registration);
                     
-                    // Check for updates
+                    // Check for updates immediately
+                    registration.update();
+                    
+                    // Listen for updates
                     registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
                         console.log('New service worker version available');
+                        
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed') {
+                                if (navigator.serviceWorker.controller) {
+                                    // New update available
+                                    showUpdateNotification();
+                                }
+                            }
+                        });
                     });
                 })
                 .catch((error) => {
                     console.error('Service Worker registration failed:', error);
                 });
+                
+            // Check for updates every 30 minutes
+            setInterval(() => {
+                if (navigator.serviceWorker.controller) {
+                    navigator.serviceWorker.controller.postMessage({action: 'checkUpdate'});
+                }
+            }, 30 * 60 * 1000);
         });
     } else {
         console.log('Service Worker not supported');
     }
 }
 
-// Updated initialization
-async function initApp() {
-    console.log('Initializing app...');
-    try {
-        await initializeAuth();
-        await loadDepartments();
-        setupEventListeners();
-        
-        // Setup PWA functionality
-        setupPWA();
-        
-        console.log('App initialized successfully');
-    } catch (error) {
-        console.error('App initialization error:', error);
+// Show update notification
+function showUpdateNotification() {
+    if (confirm('A new version is available. Refresh to get the latest features?')) {
+        window.location.reload();
     }
 }
 
+// Force refresh cache when needed
+function clearAppCache() {
+    if ('caches' in window) {
+        caches.keys().then((names) => {
+            names.forEach(name => {
+                caches.delete(name);
+            });
+        });
+    }
+    
+    if (navigator.serviceWorker) {
+        navigator.serviceWorker.getRegistrations().then((registrations) => {
+            registrations.forEach(registration => registration.unregister());
+        });
+    }
+    
+    window.location.reload(true);
+}
+
+// Updated initialization
+
+
+
+async function initApp() {
+    console.log('Initializing app...');
+    
+    try {
+        // Initialize Supabase connection
+        await initializeSupabase();
+        
+        // Initialize authentication
+        await initializeAuth();
+        
+        // Setup all event listeners
+        setupEventListeners();
+        
+        // Initialize navigation history
+        initializeNavigation();
+        
+        // Load departments data
+        await loadDepartments();
+        
+        // Check for PWA install prompt
+        checkPWAInstallPrompt();
+        
+        // Update UI based on auth state
+        if (currentUser) {
+            updateUIForLoggedInUser();
+        } else {
+            updateUIForLoggedOutUser();
+        }
+        
+        console.log('App initialized successfully');
+        
+    } catch (error) {
+        console.error('App initialization error:', error);
+        // Fallback to basic functionality
+        setupEventListeners();
+        updateUIForLoggedOutUser();
+    }
+}
 // Initialize service worker
 registerServiceWorker();
 
@@ -2543,6 +2650,244 @@ if (document.readyState === 'loading') {
     initApp();
 }
 
+
+
+// function checkPWAInstallPrompt() {
+//     // Check if app is already installed
+//     if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+//         console.log('App is running in standalone mode');
+//         return;
+//     }
+    
+//     // Show install prompt after delay if not already shown recently
+//     const lastPrompt = localStorage.getItem('pwa_prompt_shown');
+//     const now = Date.now();
+//     const dayInMs = 24 * 60 * 60 * 1000;
+    
+//     if (!lastPrompt || (now - parseInt(lastPrompt)) > dayInMs) {
+//         setTimeout(() => {
+//             if (deferredPrompt) {
+//                 showPWAPopup();
+//             }
+//         }, 5000); // Show after 5 seconds
+//     }
+// }
+// ========================================
+// DEPARTMENT STAFF LOADING
+// ========================================
+
+async function loadDepartmentStaff(dept, retryCount = 0) {
+    console.log(`Loading staff for department: ${dept}, retry count: ${retryCount}`);
+    
+    // Show loading state
+    const staffContainer = document.getElementById('staffContainer');
+    const hodContainer = document.getElementById('hodContainer');
+    
+    if (staffContainer) {
+        staffContainer.innerHTML = '<div class="loading-message">Loading staff members...</div>';
+    }
+    if (hodContainer) {
+        hodContainer.innerHTML = '<div class="loading-message">Loading HOD...</div>';
+    }
+    
+    if (!supabaseClient) {
+        console.warn('No database connection, showing default message');
+        displayNoStaffMessage();
+        return;
+    }
+
+    try {
+        // Get department ID
+        const deptInfo = departmentMap[dept];
+        if (!deptInfo) {
+            throw new Error(`Department ${dept} not found in department map`);
+        }
+
+        // Add small delay to prevent race conditions
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+        // Fetch profiles with department information
+        const { data: profiles, error } = await supabaseClient
+            .from('profiles')
+            .select(`
+                profile_id,
+                name,
+                designation,
+                experience,
+                research_papers,
+                achievements,
+                profile_image,
+                custom_fields,
+                department,
+                is_published
+            `)
+            .eq('department', deptInfo.id)
+            .eq('is_published', true)
+            .order('designation', { ascending: true })
+            .order('name', { ascending: true });
+
+        if (error) {
+            console.error('Database query error:', error);
+            throw error;
+        }
+
+        console.log(`Found ${profiles?.length || 0} profiles for department ${dept}`);
+
+        // Get department name for display
+        const { data: deptData, error: deptError } = await supabaseClient
+            .from('departments')
+            .select('dept_name, dept_short_name')
+            .eq('dept_id', deptInfo.id)
+            .single();
+
+        let departmentName = deptInfo.name; // fallback
+        if (!deptError && deptData) {
+            departmentName = deptData.dept_name;
+        }
+
+        // Process and display profiles
+        if (profiles && profiles.length > 0) {
+            // Separate HOD and other staff
+            const hodProfiles = profiles.filter(p => p.designation === 'HOD');
+            const otherStaff = profiles.filter(p => p.designation !== 'HOD');
+
+            // Display HOD
+            displayHOD(hodProfiles, departmentName);
+            
+            // Display other staff members
+            displayStaffMembers(otherStaff, departmentName);
+            
+        } else {
+            // No profiles found
+            displayNoStaffMessage();
+        }
+
+    } catch (error) {
+        console.error('Error loading department staff:', error);
+        
+        // Retry mechanism
+        if (retryCount < 2) {
+            console.log(`Retrying in 1 second... (attempt ${retryCount + 1})`);
+            setTimeout(() => {
+                loadDepartmentStaff(dept, retryCount + 1);
+            }, 1000);
+            return;
+        }
+        
+        // Max retries reached, show error message
+        displayErrorMessage(error.message);
+    }
+}
+// Helper function to display staff members
+function displayStaffMembers(staffProfiles, departmentName) {
+    const staffContainer = document.getElementById('staffContainer');
+    if (!staffContainer) return;
+
+    if (staffProfiles.length > 0) {
+        staffContainer.innerHTML = staffProfiles.map(profile => `
+            <div class="staff-card" onclick="showProfileView('${profile.profile_id}')">
+                <div class="staff-img">${profile.profile_image ? 
+                    `<img src="${profile.profile_image}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                    '👤'}</div>
+                <div class="staff-info">
+                    <div class="staff-name">${profile.name}</div>
+                    <div class="staff-designation">${profile.designation}</div>
+                    <div class="staff-experience">${profile.experience} years experience</div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        staffContainer.innerHTML = `
+            <div class="staff-card no-click">
+                <div class="staff-img">👤</div>
+                <div class="staff-info">
+                    <div class="staff-name">No staff members yet</div>
+                    <div class="staff-designation">Be the first to create a profile!</div>
+                </div>
+            </div>
+        `;
+    }
+}
+// Helper function to display no staff message
+function displayNoStaffMessage() {
+    const staffContainer = document.getElementById('staffContainer');
+    const hodContainer = document.getElementById('hodContainer');
+    
+    if (hodContainer) {
+        hodContainer.innerHTML = `
+            <div class="staff-card no-click">
+                <div class="staff-img">👤</div>
+                <div class="staff-info">
+                    <div class="staff-name">No HOD assigned</div>
+                    <div class="staff-designation">Position vacant</div>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (staffContainer) {
+        staffContainer.innerHTML = `
+            <div class="staff-card no-click">
+                <div class="staff-img">👤</div>
+                <div class="staff-info">
+                    <div class="staff-name">No staff members yet</div>
+                    <div class="staff-designation">Register to create profiles</div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// Helper function to display error message
+function displayErrorMessage(errorMessage) {
+    const staffContainer = document.getElementById('staffContainer');
+    const hodContainer = document.getElementById('hodContainer');
+    
+    const errorHtml = `
+        <div class="staff-card no-click error-card">
+            <div class="staff-img">⚠️</div>
+            <div class="staff-info">
+                <div class="staff-name">Error loading profiles</div>
+                <div class="staff-designation">Please try refreshing the page</div>
+            </div>
+        </div>
+    `;
+    
+    if (hodContainer) hodContainer.innerHTML = errorHtml;
+    if (staffContainer) staffContainer.innerHTML = errorHtml;
+}
+
+// Helper function to display HOD
+function displayHOD(hodProfiles, departmentName) {
+    const hodContainer = document.getElementById('hodContainer');
+    if (!hodContainer) return;
+
+    if (hodProfiles.length > 0) {
+        const hod = hodProfiles[0]; // Take first HOD if multiple
+        hodContainer.innerHTML = `
+            <div class="staff-card" onclick="showProfileView('${hod.profile_id}')">
+                <div class="staff-img">${hod.profile_image ? 
+                    `<img src="${hod.profile_image}" alt="${hod.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                    '👤'}</div>
+                <div class="staff-info">
+                    <div class="staff-name">${hod.name}</div>
+                    <div class="staff-designation">${hod.designation}</div>
+                    <div class="staff-experience">${hod.experience} years experience</div>
+                </div>
+            </div>
+        `;
+    } else {
+        hodContainer.innerHTML = `
+            <div class="staff-card no-click">
+                <div class="staff-img">👤</div>
+                <div class="staff-info">
+                    <div class="staff-name">No HOD assigned</div>
+                    <div class="staff-designation">Position vacant</div>
+                </div>
+            </div>
+        `;
+    }
+}
         // ========================================
         // DOWNLOAD FUNCTIONS
         // ========================================
@@ -2931,6 +3276,21 @@ const { jsPDF } = window.jspdf;
             console.log('Event listeners set up successfully');
         }
 
+        // Force cache bypass on refresh
+window.addEventListener('beforeunload', () => {
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({action: 'forceRefresh'});
+  }
+});
+
+// Listen for service worker messages
+if (navigator.serviceWorker) {
+  navigator.serviceWorker.addEventListener('message', event => {
+    if (event.data.type === 'REFRESH') {
+      window.location.reload(true);
+    }
+  });
+}
         // ========================================
         // PWA EVENT LISTENERS
         // ========================================
