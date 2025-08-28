@@ -1823,171 +1823,328 @@ showMainPage();
 }
 
         async function handleProfileCreation(e) {
-            e.preventDefault();
-            
-            console.log('Profile form submitted');
-            
-            if (!currentUser) {
-                alert('Please login first!');
-                return;
-            }
-            
-            if (!supabaseClient) {
-                alert('Database connection not available');
-                return;
-            }
-            
-            // Get form values
-            const name = document.getElementById('profileName').value.trim();
-            const department = document.getElementById('profileDepartment').value;
-            const designation = document.getElementById('profileDesignation').value;
-            const experience = document.getElementById('profileExperience').value;
-            const research = document.getElementById('profileResearch').value.trim();
-            const achievements = document.getElementById('profileAchievements').value.trim();
-            const imageFile = document.getElementById('profileImage').files[0];
-            const customFields = collectCustomFields();
-            
-            // Validate required fields
-            if (!name || !department || !designation || !experience) {
-                alert('Please fill in all required fields');
-                return;
-            }
-            
-            console.log('Form data collected:', { name, department, designation, experience });
-            
-            try {
-                // Get current user
-              // Get current user
-const { data: { user } } = await supabaseClient.auth.getUser();
-
-if (!user) {
-    alert('Authentication error. Please login again.');
-    return;
-}
-
-// Get the database user ID
-let dbUserId = localStorage.getItem('db_user_id');
-if (!dbUserId) {
-    // Try to find by email if not in localStorage
-    const { data: dbUser, error: userError } = await supabaseClient
-        .from('users')
-        .select('user_id')
-        .eq('email', user.email)
-        .single();
+    e.preventDefault();
     
-    if (userError || !dbUser) {
-        alert('User session error. Please register again.');
+    console.log('Profile form submitted');
+    
+    if (!currentUser) {
+        alert('Please login first!');
         return;
     }
-    dbUserId = dbUser.user_id;
-    localStorage.setItem('db_user_id', dbUserId);
-}
+    
+    if (!supabaseClient) {
+        alert('Database connection not available');
+        return;
+    }
+    
+    // Get form values
+    const name = document.getElementById('profileName').value.trim();
+    const department = document.getElementById('profileDepartment').value;
+    const designation = document.getElementById('profileDesignation').value;
+    const experience = document.getElementById('profileExperience').value;
+    const research = document.getElementById('profileResearch').value.trim();
+    const achievements = document.getElementById('profileAchievements').value.trim();
+    const imageFile = document.getElementById('profileImage').files[0];
+    const customFields = collectCustomFields();
+    
+    // Validate required fields
+    if (!name || !department || !designation || !experience) {
+        alert('Please fill in all required fields');
+        return;
+    }
+    
+    console.log('Form data collected:', { name, department, designation, experience });
+    
+    try {
+        // Get current user
+        const { data: { user } } = await supabaseClient.auth.getUser();
 
-console.log('Database user ID:', dbUserId);
-                
-                let imageUrl = null;
-                
-                // Upload image if provided
-                if (imageFile) {
-                    console.log('Uploading image...');
-                    const fileExt = imageFile.name.split('.').pop();
-                    const fileName = `${user.id}/profile.${fileExt}`;
-                    
-                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
-                        .from('profile-images')
-                        .upload(fileName, imageFile, {
-                            cacheControl: '3600',
-                            upsert: true
-                        });
-                    
-                    if (uploadError) {
-                        console.error('Image upload error:', uploadError);
-                    } else {
-                        const { data: urlData } = supabaseClient.storage
-                            .from('profile-images')
-                            .getPublicUrl(fileName);
-                        
-                        imageUrl = urlData.publicUrl;
-                        console.log('Image uploaded:', imageUrl);
-                    }
-                } else if (isEditMode && currentUserProfile && currentUserProfile.profile_image) {
-                    imageUrl = currentUserProfile.profile_image;
-                }
-                
-                // Prepare profile data
-              // Prepare profile data using database user ID (integer)
-const profileData = {
-    user_id: parseInt(dbUserId),  // Use integer ID
-    name: name,
-    department: parseInt(department),
-    designation: designation,
-    experience: parseInt(experience),
-    research_papers: research || null,
-    achievements: achievements || null,
-    custom_fields: Object.keys(customFields).length > 0 ? customFields : null,
-    profile_image: imageUrl,
-    is_published: true
-};
-                
-                console.log('Profile data to save:', profileData);
-                
-                let result;
-               if (isEditMode && currentUserProfile) {
-    console.log('Updating existing profile...');
-    // Update existing profile
-    result = await supabaseClient
-        .from('profiles')
-        .update(profileData)
-        .eq('profile_id', currentUserProfile.profile_id) // Use profile_id instead
-        .select();
-} else {
-    console.log('Creating new profile...');
-    // Check if profile already exists
-    const { data: existingProfile } = await supabaseClient
-        .from('profiles')
-        .select('profile_id')
-        .eq('user_id', parseInt(dbUserId))
-        .single();     
-                    if (existingProfile) {
-                        alert('Profile already exists! Switching to edit mode.');
-                        isEditMode = true;
-                        await loadUserProfile();
-                        editProfile();
-                        return;
-                    }
-                    
-                    // Create new profile
-                    result = await supabaseClient
-                        .from('profiles')
-                        .insert([profileData])
-                        .select();
-                }
-                
-                const { data, error } = result;
-                
-                if (error) {
-                    console.error('Database error:', error);
-                    throw error;
-                }
-                
-                console.log('Profile saved successfully:', data);
-                
-                alert(isEditMode ? 'Profile updated successfully!' : 'Profile created successfully!');
-                
-                // Reload user profile
-                await loadUserProfile();
-                showMyProfile();
-                
-                // Clear form
-                clearProfileForm();
-                isEditMode = false;
-                
-            } catch (error) {
-                console.error('Profile operation error:', error);
-                alert('Failed to save profile: ' + error.message);
-            }
+        if (!user) {
+            alert('Authentication error. Please login again.');
+            return;
         }
 
+        // Get the database user ID
+        let dbUserId = localStorage.getItem('db_user_id');
+        if (!dbUserId) {
+            // Try to find by email if not in localStorage
+            const { data: dbUser, error: userError } = await supabaseClient
+                .from('users')
+                .select('user_id')
+                .eq('email', user.email)
+                .single();
+            
+            if (userError || !dbUser) {
+                alert('User session error. Please register again.');
+                return;
+            }
+            dbUserId = dbUser.user_id;
+            localStorage.setItem('db_user_id', dbUserId);
+        }
+
+        console.log('Database user ID:', dbUserId);
+        
+        let imageUrl = null;
+        
+        // Upload image if provided
+        if (imageFile) {
+            console.log('Uploading image...');
+            const fileExt = imageFile.name.split('.').pop();
+            const timestamp = Date.now();
+            const fileName = `${user.id}/profile_${timestamp}.${fileExt}`;
+            
+            // If updating, delete old image first
+            if (isEditMode && currentUserProfile && currentUserProfile.profile_image) {
+                try {
+                    // Extract old filename from URL
+                    const oldUrl = currentUserProfile.profile_image;
+                    const urlParts = oldUrl.split('/');
+                    const fileNameWithQuery = urlParts[urlParts.length - 1];
+                    const oldFileName = fileNameWithQuery.split('?')[0]; // Remove query params
+                    const oldFilePath = `${user.id}/${oldFileName}`;
+                    
+                    console.log('Deleting old image:', oldFilePath);
+                    const { error: deleteError } = await supabaseClient.storage
+                        .from('profile-images')
+                        .remove([oldFilePath]);
+                    
+                    if (deleteError) {
+                        console.warn('Could not delete old image:', deleteError);
+                    } else {
+                        console.log('Old image deleted successfully');
+                    }
+                } catch (deleteError) {
+                    console.warn('Error during old image deletion:', deleteError);
+                }
+            }
+            
+            // Upload new image
+            const { data: uploadData, error: uploadError } = await supabaseClient.storage
+                .from('profile-images')
+                .upload(fileName, imageFile, {
+                    cacheControl: '0', // Disable caching for immediate updates
+                    upsert: false // Don't overwrite, create new file
+                });
+            
+            if (uploadError) {
+                console.error('Image upload error:', uploadError);
+                // Fallback: try with random suffix if file exists
+                if (uploadError.message && uploadError.message.includes('already exists')) {
+                    const randomSuffix = Math.random().toString(36).substr(2, 9);
+                    const fallbackName = `${user.id}/profile_${timestamp}_${randomSuffix}.${fileExt}`;
+                    
+                    console.log('Retrying with fallback name:', fallbackName);
+                    const { data: retryData, error: retryError } = await supabaseClient.storage
+                        .from('profile-images')
+                        .upload(fallbackName, imageFile, { 
+                            cacheControl: '0',
+                            upsert: false 
+                        });
+                    
+                    if (!retryError) {
+                        const { data: urlData } = supabaseClient.storage
+                            .from('profile-images')
+                            .getPublicUrl(fallbackName);
+                        imageUrl = urlData.publicUrl + `?v=${timestamp}`;
+                        console.log('Fallback image uploaded:', imageUrl);
+                    } else {
+                        console.error('Fallback upload also failed:', retryError);
+                    }
+                } else {
+                    console.error('Upload failed with non-duplicate error:', uploadError);
+                }
+            } else {
+                const { data: urlData } = supabaseClient.storage
+                    .from('profile-images')
+                    .getPublicUrl(fileName);
+                
+                imageUrl = urlData.publicUrl + `?v=${timestamp}`; // Cache busting
+                console.log('Image uploaded successfully:', imageUrl);
+            }
+        } else if (isEditMode && currentUserProfile && currentUserProfile.profile_image) {
+            // Keep existing image if no new image provided during edit
+            imageUrl = currentUserProfile.profile_image;
+        }
+        
+        // Prepare profile data using database user ID (integer)
+        const profileData = {
+            user_id: parseInt(dbUserId),  // Use integer ID
+            name: name,
+            department: parseInt(department),
+            designation: designation,
+            experience: parseInt(experience),
+            research_papers: research || null,
+            achievements: achievements || null,
+            custom_fields: Object.keys(customFields).length > 0 ? customFields : null,
+            profile_image: imageUrl,
+            is_published: true
+        };
+        
+        console.log('Profile data to save:', profileData);
+        
+        let result;
+        if (isEditMode && currentUserProfile) {
+            console.log('Updating existing profile...');
+            // Update existing profile
+            result = await supabaseClient
+                .from('profiles')
+                .update(profileData)
+                .eq('profile_id', currentUserProfile.profile_id) // Use profile_id instead
+                .select();
+        } else {
+            console.log('Creating new profile...');
+            // Check if profile already exists
+            const { data: existingProfile } = await supabaseClient
+                .from('profiles')
+                .select('profile_id')
+                .eq('user_id', parseInt(dbUserId))
+                .single();     
+                
+            if (existingProfile) {
+                alert('Profile already exists! Switching to edit mode.');
+                isEditMode = true;
+                await loadUserProfile();
+                editProfile();
+                return;
+            }
+            
+            // Create new profile
+            result = await supabaseClient
+                .from('profiles')
+                .insert([profileData])
+                .select();
+        }
+        
+        const { data, error } = result;
+        
+        if (error) {
+            console.error('Database error:', error);
+            throw error;
+        }
+        
+        console.log('Profile saved successfully:', data);
+        
+        alert(isEditMode ? 'Profile updated successfully!' : 'Profile created successfully!');
+        
+        // Reload user profile
+        await loadUserProfile();
+        showMyProfile();
+        
+        // Clear form
+        clearProfileForm();
+        isEditMode = false;
+        
+    } catch (error) {
+        console.error('Profile operation error:', error);
+        alert('Failed to save profile: ' + error.message);
+    }
+}
+
+async function deleteProfile() {
+    if (!currentUserProfile || !currentUser || !supabaseClient) {
+        alert('Unable to delete profile');
+        return;
+    }
+    
+    // Confirm deletion
+    if (!confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
+        return;
+    }
+    
+    try {
+        // Delete profile image from storage if exists
+        if (currentUserProfile.profile_image) {
+            try {
+                // Extract filename from URL more robustly
+                const imageUrl = currentUserProfile.profile_image;
+                console.log('Image URL to delete:', imageUrl);
+                
+                // Handle different URL formats
+                let fileName;
+                if (imageUrl.includes('/profile-images/')) {
+                    // Extract everything after '/profile-images/'
+                    const parts = imageUrl.split('/profile-images/');
+                    if (parts.length > 1) {
+                        fileName = parts[1].split('?')[0]; // Remove query parameters
+                    }
+                } else {
+                    // Fallback: try to extract filename from end of URL
+                    const urlParts = imageUrl.split('/');
+                    const fileNameWithQuery = urlParts[urlParts.length - 1];
+                    fileName = fileNameWithQuery.split('?')[0];
+                    
+                    // If it doesn't include user path, prepend it
+                    if (!fileName.includes(currentUser.id)) {
+                        fileName = `${currentUser.id}/${fileName}`;
+                    }
+                }
+                
+                if (fileName) {
+                    console.log('Deleting profile image:', fileName);
+                    const { error: deleteError } = await supabaseClient.storage
+                        .from('profile-images')
+                        .remove([fileName]);
+                    
+                    if (deleteError) {
+                        console.warn('Could not delete profile image:', deleteError);
+                        
+                        // Try alternative deletion methods
+                        const alternativeNames = [
+                            `${currentUser.id}/profile.jpg`,
+                            `${currentUser.id}/profile.png`,
+                            `${currentUser.id}/profile.jpeg`,
+                            fileName.replace(currentUser.id + '/', '') // Try without user ID prefix
+                        ];
+                        
+                        for (const altName of alternativeNames) {
+                            try {
+                                const { error: altError } = await supabaseClient.storage
+                                    .from('profile-images')
+                                    .remove([altName]);
+                                
+                                if (!altError) {
+                                    console.log('Successfully deleted with alternative name:', altName);
+                                    break;
+                                }
+                            } catch (altDeleteError) {
+                                console.warn('Alternative deletion failed:', altName, altDeleteError);
+                            }
+                        }
+                    } else {
+                        console.log('Profile image deleted successfully');
+                    }
+                } else {
+                    console.warn('Could not extract filename from URL:', imageUrl);
+                }
+            } catch (error) {
+                console.warn('Error during image deletion process:', error);
+            }
+        }
+        
+        // Delete profile from database
+        const { error: profileDeleteError } = await supabaseClient
+            .from('profiles')
+            .delete()
+            .eq('profile_id', currentUserProfile.profile_id);
+            
+        if (profileDeleteError) {
+            console.error('Profile deletion error:', profileDeleteError);
+            throw profileDeleteError;
+        }
+        
+        console.log('Profile deleted from database successfully');
+        
+        // Clear profile data
+        currentUserProfile = null;
+        
+        alert('Profile deleted successfully!');
+        showMyProfile(); // This will show the "no profile" section
+        
+    } catch (error) {
+        console.error('Delete profile error:', error);
+        alert('Failed to delete profile: ' + error.message);
+    }
+}
         function clearProfileForm() {
             document.getElementById('profileForm').reset();
             document.getElementById('customFieldsList').innerHTML = '';
@@ -2310,45 +2467,6 @@ window.addEventListener('load', function() {
     }
 }
 
-async function deleteProfile() {
-    if (!currentUserProfile || !currentUser || !supabaseClient) {
-        alert('Unable to delete profile');
-        return;
-    }
-    
-    // Confirm deletion
-    if (!confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-        return;
-    }
-    
-    try {
-        // Delete profile image from storage if exists
-        if (currentUserProfile.profile_image) {
-            const fileName = `${currentUser.id}/profile.jpg`;
-            await supabaseClient.storage
-                .from('profile-images')
-                .remove([fileName]);
-        }
-        
-        // Delete profile from database
-        const { error } = await supabaseClient
-            .from('profiles')
-            .delete()
-            .eq('profile_id', currentUserProfile.profile_id);
-            
-        if (error) throw error;
-        
-        // Clear profile data
-        currentUserProfile = null;
-        
-        alert('Profile deleted successfully!');
-        showMyProfile(); // This will show the "no profile" section
-        
-    } catch (error) {
-        console.error('Delete profile error:', error);
-        alert('Failed to delete profile: ' + error.message);
-    }
-}
 
 
        async function handleLogout() {
