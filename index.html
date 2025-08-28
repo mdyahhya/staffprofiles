@@ -2779,35 +2779,7 @@ async function loadDepartmentStaff(dept, retryCount = 0) {
     }
 }
 // Helper function to display staff members
-function displayStaffMembers(staffProfiles, departmentName) {
-    const staffContainer = document.getElementById('staffContainer');
-    if (!staffContainer) return;
 
-    if (staffProfiles.length > 0) {
-        staffContainer.innerHTML = staffProfiles.map(profile => `
-            <div class="staff-card" onclick="showProfileView('${profile.profile_id}')">
-                <div class="staff-img">${profile.profile_image ? 
-                    `<img src="${profile.profile_image}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
-                    '👤'}</div>
-                <div class="staff-info">
-                    <div class="staff-name">${profile.name}</div>
-                    <div class="staff-designation">${profile.designation}</div>
-                    <div class="staff-experience">${profile.experience} years experience</div>
-                </div>
-            </div>
-        `).join('');
-    } else {
-        staffContainer.innerHTML = `
-            <div class="staff-card no-click">
-                <div class="staff-img">👤</div>
-                <div class="staff-info">
-                    <div class="staff-name">No staff members yet</div>
-                    <div class="staff-designation">Be the first to create a profile!</div>
-                </div>
-            </div>
-        `;
-    }
-}
 // Helper function to display no staff message
 function displayNoStaffMessage() {
     const staffContainer = document.getElementById('staffContainer');
