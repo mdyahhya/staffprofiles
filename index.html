@@ -2705,6 +2705,9 @@ function updateUIForLoggedOutUser() {
  // ========================================
 // RELIABLE PWA INSTALLATION SCRIPT
 // ========================================
+// ========================================
+// RELIABLE PWA INSTALLATION SCRIPT
+// ========================================
 
 // PWA Variables
 let deferredPrompt = null;
@@ -2816,7 +2819,7 @@ function createPWAPopup() {
                     Get instant access and offline features
                 </p>
             </div>
-            <button onclick="hidePWAPopup()" style="
+            <button id="pwaCloseBtn" style="
                 background: rgba(255,255,255,0.2);
                 border: none;
                 color: white;
@@ -2835,7 +2838,7 @@ function createPWAPopup() {
         </div>
         
         <div style="display: flex; gap: 12px; margin-top: 18px;">
-            <button onclick="installPWA()" style="
+            <button id="pwaInstallBtn" style="
                 flex: 1;
                 background: white;
                 border: none;
@@ -2851,7 +2854,7 @@ function createPWAPopup() {
                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'">
                 📱 Install Now
             </button>
-            <button onclick="hidePWAPopup()" style="
+            <button id="pwaLaterBtn" style="
                 background: rgba(255,255,255,0.15);
                 border: 2px solid rgba(255,255,255,0.3);
                 color: white;
@@ -2869,6 +2872,32 @@ function createPWAPopup() {
     `;
 
     document.body.appendChild(popup);
+    
+    // Add event listeners to prevent event bubbling and handle clicks properly
+    popup.addEventListener('click', function(e) {
+        // Prevent the popup from closing when clicked inside
+        e.stopPropagation();
+    });
+    
+    // Add specific event listeners for buttons
+    document.getElementById('pwaCloseBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        hidePWAPopup();
+    });
+    
+    document.getElementById('pwaInstallBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        installPWA();
+    });
+    
+    document.getElementById('pwaLaterBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        hidePWAPopup();
+    });
+    
     return popup;
 }
 
@@ -2885,24 +2914,9 @@ function showPWAPopup() {
     const deviceInfo = getDeviceInfo();
     console.log('Device info:', deviceInfo);
     
-    // Check if user dismissed recently (only for non-first-time visitors)
-    const visitCount = localStorage.getItem('visit_count') || '0';
-    const lastDismissed = localStorage.getItem('pwa_dismissed');
-    
-    if (parseInt(visitCount) > 1 && lastDismissed) {
-        const dismissedTime = new Date(lastDismissed).getTime();
-        const now = new Date().getTime();
-        const hoursSinceDismissed = (now - dismissedTime) / (1000 * 60 * 60);
-        
-        // Only show again after 8 hours for returning visitors
-        if (hoursSinceDismissed < 8) {
-            console.log(`PWA popup dismissed recently (${hoursSinceDismissed.toFixed(1)} hours ago), waiting...`);
-            return;
-        }
-    }
-    
-    // Increment visit count
-    localStorage.setItem('visit_count', (parseInt(visitCount) + 1).toString());
+    // REMOVED: Dismissal tracking - now shows every time
+    // Show popup every time user opens the website
+    console.log('Showing PWA popup on every visit...');
     
     // For iOS, show custom instructions
     if (deviceInfo.isIOS) {
@@ -2936,9 +2950,8 @@ function hidePWAPopup() {
         }, 400);
     }
     
-    // Track dismissal time
-    localStorage.setItem('pwa_dismissed', new Date().toISOString());
-    console.log('PWA popup dismissal tracked');
+    // REMOVED: Dismissal tracking - so popup shows every time
+    console.log('PWA popup hidden');
 }
 
 // iOS specific PWA install instructions
@@ -3226,9 +3239,20 @@ function setupPWA() {
 // Force show popup function for testing
 window.showPWAInstallPopup = function() {
     console.log('Manually triggering PWA popup...');
+    // Clear any dismissal tracking
     localStorage.removeItem('pwa_dismissed');
     localStorage.removeItem('pwa_installed');
     showPWAPopup();
+};
+
+// Clear dismissal tracking function
+window.clearPWATracking = function() {
+    localStorage.removeItem('pwa_dismissed');
+    localStorage.removeItem('pwa_installed');
+    localStorage.removeItem('visit_count');
+    localStorage.removeItem('ios_install_shown');
+    localStorage.removeItem('ios_install_last_shown');
+    console.log('All PWA tracking cleared');
 };
 
 // Service Worker registration
