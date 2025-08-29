@@ -2702,72 +2702,399 @@ function updateUIForLoggedOutUser() {
 
         // ========================================
         // PWA FUNCTIONS
-        // ========================================
+ // ========================================
+// RELIABLE PWA INSTALLATION SCRIPT
+// ========================================
+
 // PWA Variables
 let deferredPrompt = null;
 let pwaInstalled = false;
 
-// Check if app is already installed or running as PWA
+// Detect device type and browser
+function getDeviceInfo() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    const isIOSSafari = isIOS && /Safari/.test(userAgent) && !/CriOS|FxiOS/.test(userAgent);
+    const isAndroid = /android/i.test(userAgent);
+    const isChrome = /Chrome/.test(userAgent) && /Google Inc/.test(navigator.vendor);
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+    
+    return {
+        isIOS,
+        isIOSSafari,
+        isAndroid,
+        isChrome,
+        isMobile,
+        supportsInstallPrompt: !isIOS
+    };
+}
+
+// Enhanced function to check if PWA is installed
 function isPWAInstalled() {
+    const deviceInfo = getDeviceInfo();
+    
     // Check if running in standalone mode (installed PWA)
     if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+        console.log('PWA detected: running in standalone mode');
         return true;
     }
-    // Check if installed on iOS Safari
-    if (window.navigator.standalone === true) {
+    
+    // iOS specific check
+    if (deviceInfo.isIOS && window.navigator.standalone === true) {
+        console.log('PWA detected: iOS standalone mode');
         return true;
     }
+    
+    // Android specific checks
+    if (deviceInfo.isAndroid) {
+        // Check for TWA (Trusted Web Activity)
+        if (document.referrer.startsWith('android-app://')) {
+            console.log('PWA detected: Android TWA mode');
+            return true;
+        }
+    }
+    
     // Check localStorage flag
     if (localStorage.getItem('pwa_installed') === 'true') {
+        console.log('PWA detected: localStorage flag');
         return true;
     }
+    
+    console.log('PWA not installed');
     return false;
 }
 
-// Show PWA popup only if not installed and criteria met
+// Create PWA Install Popup HTML
+function createPWAPopup() {
+    console.log('Creating PWA popup...');
+    
+    // Remove existing popup if any
+    const existingPopup = document.getElementById('pwaPopup');
+    if (existingPopup) {
+        existingPopup.remove();
+    }
+
+    // Create popup HTML
+    const popup = document.createElement('div');
+    popup.id = 'pwaPopup';
+    popup.style.cssText = `
+        position: fixed;
+        bottom: -200px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 400px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        z-index: 10000;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    `;
+
+    popup.innerHTML = `
+        <div style="display: flex; align-items: center; margin-bottom: 15px;">
+            <div style="
+                width: 55px;
+                height: 55px;
+                background: rgba(255,255,255,0.2);
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 15px;
+                font-size: 28px;
+                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            ">📱</div>
+            <div style="flex: 1;">
+                <h3 style="margin: 0; font-size: 19px; font-weight: 700; line-height: 1.2;">Install Our App</h3>
+                <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; line-height: 1.3;">
+                    Get instant access and offline features
+                </p>
+            </div>
+            <button onclick="hidePWAPopup()" style="
+                background: rgba(255,255,255,0.2);
+                border: none;
+                color: white;
+                font-size: 18px;
+                cursor: pointer;
+                padding: 8px;
+                border-radius: 50%;
+                width: 34px;
+                height: 34px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: background 0.2s ease;
+            " onmouseover="this.style.background='rgba(255,255,255,0.3)'" 
+               onmouseout="this.style.background='rgba(255,255,255,0.2)'">✕</button>
+        </div>
+        
+        <div style="display: flex; gap: 12px; margin-top: 18px;">
+            <button onclick="installPWA()" style="
+                flex: 1;
+                background: white;
+                border: none;
+                color: #667eea;
+                padding: 14px 20px;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: 700;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.15)'" 
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'">
+                📱 Install Now
+            </button>
+            <button onclick="hidePWAPopup()" style="
+                background: rgba(255,255,255,0.15);
+                border: 2px solid rgba(255,255,255,0.3);
+                color: white;
+                padding: 14px 20px;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            " onmouseover="this.style.background='rgba(255,255,255,0.25)'" 
+               onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+                Later
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(popup);
+    return popup;
+}
+
+// Show PWA popup with animation
 function showPWAPopup() {
-    // Don't show if already installed
+    console.log('Attempting to show PWA popup...');
+    
+    // Double check if PWA is installed
     if (isPWAInstalled()) {
         console.log('PWA already installed, not showing popup');
         return;
     }
     
-    // Don't show if user dismissed recently
+    const deviceInfo = getDeviceInfo();
+    console.log('Device info:', deviceInfo);
+    
+    // Check if user dismissed recently (only for non-first-time visitors)
+    const visitCount = localStorage.getItem('visit_count') || '0';
     const lastDismissed = localStorage.getItem('pwa_dismissed');
-    if (lastDismissed) {
+    
+    if (parseInt(visitCount) > 1 && lastDismissed) {
         const dismissedTime = new Date(lastDismissed).getTime();
         const now = new Date().getTime();
         const hoursSinceDismissed = (now - dismissedTime) / (1000 * 60 * 60);
         
-        // Only show again after 24 hours
-        if (hoursSinceDismissed < 24) {
-            console.log('PWA popup dismissed recently, waiting...');
+        // Only show again after 8 hours for returning visitors
+        if (hoursSinceDismissed < 8) {
+            console.log(`PWA popup dismissed recently (${hoursSinceDismissed.toFixed(1)} hours ago), waiting...`);
             return;
         }
     }
     
-    // Show the popup
-    const popup = document.getElementById('pwaPopup');
-    if (popup) {
-        popup.classList.add('show');
+    // Increment visit count
+    localStorage.setItem('visit_count', (parseInt(visitCount) + 1).toString());
+    
+    // For iOS, show custom instructions
+    if (deviceInfo.isIOS) {
+        console.log('Showing iOS install instructions...');
+        showIOSInstallInstructions();
+        return;
     }
+    
+    // For Android/Desktop - create and show the popup
+    console.log('Creating popup for Android/Desktop...');
+    const popup = createPWAPopup();
+    
+    // Animate popup into view with delay
+    setTimeout(() => {
+        popup.style.bottom = '20px';
+        console.log('PWA popup animated into view');
+    }, 200);
 }
 
 // Hide PWA popup and track dismissal
 function hidePWAPopup() {
+    console.log('Hiding PWA popup...');
     const popup = document.getElementById('pwaPopup');
     if (popup) {
-        popup.classList.remove('show');
+        // Animate out
+        popup.style.bottom = '-200px';
+        
+        // Remove after animation
+        setTimeout(() => {
+            popup.remove();
+        }, 400);
     }
     
     // Track dismissal time
     localStorage.setItem('pwa_dismissed', new Date().toISOString());
+    console.log('PWA popup dismissal tracked');
 }
 
-// Install PWA - DIRECT INSTALLATION ONLY
+// iOS specific PWA install instructions
+function showIOSInstallInstructions() {
+    const isIOSSafari = getDeviceInfo().isIOSSafari;
+    
+    if (!isIOSSafari) {
+        alert('To install this app on iOS, please open it in Safari browser.');
+        return;
+    }
+    
+    // Create iOS install modal
+    const modal = document.createElement('div');
+    modal.id = 'iosInstallModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.85);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 20px;
+        box-sizing: border-box;
+        backdrop-filter: blur(5px);
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 380px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        ">
+            <button onclick="hideIOSInstallModal()" style="
+                position: absolute;
+                top: 15px;
+                right: 20px;
+                background: #f0f0f0;
+                border: none;
+                font-size: 18px;
+                cursor: pointer;
+                color: #666;
+                width: 30px;
+                height: 30px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            ">✕</button>
+            
+            <div style="font-size: 50px; margin-bottom: 15px;">📱</div>
+            <h3 style="margin: 0 0 25px 0; color: #333; font-size: 24px;">Install Our App</h3>
+            
+            <div style="text-align: left; margin-bottom: 25px;">
+                <div style="margin: 15px 0; display: flex; align-items: center;">
+                    <span style="
+                        display: inline-block;
+                        width: 32px;
+                        height: 32px;
+                        background: #007AFF;
+                        color: white;
+                        text-align: center;
+                        line-height: 32px;
+                        border-radius: 50%;
+                        margin-right: 15px;
+                        font-weight: bold;
+                        font-size: 14px;
+                    ">1</span>
+                    <span>Tap the Share button <strong style="font-size: 20px;">⎙</strong> below</span>
+                </div>
+                
+                <div style="margin: 15px 0; display: flex; align-items: center;">
+                    <span style="
+                        display: inline-block;
+                        width: 32px;
+                        height: 32px;
+                        background: #007AFF;
+                        color: white;
+                        text-align: center;
+                        line-height: 32px;
+                        border-radius: 50%;
+                        margin-right: 15px;
+                        font-weight: bold;
+                        font-size: 14px;
+                    ">2</span>
+                    <span>Select <strong>"Add to Home Screen"</strong></span>
+                </div>
+                
+                <div style="margin: 15px 0; display: flex; align-items: center;">
+                    <span style="
+                        display: inline-block;
+                        width: 32px;
+                        height: 32px;
+                        background: #007AFF;
+                        color: white;
+                        text-align: center;
+                        line-height: 32px;
+                        border-radius: 50%;
+                        margin-right: 15px;
+                        font-weight: bold;
+                        font-size: 14px;
+                    ">3</span>
+                    <span>Tap <strong>"Add"</strong> to install</span>
+                </div>
+            </div>
+            
+            <button onclick="hideIOSInstallModal(); localStorage.setItem('ios_install_shown', 'true');" style="
+                background: #007AFF;
+                color: white;
+                border: none;
+                padding: 15px 30px;
+                border-radius: 10px;
+                font-size: 16px;
+                font-weight: 600;
+                cursor: pointer;
+                width: 100%;
+            ">Got it!</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    console.log('iOS install modal shown');
+}
+
+// Hide iOS install modal
+function hideIOSInstallModal() {
+    const modal = document.getElementById('iosInstallModal');
+    if (modal) {
+        modal.remove();
+    }
+    console.log('iOS install modal hidden');
+}
+
+// Enhanced install function
 function installPWA() {
+    console.log('Install PWA triggered...');
+    const deviceInfo = getDeviceInfo();
+    
+    // iOS specific handling
+    if (deviceInfo.isIOS) {
+        hideIOSInstallModal();
+        showIOSInstallInstructions();
+        return;
+    }
+    
+    // Android/Desktop with beforeinstallprompt support
     if (deferredPrompt) {
-        // Use the deferred prompt for direct installation
+        console.log('Using deferred prompt...');
         deferredPrompt.prompt();
         
         deferredPrompt.userChoice.then((choiceResult) => {
@@ -2778,6 +3105,7 @@ function installPWA() {
                 localStorage.setItem('pwa_installed', 'true');
                 pwaInstalled = true;
                 hidePWAPopup();
+                showInstallSuccessMessage();
             } else {
                 console.log('User dismissed PWA installation');
                 hidePWAPopup();
@@ -2786,168 +3114,182 @@ function installPWA() {
             deferredPrompt = null;
         });
     } else {
-        // If no prompt available, just hide popup
-        console.log('Install prompt not available');
-        hidePWAPopup();
+        console.log('No deferred prompt available, showing manual instructions...');
+        showManualInstallInstructions();
     }
 }
 
-// Enhanced PWA detection and setup
+// Show install success message
+function showInstallSuccessMessage() {
+    const message = document.createElement('div');
+    message.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #4CAF50;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-weight: 600;
+        z-index: 10001;
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        font-size: 16px;
+    `;
+    message.textContent = '✅ App installed successfully!';
+    
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+        message.style.opacity = '0';
+        message.style.transform = 'translateX(-50%) translateY(-20px)';
+        setTimeout(() => message.remove(), 300);
+    }, 3000);
+}
+
+// Manual install instructions
+function showManualInstallInstructions() {
+    const deviceInfo = getDeviceInfo();
+    let instructions = '';
+    
+    if (deviceInfo.isChrome && deviceInfo.isAndroid) {
+        instructions = '1. Tap the menu (⋮) in Chrome\n2. Select "Add to Home screen"\n3. Tap "Add" to install';
+    } else if (deviceInfo.isChrome) {
+        instructions = '1. Click the install icon in the address bar\n2. Or go to Chrome menu → "Install app"';
+    } else if (deviceInfo.isAndroid) {
+        instructions = 'Please open this website in Chrome browser to install the app.';
+    } else {
+        instructions = 'Bookmark this page for quick access, or check your browser\'s install options.';
+    }
+    
+    alert('Install Instructions:\n\n' + instructions);
+    hidePWAPopup();
+}
+
+// PWA Detection and Setup
 function setupPWA() {
-    // Check if already installed
+    console.log('Setting up PWA...');
+    const deviceInfo = getDeviceInfo();
+    
+    // Check if already installed first
     if (isPWAInstalled()) {
         pwaInstalled = true;
-        console.log('PWA is already installed');
+        console.log('PWA is already installed, skipping setup');
         return;
     }
     
-    // Listen for install prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('beforeinstallprompt event fired');
-        e.preventDefault();
-        deferredPrompt = e;
+    console.log('PWA not installed, setting up install prompt...');
+    
+    // Listen for install prompt (Android, Desktop Chrome, etc.)
+    if (deviceInfo.supportsInstallPrompt) {
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('beforeinstallprompt event fired');
+            e.preventDefault();
+            deferredPrompt = e;
+        });
         
-        // Show custom install prompt after 3 seconds
-        setTimeout(showPWAPopup, 3000);
-    });
+        // Listen for successful installation
+        window.addEventListener('appinstalled', (e) => {
+            console.log('PWA was installed successfully via appinstalled event');
+            localStorage.setItem('pwa_installed', 'true');
+            pwaInstalled = true;
+            hidePWAPopup();
+            showInstallSuccessMessage();
+        });
+    }
     
-    // Listen for successful installation
-    window.addEventListener('appinstalled', (e) => {
-        console.log('PWA was installed successfully');
-        localStorage.setItem('pwa_installed', 'true');
-        pwaInstalled = true;
-        hidePWAPopup();
-    });
-    
-    // For browsers that don't fire beforeinstallprompt
+    // Show install prompt after page loads - THIS IS THE KEY PART
+    // We don't wait for beforeinstallprompt, we show our popup regardless
     setTimeout(() => {
-        if (!deferredPrompt && !isPWAInstalled()) {
-            console.log('No install prompt available');
-            // Don't show popup if no prompt is available
+        console.log('Timeout reached, checking if we should show popup...');
+        if (!isPWAInstalled()) {
+            showPWAPopup();
         }
-    }, 1000);
+    }, 2000); // Show after 2 seconds
+    
+    // For iOS, monitor standalone mode changes
+    if (deviceInfo.isIOS) {
+        let wasStandalone = window.navigator.standalone;
+        
+        const checkStandalone = setInterval(() => {
+            if (!wasStandalone && window.navigator.standalone) {
+                console.log('App installed on iOS (standalone mode detected)');
+                localStorage.setItem('pwa_installed', 'true');
+                pwaInstalled = true;
+                clearInterval(checkStandalone);
+            }
+            wasStandalone = window.navigator.standalone;
+        }, 1000);
+    }
 }
 
-// Service Worker registration with error handling
+// Force show popup function for testing
+window.showPWAInstallPopup = function() {
+    console.log('Manually triggering PWA popup...');
+    localStorage.removeItem('pwa_dismissed');
+    localStorage.removeItem('pwa_installed');
+    showPWAPopup();
+};
+
+// Service Worker registration
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
                 .then((registration) => {
-                    console.log('Service Worker registered successfully:', registration);
-                    
-                    // Check for updates immediately
-                    registration.update();
-                    
-                    // Listen for updates
-                    registration.addEventListener('updatefound', () => {
-                        const newWorker = registration.installing;
-                        console.log('New service worker version available');
-                        
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed') {
-                                if (navigator.serviceWorker.controller) {
-                                    // New update available
-                                    showUpdateNotification();
-                                }
-                            }
-                        });
-                    });
+                    console.log('Service Worker registered successfully:', registration.scope);
                 })
                 .catch((error) => {
                     console.error('Service Worker registration failed:', error);
                 });
-                
-            // Check for updates every 30 minutes
-            setInterval(() => {
-                if (navigator.serviceWorker.controller) {
-                    navigator.serviceWorker.controller.postMessage({action: 'checkUpdate'});
-                }
-            }, 30 * 60 * 1000);
         });
     } else {
-        console.log('Service Worker not supported');
+        console.log('Service Worker not supported in this browser');
     }
 }
 
-// Show update notification
-function showUpdateNotification() {
-    if (confirm('A new version is available. Refresh to get the latest features?')) {
-        window.location.reload();
-    }
-}
-
-// Force refresh cache when needed
-function clearAppCache() {
-    if ('caches' in window) {
-        caches.keys().then((names) => {
-            names.forEach(name => {
-                caches.delete(name);
-            });
-        });
-    }
+// Initialize everything
+function initializePWA() {
+    console.log('Initializing PWA system...');
     
-    if (navigator.serviceWorker) {
-        navigator.serviceWorker.getRegistrations().then((registrations) => {
-            registrations.forEach(registration => registration.unregister());
-        });
-    }
+    // Register service worker first
+    registerServiceWorker();
     
-    window.location.reload(true);
+    // Setup PWA install functionality
+    setupPWA();
+    
+    console.log('PWA system initialized');
 }
 
-// Updated initialization
+// Start when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePWA);
+} else {
+    initializePWA();
+}
 
-
-
+// Also integrate with your existing initApp function
 async function initApp() {
     console.log('Initializing app...');
     
     try {
-        // Initialize Supabase connection
-        await initializeSupabase();
+        // Your existing initialization code...
+        // await initializeSupabase();
+        // await initializeAuth();
+        // setupEventListeners();
+        // etc...
         
-        // Initialize authentication
-        await initializeAuth();
-        
-        // Setup all event listeners
-        setupEventListeners();
-        
-        // Initialize navigation history
-        initializeNavigation();
-        
-        // Load departments data
-        await loadDepartments();
-        
-        // Check for PWA install prompt
-        checkPWAInstallPrompt();
-        
-        // Update UI based on auth state
-        if (currentUser) {
-            updateUIForLoggedInUser();
-        } else {
-            updateUIForLoggedOutUser();
-        }
+        // Initialize PWA features
+        initializePWA();
         
         console.log('App initialized successfully');
         
     } catch (error) {
         console.error('App initialization error:', error);
-        // Fallback to basic functionality
-        setupEventListeners();
-        updateUIForLoggedOutUser();
+        // Still initialize PWA even if other parts fail
+        initializePWA();
     }
 }
-// Initialize service worker
-registerServiceWorker();
-
-// Initialize app when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initApp);
-} else {
-    initApp();
-}
-
 
 
 // function checkPWAInstallPrompt() {
