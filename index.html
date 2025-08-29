@@ -16,6 +16,51 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
 
+    <!-- iOS Specific PWA Meta Tags - Add to <head> section -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="VVPIET Staff">
+<meta name="apple-touch-fullscreen" content="yes">
+
+<!-- iOS Icons (Multiple sizes for different devices) -->
+<link rel="apple-touch-icon" sizes="57x57" href="/stafflogo.jpg">
+<link rel="apple-touch-icon" sizes="60x60" href="/stafflogo.jpg">
+<link rel="apple-touch-icon" sizes="72x72" href="/stafflogo.jpg">
+<link rel="apple-touch-icon" sizes="76x76" href="/stafflogo.jpg">
+<link rel="apple-touch-icon" sizes="114x114" href="/stafflogo.jpg">
+<link rel="apple-touch-icon" sizes="120x120" href="/stafflogo.jpg">
+<link rel="apple-touch-icon" sizes="144x144" href="/stafflogo.jpg">
+<link rel="apple-touch-icon" sizes="152x152" href="/stafflogo.jpg">
+<link rel="apple-touch-icon" sizes="167x167" href="/stafflogo.jpg">
+<link rel="apple-touch-icon" sizes="180x180" href="/stafflogo.jpg">
+
+<!-- iOS Splash Screens for different device sizes -->
+<link rel="apple-touch-startup-image" media="screen and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iphone5_splash.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iphone6_splash.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iphoneplus_splash.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iphonex_splash.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/iphonexr_splash.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" href="/splash/iphonexsmax_splash.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/ipad_splash.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/ipadpro1_splash.png">
+<link rel="apple-touch-startup-image" media="screen and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" href="/splash/ipadpro3_splash.png">
+
+<!-- iOS Safari Pinned Tab -->
+<link rel="mask-icon" href="/stafflogo.jpg" color="#8B5CF6">
+
+<!-- Prevent automatic phone number detection -->
+<meta name="format-detection" content="telephone=no">
+
+<!-- iOS viewport optimizations -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+<!-- Additional iOS optimizations -->
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#8B5CF6">
+<meta name="msapplication-navbutton-color" content="#8B5CF6">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     
@@ -2522,35 +2567,197 @@ function updateUIForLoggedOutUser() {
 
         // ========================================
         // PWA FUNCTIONS
-        // ========================================
+// ========================================
 // PWA Variables
 let deferredPrompt = null;
 let pwaInstalled = false;
 
-// Check if app is already installed or running as PWA
+// Detect device type and browser
+function getDeviceInfo() {
+    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+    const isIOSSafari = isIOS && /Safari/.test(userAgent) && !/CriOS|FxiOS/.test(userAgent);
+    const isAndroid = /android/i.test(userAgent);
+    const isChrome = /Chrome/.test(userAgent) && /Google Inc/.test(navigator.vendor);
+    
+    return {
+        isIOS,
+        isIOSSafari,
+        isAndroid,
+        isChrome,
+        isMobile: isIOS || isAndroid,
+        supportsInstallPrompt: !isIOS // iOS doesn't support beforeinstallprompt
+    };
+}
+
+// Enhanced function to check if PWA is installed
 function isPWAInstalled() {
+    const deviceInfo = getDeviceInfo();
+    
     // Check if running in standalone mode (installed PWA)
     if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
         return true;
     }
-    // Check if installed on iOS Safari
-    if (window.navigator.standalone === true) {
+    
+    // iOS specific check
+    if (deviceInfo.isIOS && window.navigator.standalone === true) {
         return true;
     }
+    
+    // Android specific checks
+    if (deviceInfo.isAndroid) {
+        // Check for TWA (Trusted Web Activity)
+        if (document.referrer.startsWith('android-app://')) {
+            return true;
+        }
+        
+        // Check for standalone display mode
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            return true;
+        }
+    }
+    
     // Check localStorage flag
     if (localStorage.getItem('pwa_installed') === 'true') {
         return true;
     }
+    
     return false;
 }
 
-// Show PWA popup only if not installed and criteria met
+// iOS specific PWA install instructions
+function showIOSInstallInstructions() {
+    const isIOSSafari = getDeviceInfo().isIOSSafari;
+    
+    if (!isIOSSafari) {
+        alert('To install this app on iOS, please open it in Safari browser.');
+        return;
+    }
+    
+    // Create iOS install modal
+    const modal = document.createElement('div');
+    modal.id = 'iosInstallModal';
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        padding: 20px;
+        box-sizing: border-box;
+    `;
+    
+    modal.innerHTML = `
+        <div style="
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 350px;
+            width: 100%;
+            text-align: center;
+            position: relative;
+        ">
+            <button onclick="hideIOSInstallModal()" style="
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                background: none;
+                border: none;
+                font-size: 24px;
+                cursor: pointer;
+                color: #666;
+            ">×</button>
+            
+            <h3 style="margin: 0 0 20px 0; color: #333;">Install App</h3>
+            
+            <div style="text-align: left; margin-bottom: 20px;">
+                <p style="margin: 10px 0; display: flex; align-items: center;">
+                    <span style="
+                        display: inline-block;
+                        width: 30px;
+                        height: 30px;
+                        background: #007AFF;
+                        color: white;
+                        text-align: center;
+                        line-height: 30px;
+                        border-radius: 50%;
+                        margin-right: 15px;
+                        font-weight: bold;
+                    ">1</span>
+                    Tap the Share button <span style="font-size: 18px; margin: 0 5px;">📤</span> at the bottom
+                </p>
+                
+                <p style="margin: 10px 0; display: flex; align-items: center;">
+                    <span style="
+                        display: inline-block;
+                        width: 30px;
+                        height: 30px;
+                        background: #007AFF;
+                        color: white;
+                        text-align: center;
+                        line-height: 30px;
+                        border-radius: 50%;
+                        margin-right: 15px;
+                        font-weight: bold;
+                    ">2</span>
+                    Scroll down and tap <strong>"Add to Home Screen"</strong>
+                </p>
+                
+                <p style="margin: 10px 0; display: flex; align-items: center;">
+                    <span style="
+                        display: inline-block;
+                        width: 30px;
+                        height: 30px;
+                        background: #007AFF;
+                        color: white;
+                        text-align: center;
+                        line-height: 30px;
+                        border-radius: 50%;
+                        margin-right: 15px;
+                        font-weight: bold;
+                    ">3</span>
+                    Tap <strong>"Add"</strong> to install
+                </p>
+            </div>
+            
+            <button onclick="hideIOSInstallModal(); localStorage.setItem('ios_install_shown', 'true');" style="
+                background: #007AFF;
+                color: white;
+                border: none;
+                padding: 12px 24px;
+                border-radius: 8px;
+                font-size: 16px;
+                cursor: pointer;
+                width: 100%;
+            ">Got it!</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+// Hide iOS install modal
+function hideIOSInstallModal() {
+    const modal = document.getElementById('iosInstallModal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// Enhanced PWA popup for different platforms
 function showPWAPopup() {
     // Don't show if already installed
     if (isPWAInstalled()) {
         console.log('PWA already installed, not showing popup');
         return;
     }
+    
+    const deviceInfo = getDeviceInfo();
     
     // Don't show if user dismissed recently
     const lastDismissed = localStorage.getItem('pwa_dismissed');
@@ -2566,7 +2773,25 @@ function showPWAPopup() {
         }
     }
     
-    // Show the popup
+    // For iOS, show custom instructions
+    if (deviceInfo.isIOS) {
+        // Don't show too frequently on iOS
+        if (localStorage.getItem('ios_install_shown') === 'true') {
+            const lastShown = localStorage.getItem('ios_install_last_shown');
+            if (lastShown) {
+                const daysSinceShown = (Date.now() - parseInt(lastShown)) / (1000 * 60 * 60 * 24);
+                if (daysSinceShown < 7) { // Show only once per week
+                    return;
+                }
+            }
+        }
+        
+        localStorage.setItem('ios_install_last_shown', Date.now().toString());
+        showIOSInstallInstructions();
+        return;
+    }
+    
+    // For Android/Desktop with install prompt support
     const popup = document.getElementById('pwaPopup');
     if (popup) {
         popup.classList.add('show');
@@ -2584,10 +2809,18 @@ function hidePWAPopup() {
     localStorage.setItem('pwa_dismissed', new Date().toISOString());
 }
 
-// Install PWA - DIRECT INSTALLATION ONLY
+// Enhanced install function for different platforms
 function installPWA() {
+    const deviceInfo = getDeviceInfo();
+    
+    // iOS specific handling
+    if (deviceInfo.isIOS) {
+        showIOSInstallInstructions();
+        return;
+    }
+    
+    // Android/Desktop with beforeinstallprompt support
     if (deferredPrompt) {
-        // Use the deferred prompt for direct installation
         deferredPrompt.prompt();
         
         deferredPrompt.userChoice.then((choiceResult) => {
@@ -2606,14 +2839,32 @@ function installPWA() {
             deferredPrompt = null;
         });
     } else {
-        // If no prompt available, just hide popup
-        console.log('Install prompt not available');
-        hidePWAPopup();
+        // Fallback: show manual instructions for unsupported browsers
+        showManualInstallInstructions();
     }
+}
+
+// Manual install instructions for unsupported browsers
+function showManualInstallInstructions() {
+    const deviceInfo = getDeviceInfo();
+    let instructions = '';
+    
+    if (deviceInfo.isChrome) {
+        instructions = 'Click the three dots menu → "Install app" or look for the install icon in the address bar.';
+    } else if (deviceInfo.isAndroid) {
+        instructions = 'Open in Chrome browser, then tap menu → "Add to Home screen".';
+    } else {
+        instructions = 'This browser doesn\'t support automatic installation. You can bookmark this page for quick access.';
+    }
+    
+    alert('Install Instructions:\n\n' + instructions);
+    hidePWAPopup();
 }
 
 // Enhanced PWA detection and setup
 function setupPWA() {
+    const deviceInfo = getDeviceInfo();
+    
     // Check if already installed
     if (isPWAInstalled()) {
         pwaInstalled = true;
@@ -2621,40 +2872,66 @@ function setupPWA() {
         return;
     }
     
-    // Listen for install prompt
-    window.addEventListener('beforeinstallprompt', (e) => {
-        console.log('beforeinstallprompt event fired');
-        e.preventDefault();
-        deferredPrompt = e;
+    // Different setup for different platforms
+    if (deviceInfo.supportsInstallPrompt) {
+        // Listen for install prompt (Android, Desktop Chrome, etc.)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('beforeinstallprompt event fired');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show custom install prompt after delay
+            setTimeout(showPWAPopup, 3000);
+        });
         
-        // Show custom install prompt after 3 seconds
-        setTimeout(showPWAPopup, 3000);
-    });
+        // Listen for successful installation
+        window.addEventListener('appinstalled', (e) => {
+            console.log('PWA was installed successfully');
+            localStorage.setItem('pwa_installed', 'true');
+            pwaInstalled = true;
+            hidePWAPopup();
+        });
+    } else if (deviceInfo.isIOS) {
+        // iOS specific setup
+        console.log('iOS detected - using custom install flow');
+        
+        // Show install prompt after delay if conditions are met
+        setTimeout(() => {
+            if (!isPWAInstalled()) {
+                showPWAPopup();
+            }
+        }, 5000); // Longer delay for iOS
+    }
     
-    // Listen for successful installation
-    window.addEventListener('appinstalled', (e) => {
-        console.log('PWA was installed successfully');
-        localStorage.setItem('pwa_installed', 'true');
-        pwaInstalled = true;
-        hidePWAPopup();
-    });
-    
-    // For browsers that don't fire beforeinstallprompt
-    setTimeout(() => {
-        if (!deferredPrompt && !isPWAInstalled()) {
-            console.log('No install prompt available');
-            // Don't show popup if no prompt is available
-        }
-    }, 1000);
+    // Detect if user adds to home screen on iOS
+    if (deviceInfo.isIOS) {
+        // Listen for app becoming standalone
+        let wasStandalone = window.navigator.standalone;
+        
+        setInterval(() => {
+            if (!wasStandalone && window.navigator.standalone) {
+                console.log('App installed on iOS');
+                localStorage.setItem('pwa_installed', 'true');
+                pwaInstalled = true;
+            }
+            wasStandalone = window.navigator.standalone;
+        }, 1000);
+    }
 }
 
-// Service Worker registration with error handling
+// Service Worker registration with iOS considerations
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
                 .then((registration) => {
                     console.log('Service Worker registered successfully:', registration);
+                    
+                    // iOS Safari has limited service worker capabilities
+                    const deviceInfo = getDeviceInfo();
+                    if (deviceInfo.isIOSSafari) {
+                        console.log('iOS Safari detected - limited SW features available');
+                    }
                     
                     // Check for updates immediately
                     registration.update();
@@ -2667,7 +2944,6 @@ function registerServiceWorker() {
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed') {
                                 if (navigator.serviceWorker.controller) {
-                                    // New update available
                                     showUpdateNotification();
                                 }
                             }
@@ -2678,26 +2954,41 @@ function registerServiceWorker() {
                     console.error('Service Worker registration failed:', error);
                 });
                 
-            // Check for updates every 30 minutes
+            // Check for updates periodically (less frequent on mobile to save battery)
+            const updateInterval = getDeviceInfo().isMobile ? 60 * 60 * 1000 : 30 * 60 * 1000; // 1 hour on mobile, 30 min on desktop
+            
             setInterval(() => {
                 if (navigator.serviceWorker.controller) {
                     navigator.serviceWorker.controller.postMessage({action: 'checkUpdate'});
                 }
-            }, 30 * 60 * 1000);
+            }, updateInterval);
         });
     } else {
         console.log('Service Worker not supported');
     }
 }
 
-// Show update notification
+// Enhanced update notification with platform awareness
 function showUpdateNotification() {
-    if (confirm('A new version is available. Refresh to get the latest features?')) {
-        window.location.reload();
+    const deviceInfo = getDeviceInfo();
+    
+    let message = 'A new version is available. Refresh to get the latest features?';
+    
+    if (deviceInfo.isIOS) {
+        message = 'A new version is available. Pull down to refresh or close and reopen the app.';
+    }
+    
+    if (confirm(message)) {
+        if (deviceInfo.isIOS && window.navigator.standalone) {
+            // For iOS PWA, we can't force reload, so give instructions
+            alert('Please close the app completely and reopen it to get the update.');
+        } else {
+            window.location.reload();
+        }
     }
 }
 
-// Force refresh cache when needed
+// Platform-aware cache clearing
 function clearAppCache() {
     if ('caches' in window) {
         caches.keys().then((names) => {
@@ -2713,15 +3004,21 @@ function clearAppCache() {
         });
     }
     
-    window.location.reload(true);
+    const deviceInfo = getDeviceInfo();
+    if (deviceInfo.isIOS && window.navigator.standalone) {
+        alert('Cache cleared. Please close and reopen the app.');
+    } else {
+        window.location.reload(true);
+    }
 }
 
-// Updated initialization
-
-
-
+// Initialize PWA with platform detection
 async function initApp() {
     console.log('Initializing app...');
+    
+    // Log device information
+    const deviceInfo = getDeviceInfo();
+    console.log('Device info:', deviceInfo);
     
     try {
         // Initialize Supabase connection
@@ -2739,8 +3036,8 @@ async function initApp() {
         // Load departments data
         await loadDepartments();
         
-        // Check for PWA install prompt
-        checkPWAInstallPrompt();
+        // Setup PWA with platform awareness
+        setupPWA();
         
         // Update UI based on auth state
         if (currentUser) {
@@ -2758,6 +3055,7 @@ async function initApp() {
         updateUIForLoggedOutUser();
     }
 }
+
 // Initialize service worker
 registerServiceWorker();
 
@@ -2768,7 +3066,19 @@ if (document.readyState === 'loading') {
     initApp();
 }
 
-
+// iOS specific viewport handling for PWA
+if (getDeviceInfo().isIOS) {
+    // Handle iOS safe areas
+    document.documentElement.style.setProperty('--safe-area-inset-top', 'env(safe-area-inset-top)');
+    document.documentElement.style.setProperty('--safe-area-inset-bottom', 'env(safe-area-inset-bottom)');
+    
+    // Prevent zoom on iOS
+    document.addEventListener('touchmove', function (event) {
+        if (event.scale !== 1) {
+            event.preventDefault();
+        }
+    }, { passive: false });
+}
 
 // function checkPWAInstallPrompt() {
 //     // Check if app is already installed
