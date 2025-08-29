@@ -385,25 +385,210 @@
             color: #8B5CF6;
         }
 
-        .staff-card {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 10px;
-            border: 1px solid #e5e5e5;
-        }
+        /* Staff Card Container */
+.staff-card {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    background-color: #ffffff;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 450px;
+}
 
-        .staff-name {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
+/* Hover Effects */
+.staff-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
 
-        .staff-designation {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 10px;
-        }
+.staff-card:active {
+    transform: translateY(0);
+}
+
+/* Staff Image Container */
+.staff-img {
+    width: 60px;
+    height: 60px;
+    min-width: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 15px;
+    background-color: #f5f5f5;
+    border: 2px solid #e5e5e5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    color: #999999;
+}
+
+/* Image inside staff-img container */
+.staff-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 50%;
+}
+
+/* Staff Info Section */
+.staff-info {
+    flex-grow: 1;
+    min-width: 0;
+    overflow: hidden;
+}
+
+/* Staff Name */
+.staff-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333333;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+/* Staff Designation */
+.staff-designation {
+    font-size: 14px;
+    color: #666666;
+    margin-bottom: 4px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+/* Staff Experience */
+.staff-experience {
+    font-size: 12px;
+    color: #999999;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.2;
+}
+
+/* Tablet Responsive (768px and below) */
+@media (max-width: 768px) {
+    .staff-card {
+        max-width: 100%;
+        padding: 12px;
+        margin-bottom: 10px;
+    }
+
+    .staff-img {
+        width: 50px;
+        height: 50px;
+        min-width: 50px;
+        margin-right: 12px;
+        font-size: 20px;
+    }
+
+    .staff-name {
+        font-size: 14px;
+    }
+
+    .staff-designation {
+        font-size: 13px;
+    }
+
+    .staff-experience {
+        font-size: 11px;
+    }
+}
+
+/* Mobile Responsive (480px and below) */
+@media (max-width: 480px) {
+    .staff-card {
+        padding: 10px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+    }
+
+    .staff-img {
+        width: 45px;
+        height: 45px;
+        min-width: 45px;
+        margin-right: 10px;
+        font-size: 18px;
+    }
+
+    .staff-name {
+        font-size: 13px;
+        margin-bottom: 3px;
+    }
+
+    .staff-designation {
+        font-size: 12px;
+        margin-bottom: 3px;
+    }
+
+    .staff-experience {
+        font-size: 10px;
+    }
+}
+
+/* Small Mobile (320px and below) */
+@media (max-width: 320px) {
+    .staff-card {
+        padding: 8px;
+        margin-bottom: 6px;
+    }
+
+    .staff-img {
+        width: 40px;
+        height: 40px;
+        min-width: 40px;
+        margin-right: 8px;
+        font-size: 16px;
+    }
+
+    .staff-name {
+        font-size: 12px;
+        margin-bottom: 2px;
+    }
+
+    .staff-designation {
+        font-size: 11px;
+        margin-bottom: 2px;
+    }
+
+    .staff-experience {
+        font-size: 9px;
+    }
+}
+
+/* Focus states for accessibility */
+.staff-card:focus {
+    outline: 2px solid #8B5CF6;
+    outline-offset: 2px;
+}
+
+/* Loading state (optional) */
+.staff-card.loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+.staff-card.loading .staff-img {
+    background-color: #e0e0e0;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
 
         .check-profile-btn {
             background: #8B5CF6;
