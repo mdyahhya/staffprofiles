@@ -1709,6 +1709,22 @@ async function showProfileView(profileId) {
     }
 }
 
+function showLoginPage() {
+    showPage('loginPage');
+    // Rebind form events after page is shown
+    setTimeout(() => {
+        bindFormEvents();
+    }, 100);
+}
+
+function showRegisterPage() {
+    showPage('registerPage');
+    // Rebind form events after page is shown
+    setTimeout(() => {
+        bindFormEvents();
+    }, 100);
+}
+
         function editProfile() {
             if (!currentUserProfile) return;
             
@@ -1891,13 +1907,6 @@ function setButtonLoading(buttonId, isLoading) {
         // ========================================
 
         async function handleRegistration(e) {
-
-        // Add this at the very beginning, before any other code
-document.getElementById('registerForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    e.stopPropagation();
-});
-
     e.preventDefault();
     
     const email = document.getElementById('registerEmail').value;
@@ -1910,8 +1919,12 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         return;
     }
     
-    if (!email || !password || !department || !code) {
-        alert('Please fill in all fields');
+    if (!validateRegistrationForm()) {
+        return;
+    }
+    
+    if (!department || !code) {
+        alert('Please select a department and enter the code');
         return;
     }
     
@@ -1929,34 +1942,39 @@ document.getElementById('registerForm').addEventListener('submit', function(e) {
         }
         
         // Register with Supabase Auth
-        // Register with Supabase Auth
-const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-    email: email,
-    password: password
-});
+        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
+            email: email,
+            password: password
+        });
 
-if (authError) throw authError;
+        if (authError) throw authError;
 
-// Insert into users table to get integer ID
-const { data: userData, error: userError } = await supabaseClient
-    .from('users')
-    .insert([{
-        email: email,
-        password: password,
-        department: parseInt(department),
-        role: 'Staff',
-        is_active: true
-    }])
-    .select()
-    .single();
+        // Set current user immediately
+        currentUser = authData.user;
 
-if (userError) throw userError;
+        // Insert into users table to get integer ID
+        const { data: userData, error: userError } = await supabaseClient
+            .from('users')
+            .insert([{
+                email: email,
+                password: password, // Consider removing this for security
+                department: parseInt(department),
+                role: 'Staff',
+                is_active: true
+            }])
+            .select()
+            .single();
 
-// Store the integer user ID
-localStorage.setItem('db_user_id', userData.user_id);
+        if (userError) throw userError;
 
-alert('Registration successful! You are now logged in.');
-showMainPage();
+        // Store the integer user ID
+        localStorage.setItem('db_user_id', userData.user_id);
+        
+        // Update UI for logged in user
+        updateUIForLoggedInUser();
+
+        alert('Registration successful! You are now logged in.');
+        showMainPage();
         
         // Clear form
         document.getElementById('registerForm').reset();
@@ -1966,7 +1984,7 @@ showMainPage();
         alert('Registration failed: ' + error.message);
     }
 }
-        async function handleLogin(e) {
+ async function handleLogin(e) {
     e.preventDefault();
     
     const email = document.getElementById('loginEmail').value;
@@ -1974,6 +1992,11 @@ showMainPage();
     
     if (!supabaseClient) {
         alert('Database connection not available');
+        return;
+    }
+    
+    if (!email || !password) {
+        alert('Please enter both email and password');
         return;
     }
     
@@ -1985,8 +2008,26 @@ showMainPage();
         
         if (error) throw error;
         
-        // ADD THESE LINES - Set user state immediately
+        // Set user state immediately
         currentUser = data.user;
+        
+        // Get the database user ID
+        const { data: dbUser, error: userError } = await supabaseClient
+            .from('users')
+            .select('user_id')
+            .eq('email', email)
+            .single();
+        
+        if (userError || !dbUser) {
+            console.error('Database user lookup error:', userError);
+            // Handle case where auth user exists but db user doesn't
+            alert('Account setup incomplete. Please contact administrator.');
+            return;
+        }
+        
+        localStorage.setItem('db_user_id', dbUser.user_id);
+        
+        // Load user profile and update UI
         await loadUserProfile();
         updateUIForLoggedInUser();
         
@@ -2017,7 +2058,7 @@ showMainPage();
         return;
     }
     
-    // Get form values
+   
     const name = document.getElementById('profileName').value.trim();
     const department = document.getElementById('profileDepartment').value;
     const designation = document.getElementById('profileDesignation').value;
@@ -2027,7 +2068,7 @@ showMainPage();
     const imageFile = document.getElementById('profileImage').files[0];
     const customFields = collectCustomFields();
     
-    // Validate required fields
+    
     if (!name || !department || !designation || !experience) {
         alert('Please fill in all required fields');
         return;
@@ -3983,6 +4024,102 @@ if (navigator.serviceWorker) {
             // DOM is already loaded
             initApp();
         }
+        // ========================================
+// DOM INITIALIZATION AND EVENT BINDING
+// ========================================
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM loaded, initializing app...');
+    
+    // Initialize Supabase and check auth state
+    initializeApp();
+    
+    // Bind form event listeners
+    bindFormEvents();
+    
+    // Bind button event listeners
+    bindButtonEvents();
+    
+    // Load initial data
+    loadInitialData();
+    
+    // Set up auth state listener
+    setupAuthStateListener();
+});
+
+function bindFormEvents() {
+    // Login form
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+        console.log('Login form event bound');
+    } else {
+        console.warn('Login form not found');
+    }
+    
+    // Register form
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.addEventListener('submit', handleRegistration);
+        console.log('Register form event bound');
+    } else {
+        console.warn('Register form not found');
+    }
+    
+    // Profile form
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.addEventListener('submit', handleProfileCreation);
+        console.log('Profile form event bound');
+    } else {
+        console.warn('Profile form not found');
+    }
+}
+
+function bindButtonEvents() {
+    // Store original button text for loading states
+    const buttons = document.querySelectorAll('button[type="submit"]');
+    buttons.forEach(btn => {
+        if (!btn.getAttribute('data-original-text')) {
+            btn.setAttribute('data-original-text', btn.textContent);
+        }
+    });
+    
+    // Auth button (Login/Logout)
+    const authBtn = document.getElementById('authButton') || document.querySelector('[onclick*="handleAuthAction"]');
+    if (authBtn) {
+        authBtn.addEventListener('click', handleAuthAction);
+    }
+    
+    // Department buttons - bind dynamically when created
+    bindDepartmentButtons();
+    
+    // Profile buttons
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    if (editProfileBtn) {
+        editProfileBtn.addEventListener('click', editProfile);
+    }
+    
+    const deleteProfileBtn = document.getElementById('deleteProfileBtn');
+    if (deleteProfileBtn) {
+        deleteProfileBtn.addEventListener('click', deleteProfile);
+    }
+    
+    // Navigation buttons
+    const backButtons = document.querySelectorAll('[onclick*="goBack"], [onclick*="handleBack"]');
+    backButtons.forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            handleBackNavigation();
+        });
+    });
+    
+    // Custom fields button
+    const addFieldBtn = document.getElementById('addCustomFieldBtn');
+    if (addFieldBtn) {
+        addFieldBtn.addEventListener('click', addCustomField);
+    }
+}
     </script>
 </body>
 </html>
