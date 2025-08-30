@@ -2751,6 +2751,7 @@ function updateUIForLoggedOutUser() {
 // ========================================
 
 // PWA Variables
+// PWA Variables
 let deferredPrompt = null;
 let pwaInstalled = false;
 
@@ -2760,14 +2761,18 @@ function getDeviceInfo() {
     const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
     const isIOSSafari = isIOS && /Safari/.test(userAgent) && !/CriOS|FxiOS/.test(userAgent);
     const isAndroid = /android/i.test(userAgent);
+    const isWindows = /Win32|Win64|Windows|WinCE/.test(userAgent);
     const isChrome = /Chrome/.test(userAgent) && /Google Inc/.test(navigator.vendor);
+    const isEdge = /Edg/.test(userAgent);
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
     
     return {
         isIOS,
         isIOSSafari,
         isAndroid,
+        isWindows,
         isChrome,
+        isEdge,
         isMobile,
         supportsInstallPrompt: !isIOS
     };
@@ -2798,9 +2803,22 @@ function isPWAInstalled() {
         }
     }
     
-    // Check localStorage flag
-    if (localStorage.getItem('pwa_installed') === 'true') {
-        console.log('PWA detected: localStorage flag');
+    // Windows specific check - look for app installation indicators
+    if (deviceInfo.isWindows) {
+        // Check for Windows PWA installation indicators
+        if (window.navigator.userAgentData && window.navigator.userAgentData.mobile === false) {
+            // Desktop environment check
+            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+            if (isStandalone) {
+                console.log('PWA detected: Windows standalone mode');
+                return true;
+            }
+        }
+    }
+    
+    // Check memory flag for installation tracking
+    if (window.pwaInstallationInProgress) {
+        console.log('PWA installation in progress');
         return true;
     }
     
@@ -2816,6 +2834,19 @@ function createPWAPopup() {
     const existingPopup = document.getElementById('pwaPopup');
     if (existingPopup) {
         existingPopup.remove();
+    }
+
+    const deviceInfo = getDeviceInfo();
+    let installText = 'Install Now';
+    let description = 'Get instant access and offline features';
+    
+    // Customize text based on platform
+    if (deviceInfo.isWindows) {
+        installText = '🖥️ Install Desktop App';
+        description = 'Add shortcut to desktop and start menu';
+    } else if (deviceInfo.isAndroid) {
+        installText = '📱 Install App';
+        description = 'Add to home screen for quick access';
     }
 
     // Create popup HTML
@@ -2853,11 +2884,11 @@ function createPWAPopup() {
                 margin-right: 15px;
                 font-size: 28px;
                 box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            ">📱</div>
+            ">${deviceInfo.isWindows ? '🖥️' : '📱'}</div>
             <div style="flex: 1;">
                 <h3 style="margin: 0; font-size: 19px; font-weight: 700; line-height: 1.2;">Install Our App</h3>
                 <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; line-height: 1.3;">
-                    Get instant access and offline features
+                    ${description}
                 </p>
             </div>
             <button id="pwaCloseBtn" style="
@@ -2893,7 +2924,7 @@ function createPWAPopup() {
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.15)'" 
                onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'">
-                📱 Install Now
+                ${installText}
             </button>
             <button id="pwaLaterBtn" style="
                 background: rgba(255,255,255,0.15);
@@ -2916,7 +2947,6 @@ function createPWAPopup() {
     
     // Add event listeners to prevent event bubbling and handle clicks properly
     popup.addEventListener('click', function(e) {
-        // Prevent the popup from closing when clicked inside
         e.stopPropagation();
     });
     
@@ -2955,7 +2985,6 @@ function showPWAPopup() {
     const deviceInfo = getDeviceInfo();
     console.log('Device info:', deviceInfo);
     
-    // REMOVED: Dismissal tracking - now shows every time
     // Show popup every time user opens the website
     console.log('Showing PWA popup on every visit...');
     
@@ -2966,8 +2995,8 @@ function showPWAPopup() {
         return;
     }
     
-    // For Android/Desktop - create and show the popup
-    console.log('Creating popup for Android/Desktop...');
+    // For Windows/Android/Desktop - create and show the popup
+    console.log('Creating popup for Windows/Android/Desktop...');
     const popup = createPWAPopup();
     
     // Animate popup into view with delay
@@ -2991,7 +3020,6 @@ function hidePWAPopup() {
         }, 400);
     }
     
-    // REMOVED: Dismissal tracking - so popup shows every time
     console.log('PWA popup hidden');
 }
 
@@ -3107,7 +3135,7 @@ function showIOSInstallInstructions() {
                 </div>
             </div>
             
-            <button onclick="hideIOSInstallModal(); localStorage.setItem('ios_install_shown', 'true');" style="
+            <button onclick="hideIOSInstallModal();" style="
                 background: #007AFF;
                 color: white;
                 border: none;
@@ -3134,6 +3162,93 @@ function hideIOSInstallModal() {
     console.log('iOS install modal hidden');
 }
 
+// Windows Desktop App Installation with proper icon and shortcuts
+function installWindowsDesktopApp() {
+    console.log('Installing Windows desktop app...');
+    
+    // Set installation flag
+    window.pwaInstallationInProgress = true;
+    
+    if (deferredPrompt) {
+        console.log('Using deferred prompt for Windows installation...');
+        
+        // Show browser's native install dialog
+        deferredPrompt.prompt();
+        
+        deferredPrompt.userChoice.then((choiceResult) => {
+            console.log('Windows PWA install choice:', choiceResult.outcome);
+            
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted Windows PWA installation');
+                
+                // Show installing message
+                showInstallingMessage();
+                
+                // Track installation
+                pwaInstalled = true;
+                hidePWAPopup();
+                
+                // Wait for installation to complete, then show success
+                setTimeout(() => {
+                    hideInstallingMessage();
+                    showInstallSuccessMessage('Desktop app installed! Check your desktop and start menu.');
+                }, 2000);
+                
+            } else {
+                console.log('User dismissed Windows PWA installation');
+                window.pwaInstallationInProgress = false;
+                hidePWAPopup();
+            }
+            
+            deferredPrompt = null;
+        });
+    } else {
+        console.log('No deferred prompt available for Windows, showing manual instructions...');
+        showWindowsManualInstall();
+    }
+}
+
+// Show installing message
+function showInstallingMessage() {
+    const message = document.createElement('div');
+    message.id = 'installingMessage';
+    message.style.cssText = `
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.9);
+        color: white;
+        padding: 30px;
+        border-radius: 15px;
+        font-weight: 600;
+        z-index: 10002;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        font-size: 18px;
+        text-align: center;
+        backdrop-filter: blur(10px);
+    `;
+    
+    message.innerHTML = `
+        <div style="margin-bottom: 15px; font-size: 40px;">⚙️</div>
+        <div>Installing desktop app...</div>
+        <div style="margin-top: 10px; font-size: 14px; opacity: 0.8;">
+            This will add a shortcut to your desktop and start menu
+        </div>
+    `;
+    
+    document.body.appendChild(message);
+}
+
+// Hide installing message
+function hideInstallingMessage() {
+    const message = document.getElementById('installingMessage');
+    if (message) {
+        message.style.opacity = '0';
+        setTimeout(() => message.remove(), 300);
+    }
+}
+
 // Enhanced install function
 function installPWA() {
     console.log('Install PWA triggered...');
@@ -3146,7 +3261,13 @@ function installPWA() {
         return;
     }
     
-    // Android/Desktop with beforeinstallprompt support
+    // Windows specific handling for desktop app
+    if (deviceInfo.isWindows) {
+        installWindowsDesktopApp();
+        return;
+    }
+    
+    // Android and other platforms
     if (deferredPrompt) {
         console.log('Using deferred prompt...');
         deferredPrompt.prompt();
@@ -3156,10 +3277,9 @@ function installPWA() {
             
             if (choiceResult.outcome === 'accepted') {
                 console.log('User accepted PWA installation');
-                localStorage.setItem('pwa_installed', 'true');
                 pwaInstalled = true;
                 hidePWAPopup();
-                showInstallSuccessMessage();
+                showInstallSuccessMessage('App installed successfully!');
             } else {
                 console.log('User dismissed PWA installation');
                 hidePWAPopup();
@@ -3173,8 +3293,39 @@ function installPWA() {
     }
 }
 
+// Windows manual install instructions
+function showWindowsManualInstall() {
+    const deviceInfo = getDeviceInfo();
+    let instructions = '';
+    
+    if (deviceInfo.isChrome) {
+        instructions = `To install the desktop app:
+
+1. Look for the install icon (⊞) in the address bar
+2. Click it and select "Install"
+3. Or go to Chrome menu (⋮) → "Install [App Name]"
+
+This will create a desktop shortcut and add the app to your start menu with the proper icon.`;
+    } else if (deviceInfo.isEdge) {
+        instructions = `To install the desktop app:
+
+1. Click the apps icon (⊞) in the address bar
+2. Select "Install this site as an app"
+3. Or go to Edge menu (⋯) → "Apps" → "Install this site as an app"
+
+This will create a desktop shortcut and add the app to your start menu.`;
+    } else {
+        instructions = `To get the best experience:
+
+Please open this website in Chrome or Edge browser to install it as a desktop app with proper shortcuts and icon.`;
+    }
+    
+    alert(instructions);
+    hidePWAPopup();
+}
+
 // Show install success message
-function showInstallSuccessMessage() {
+function showInstallSuccessMessage(customMessage = '✅ App installed successfully!') {
     const message = document.createElement('div');
     message.style.cssText = `
         position: fixed;
@@ -3189,8 +3340,10 @@ function showInstallSuccessMessage() {
         z-index: 10001;
         box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
         font-size: 16px;
+        text-align: center;
+        max-width: 90%;
     `;
-    message.textContent = '✅ App installed successfully!';
+    message.textContent = customMessage;
     
     document.body.appendChild(message);
     
@@ -3198,18 +3351,22 @@ function showInstallSuccessMessage() {
         message.style.opacity = '0';
         message.style.transform = 'translateX(-50%) translateY(-20px)';
         setTimeout(() => message.remove(), 300);
-    }, 3000);
+    }, 4000);
 }
 
-// Manual install instructions
+// Manual install instructions for other platforms
 function showManualInstallInstructions() {
     const deviceInfo = getDeviceInfo();
     let instructions = '';
     
     if (deviceInfo.isChrome && deviceInfo.isAndroid) {
         instructions = '1. Tap the menu (⋮) in Chrome\n2. Select "Add to Home screen"\n3. Tap "Add" to install';
+    } else if (deviceInfo.isChrome && deviceInfo.isWindows) {
+        instructions = '1. Click the install icon (⊞) in the address bar\n2. Or go to Chrome menu → "Install app"\n3. This will add a desktop shortcut';
     } else if (deviceInfo.isChrome) {
         instructions = '1. Click the install icon in the address bar\n2. Or go to Chrome menu → "Install app"';
+    } else if (deviceInfo.isEdge && deviceInfo.isWindows) {
+        instructions = '1. Click the apps icon in the address bar\n2. Select "Install this site as an app"\n3. This will create a desktop shortcut';
     } else if (deviceInfo.isAndroid) {
         instructions = 'Please open this website in Chrome browser to install the app.';
     } else {
@@ -3220,7 +3377,7 @@ function showManualInstallInstructions() {
     hidePWAPopup();
 }
 
-// PWA Detection and Setup
+// Enhanced PWA Detection and Setup
 function setupPWA() {
     console.log('Setting up PWA...');
     const deviceInfo = getDeviceInfo();
@@ -3240,26 +3397,43 @@ function setupPWA() {
             console.log('beforeinstallprompt event fired');
             e.preventDefault();
             deferredPrompt = e;
+            
+            // For Windows, we can immediately show the popup since we have the install capability
+            if (deviceInfo.isWindows && !isPWAInstalled()) {
+                console.log('Windows device with install capability detected');
+                // Don't auto-show, wait for the scheduled popup
+            }
         });
         
         // Listen for successful installation
         window.addEventListener('appinstalled', (e) => {
             console.log('PWA was installed successfully via appinstalled event');
-            localStorage.setItem('pwa_installed', 'true');
             pwaInstalled = true;
+            window.pwaInstallationInProgress = false;
             hidePWAPopup();
-            showInstallSuccessMessage();
+            hideInstallingMessage();
+            
+            // Determine success message based on platform
+            const deviceInfo = getDeviceInfo();
+            let successMessage = '✅ App installed successfully!';
+            
+            if (deviceInfo.isWindows) {
+                successMessage = '✅ Desktop app installed! Check your desktop and start menu.';
+            } else if (deviceInfo.isAndroid) {
+                successMessage = '✅ App added to home screen!';
+            }
+            
+            showInstallSuccessMessage(successMessage);
         });
     }
     
-    // Show install prompt after page loads - THIS IS THE KEY PART
-    // We don't wait for beforeinstallprompt, we show our popup regardless
+    // Force show popup after page loads
     setTimeout(() => {
-        console.log('Timeout reached, checking if we should show popup...');
+        console.log('Force showing PWA popup after timeout...');
         if (!isPWAInstalled()) {
             showPWAPopup();
         }
-    }, 2000); // Show after 2 seconds
+    }, 1000);
     
     // For iOS, monitor standalone mode changes
     if (deviceInfo.isIOS) {
@@ -3268,41 +3442,66 @@ function setupPWA() {
         const checkStandalone = setInterval(() => {
             if (!wasStandalone && window.navigator.standalone) {
                 console.log('App installed on iOS (standalone mode detected)');
-                localStorage.setItem('pwa_installed', 'true');
                 pwaInstalled = true;
                 clearInterval(checkStandalone);
+                showInstallSuccessMessage('✅ App added to home screen!');
             }
             wasStandalone = window.navigator.standalone;
         }, 1000);
+    }
+    
+    // Windows specific - monitor for installation completion
+    if (deviceInfo.isWindows) {
+        // Monitor for display mode changes indicating installation
+        const mediaQuery = window.matchMedia('(display-mode: standalone)');
+        mediaQuery.addListener((e) => {
+            if (e.matches && !pwaInstalled) {
+                console.log('Windows PWA installed - standalone mode activated');
+                pwaInstalled = true;
+                window.pwaInstallationInProgress = false;
+                showInstallSuccessMessage('✅ Desktop app installed! Check your desktop and start menu.');
+            }
+        });
     }
 }
 
 // Force show popup function for testing
 window.showPWAInstallPopup = function() {
     console.log('Manually triggering PWA popup...');
-    // Clear any dismissal tracking
-    localStorage.removeItem('pwa_dismissed');
-    localStorage.removeItem('pwa_installed');
+    // Clear any installation tracking
+    window.pwaInstallationInProgress = false;
+    pwaInstalled = false;
     showPWAPopup();
 };
 
-// Clear dismissal tracking function
+// Clear all tracking function
 window.clearPWATracking = function() {
-    localStorage.removeItem('pwa_dismissed');
-    localStorage.removeItem('pwa_installed');
-    localStorage.removeItem('visit_count');
-    localStorage.removeItem('ios_install_shown');
-    localStorage.removeItem('ios_install_last_shown');
+    window.pwaInstallationInProgress = false;
+    pwaInstalled = false;
     console.log('All PWA tracking cleared');
 };
 
-// Service Worker registration
+// Enhanced Service Worker registration with better error handling
 function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js')
                 .then((registration) => {
                     console.log('Service Worker registered successfully:', registration.scope);
+                    
+                    // Check for updates
+                    registration.addEventListener('updatefound', () => {
+                        console.log('Service Worker update found');
+                        const newWorker = registration.installing;
+                        
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                console.log('New version available');
+                                // Optionally show update notification
+                                showUpdateAvailable();
+                            }
+                        });
+                    });
                 })
                 .catch((error) => {
                     console.error('Service Worker registration failed:', error);
@@ -3311,6 +3510,43 @@ function registerServiceWorker() {
     } else {
         console.log('Service Worker not supported in this browser');
     }
+}
+
+// Show update available notification
+function showUpdateAvailable() {
+    const notification = document.createElement('div');
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #2196F3;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        z-index: 10001;
+        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    `;
+    notification.innerHTML = `
+        <div>🔄 App update available</div>
+        <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">Click to refresh</div>
+    `;
+    
+    notification.addEventListener('click', () => {
+        window.location.reload();
+    });
+    
+    document.body.appendChild(notification);
+    
+    // Auto-hide after 8 seconds
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => notification.remove(), 300);
+    }, 8000);
 }
 
 // Initialize everything
@@ -3333,7 +3569,7 @@ if (document.readyState === 'loading') {
     initializePWA();
 }
 
-// Also integrate with your existing initApp function
+// Enhanced initApp function
 async function initApp() {
     console.log('Initializing app...');
     
@@ -3356,6 +3592,15 @@ async function initApp() {
     }
 }
 
+// Global functions for external access
+window.pwaUtils = {
+    showInstallPopup: () => showPWAPopup(),
+    hideInstallPopup: () => hidePWAPopup(),
+    checkInstallStatus: () => isPWAInstalled(),
+    clearTracking: () => window.clearPWATracking(),
+    getDeviceInfo: () => getDeviceInfo(),
+    forceInstall: () => installPWA()
+};
 
 // function checkPWAInstallPrompt() {
 //     // Check if app is already installed
