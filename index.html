@@ -1746,7 +1746,13 @@ function showRegisterPage() {
             
             // Load custom fields
             loadCustomFieldsInForm();
-            
+            // Temporarily disable the submit button to prevent multiple clicks
+setTimeout(() => {
+    const submitBtn = document.getElementById('profileFormSubmitBtn');
+    if (submitBtn) {
+        submitBtn.disabled = false;
+    }
+}, 100);
             showPage('createProfilePage');
         }
 
