@@ -1513,17 +1513,17 @@ function cancelCrop() {
                     updateUIForLoggedInUser();
                 }
 
-                supabaseClient.auth.onAuthStateChange(async (event, session) => {
-                    if (session) {
-                        currentUser = session.user;
-                        await loadUserProfile();
-                        updateUIForLoggedInUser();
-                    } else {
-                        currentUser = null;
-                        currentUserProfile = null;
-                        updateUIForLoggedOutUser();
-                    }
-                });
+               supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (session) {
+        currentUser = session.user;
+        await loadUserProfile(); // This loads the profile data
+        updateUIForLoggedInUser(); // This will now correctly show/hide UI based on profile
+    } else {
+        currentUser = null;
+        currentUserProfile = null;
+        updateUIForLoggedOutUser();
+    }
+});
             } catch (error) {
                 console.error('Auth initialization error:', error);
             }
@@ -1639,15 +1639,19 @@ function showCreateProfilePage() {
 }
 
 
+// function showMyProfile() {
+//     if (currentUserProfile) {
+//         displayMyProfile();
+//         document.getElementById('profileViewSection').style.display = 'block';
+//         document.getElementById('noProfileSection').style.display = 'none';
+//     } else {
+//         document.getElementById('profileViewSection').style.display = 'none';
+//         document.getElementById('noProfileSection').style.display = 'block';
+//     }
+//     showPage('myProfilePage');
+// }
 function showMyProfile() {
-    if (currentUserProfile) {
-        displayMyProfile();
-        document.getElementById('profileViewSection').style.display = 'block';
-        document.getElementById('noProfileSection').style.display = 'none';
-    } else {
-        document.getElementById('profileViewSection').style.display = 'none';
-        document.getElementById('noProfileSection').style.display = 'block';
-    }
+    updateMyProfileUI();
     showPage('myProfilePage');
 }
 
@@ -2718,6 +2722,9 @@ window.addEventListener('load', function() {
     if (authBtn) {
         authBtn.setAttribute('onclick', 'handleLogout()');
     }
+    
+    // Update My Profile page UI based on profile existence
+    updateMyProfileUI();
 }
 
 function updateUIForLoggedOutUser() {
@@ -2726,6 +2733,22 @@ function updateUIForLoggedOutUser() {
     const authBtn = document.querySelectorAll('.taskbar-btn')[2];
     if (authBtn) {
         authBtn.setAttribute('onclick', 'showLoginPage()');
+    }
+    
+    // Hide profile-related UI elements
+    document.getElementById('profileViewSection').style.display = 'none';
+    document.getElementById('noProfileSection').style.display = 'block';
+}
+
+// Add this new helper function
+function updateMyProfileUI() {
+    if (currentUserProfile) {
+        document.getElementById('profileViewSection').style.display = 'block';
+        document.getElementById('noProfileSection').style.display = 'none';
+        displayMyProfile(); // Make sure profile data is displayed
+    } else {
+        document.getElementById('profileViewSection').style.display = 'none';
+        document.getElementById('noProfileSection').style.display = 'block';
     }
 }
 
