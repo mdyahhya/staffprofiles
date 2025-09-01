@@ -2693,9 +2693,15 @@ window.addEventListener('load', function() {
 }
 
 
-
-       async function handleLogout() {
+async function handleLogout() {
     if (currentUser) {
+        // Show confirmation dialog
+        const confirmLogout = confirm('Are you sure you want to logout?');
+        
+        if (!confirmLogout) {
+            return; // User cancelled, don't logout
+        }
+        
         if (supabaseClient) {
             await supabaseClient.auth.signOut();
         }
