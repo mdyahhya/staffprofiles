@@ -1056,8 +1056,10 @@
                         
                         <div class="profile-actions">
                             <button class="action-btn" onclick="editProfile()">✏️ Edit Profile</button>
-                            <button class="action-btn" onclick="downloadMyProfilePDF()">📄 Download PDF</button>
-                            <button class="action-btn" onclick="downloadMyProfileImage()">🖼️ Download Image</button>
+                            <!-- <button class="action-btn" onclick="downloadMyProfilePDF()">📄 Download PDF</button>
+                            <button class="action-btn" onclick="downloadMyProfileImage()">🖼️ Download Image</button> -->
+                            <button class="action-btn" onclick="downloadPDF(currentUserProfile)">Download PDF 📄</button>
+                            <button class="action-btn" onclick="downloadImage(currentUserProfile)">Download Image 🖼️</button>
                             <button class="action-btn delete-btn" onclick="deleteProfile()">🗑️ Delete Profile</button>
                         </div>
                     </div>
@@ -1201,8 +1203,10 @@
             </div>
             
             <div class="profile-actions" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <button class="action-btn" onclick="downloadPDF()" style="margin: 0 10px;">📄 Download PDF</button>
-                <button class="action-btn" onclick="downloadImage()" style="margin: 0 10px;">🖼️ Download Image</button>
+                <!-- <button class="action-btn" onclick="downloadPDF()" style="margin: 0 10px;">📄 Download PDF</button>
+                <button class="action-btn" onclick="downloadImage()" style="margin: 0 10px;">🖼️ Download Image</button> -->
+                <button class="action-btn" onclick="downloadPDF(currentViewingProfile)" style="margin: 0 10px;">Download PDF 📄</button>
+                <button class="action-btn" onclick="downloadImage(currentViewingProfile)" style="margin: 0 10px;">Download Image 🖼️</button>
             </div>
         </div>
 
@@ -1688,7 +1692,7 @@ async function showProfileView(profileId) {
                 }
                 
                 // Store profile for downloads
-                currentViewingProfile = profile;
+              console.log('Set currentViewingProfile:', currentViewingProfile);
             }
         }
         
@@ -1784,66 +1788,6 @@ function updateDownloadButtons() {
 // ENHANCED ERROR HANDLING AND PWA STABILITY
 // ========================================
 
-// Prevent PWA crashes by handling errors gracefully
-window.addEventListener('error', function(e) {
-    console.error('Global error caught:', e.error);
-    
-    // Don't let errors crash the PWA
-    if (isPWAInstalled()) {
-        e.preventDefault();
-        
-        // Show user-friendly error message
-        const errorMsg = document.createElement('div');
-        errorMsg.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ff4444;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            z-index: 10002;
-            font-size: 14px;
-            max-width: 90%;
-            text-align: center;
-        `;
-        errorMsg.textContent = 'An error occurred. The app is still working normally.';
-        
-        document.body.appendChild(errorMsg);
-        setTimeout(() => errorMsg.remove(), 3000);
-    }
-});
-
-// Prevent unhandled promise rejections from crashing PWA
-window.addEventListener('unhandledrejection', function(e) {
-    console.error('Unhandled promise rejection:', e.reason);
-    
-    if (isPWAInstalled()) {
-        e.preventDefault();
-        
-        // Show user-friendly message
-        const errorMsg = document.createElement('div');
-        errorMsg.style.cssText = `
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ff6b35;
-            color: white;
-            padding: 15px 20px;
-            border-radius: 8px;
-            z-index: 10002;
-            font-size: 14px;
-            max-width: 90%;
-            text-align: center;
-        `;
-        errorMsg.textContent = 'A network or processing error occurred. Please try again.';
-        
-        document.body.appendChild(errorMsg);
-        setTimeout(() => errorMsg.remove(), 4000);
-    }
-});
 
 // Enhanced navigation handling for PWA
 function handleNavigationSafely(pageFunction) {
@@ -2967,35 +2911,26 @@ function getDeviceInfo() {
 
 // Enhanced function to check if PWA is installed
 function isPWAInstalled() {
-    // Check if running in standalone mode (installed PWA)
-    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
-        console.log('PWA detected: running in standalone mode');
+    // Check display mode
+    if (window.matchMedia('(display-mode: standalone)').matches) {
         return true;
     }
     
-    // iOS specific check
+    // iOS check
     if (window.navigator.standalone === true) {
-        console.log('PWA detected: iOS standalone mode');
         return true;
     }
     
-    // Android specific checks
-    if (document.referrer.startsWith('android-app://')) {
-        console.log('PWA detected: Android TWA mode');
+    // Check URL parameters that indicate PWA
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('utm_source') === 'pwa' || 
+        window.location.href.includes('?pwa=true') ||
+        document.referrer.includes('android-app://')) {
         return true;
     }
     
-    // Check for PWA environment indicators
-    if (window.matchMedia('(display-mode: fullscreen)').matches ||
-        window.matchMedia('(display-mode: minimal-ui)').matches) {
-        console.log('PWA detected: fullscreen or minimal-ui mode');
-        return true;
-    }
-    
-    console.log('PWA not installed');
     return false;
 }
-
 // Only show install prompt if truly needed
 function shouldShowInstallPrompt() {
     // Don't show if already installed
@@ -3215,21 +3150,20 @@ function hidePWAPopup() {
     console.log('PWA popup hidden and dismissal tracked');
 }
 
-// Enhanced PWA Detection and Setup
 function setupPWA() {
     console.log('Setting up PWA...');
-    const deviceInfo = getDeviceInfo();
     
-    // Check if already installed first
+    // FIRST check if installed - if so, don't do anything else
     if (isPWAInstalled()) {
         pwaInstalled = true;
-        console.log('PWA is already installed, skipping setup');
-        return;
+        console.log('PWA already installed - no setup needed');
+        return; // Exit completely
     }
     
-    console.log('PWA not installed, setting up install prompt...');
+    const deviceInfo = getDeviceInfo();
+    console.log('PWA not installed, device info:', deviceInfo);
     
-    // Listen for install prompt (Android, Desktop Chrome, etc.)
+    // Only proceed if NOT installed
     if (deviceInfo.supportsInstallPrompt) {
         window.addEventListener('beforeinstallprompt', (e) => {
             console.log('beforeinstallprompt event fired');
@@ -3237,32 +3171,22 @@ function setupPWA() {
             deferredPrompt = e;
         });
         
-        // Listen for successful installation
         window.addEventListener('appinstalled', (e) => {
             console.log('PWA was installed successfully');
             pwaInstalled = true;
             hidePWAPopup();
-            
-            // Show success message
-            const deviceInfo = getDeviceInfo();
-            let successMessage = '✅ App installed successfully!';
-            
-            if (deviceInfo.isWindows) {
-                successMessage = '✅ Desktop app installed! Check your desktop and start menu.';
-            } else if (deviceInfo.isAndroid) {
-                successMessage = '✅ App added to home screen!';
-            }
-            
-            showInstallSuccessMessage(successMessage);
+            showInstallSuccessMessage('App installed successfully!');
         });
     }
     
-    // Show popup after delay, but only if needed
+    // Only show popup if definitely not installed
     setTimeout(() => {
-        showPWAPopup();
-    }, 3000); // Increased delay to 3 seconds
+        if (!isPWAInstalled()) {
+            console.log('Showing install popup after timeout');
+            showPWAPopup();
+        }
+    }, 2000);
 }
-
 // Install PWA function
 function installPWA() {
     console.log('Install PWA triggered...');
@@ -3905,14 +3829,27 @@ function displayHOD(hodProfiles, departmentName) {
 
         // Fixed function to download PDF for any profile (not just current user)
 function downloadPDF(profileData = null) {
-    // Use provided profile data or fall back to current user profile
-    const profile = profileData || currentUserProfile;
+    // Determine which profile to use
+    let profile = profileData;
+    
+    if (!profile) {
+        // If we're on profile view page, use currentViewingProfile
+        const currentPage = document.querySelector('.page.active');
+        if (currentPage && currentPage.id === 'profileViewPage') {
+            profile = currentViewingProfile;
+        } else {
+            // Otherwise use current user profile
+            profile = currentUserProfile;
+        }
+    }
     
     if (!profile) {
         alert('No profile data available for download');
         return;
     }
     
+    console.log('Downloading PDF for:', profile.name);
+     
     // Check if PDF libraries are loaded
     if (!window.html2canvas || !window.jspdf) {
         alert('PDF libraries not loaded. Please refresh the page and try again.');
@@ -4020,14 +3957,28 @@ function downloadPDF(profileData = null) {
 
 // Fixed function to download image for any profile
 function downloadImage(profileData = null) {
-    // Use provided profile data or fall back to current user profile
-    const profile = profileData || currentUserProfile;
+    // Determine which profile to use
+    let profile = profileData;
+    
+    if (!profile) {
+        // If we're on profile view page, use currentViewingProfile
+        const currentPage = document.querySelector('.page.active');
+        if (currentPage && currentPage.id === 'profileViewPage') {
+            profile = currentViewingProfile;
+        } else {
+            // Otherwise use current user profile
+            profile = currentUserProfile;
+        }
+    }
     
     if (!profile) {
         alert('No profile data available for download');
         return;
     }
     
+    console.log('Downloading image for:', profile.name);
+    
+     
     // Check if html2canvas is loaded
     if (!window.html2canvas) {
         alert('Image library not loaded. Please refresh the page and try again.');
