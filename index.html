@@ -1654,7 +1654,10 @@ function showMyProfile() {
     updateMyProfileUI();
     showPage('myProfilePage');
 }
+// Store current viewing profile data for downloads
+let currentViewingProfile = null;
 
+// Enhanced profile view function that stores profile data for downloads
 async function showProfileView(profileId) {
     try {
         let profile = null;
@@ -1683,6 +1686,9 @@ async function showProfileView(profileId) {
                 } else {
                     profile = profileData;
                 }
+                
+                // Store profile for downloads
+                currentViewingProfile = profile;
             }
         }
         
@@ -1703,6 +1709,9 @@ async function showProfileView(profileId) {
             // Display custom fields
             displayCustomFields('viewCustomFieldsSection', profile.custom_fields);
             
+            // Update download buttons to use current viewing profile
+            updateDownloadButtons();
+            
             showPage('profileViewPage');
         } else {
             alert('Profile not found');
@@ -1712,6 +1721,150 @@ async function showProfileView(profileId) {
         alert('Error loading profile: ' + error.message);
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+// Update download buttons with proper event handlers
+function updateDownloadButtons() {
+    // PDF download button for profile view
+    const pdfBtn = document.querySelector('#profileViewPage button[onclick*="downloadPDF"]');
+    if (pdfBtn) {
+        pdfBtn.removeAttribute('onclick');
+        pdfBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            downloadPDF(currentViewingProfile);
+        });
+    }
+    
+    // Image download button for profile view
+    const imgBtn = document.querySelector('#profileViewPage button[onclick*="downloadImage"]');
+    if (imgBtn) {
+        imgBtn.removeAttribute('onclick');
+        imgBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            downloadImage(currentViewingProfile);
+        });
+    }
+    
+    // My profile download buttons
+    const myPdfBtn = document.querySelector('#myProfilePage button[onclick*="downloadMyProfilePDF"]');
+    if (myPdfBtn) {
+        myPdfBtn.removeAttribute('onclick');
+        myPdfBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            downloadPDF(currentUserProfile);
+        });
+    }
+    
+    const myImgBtn = document.querySelector('#myProfilePage button[onclick*="downloadMyProfileImage"]');
+    if (myImgBtn) {
+        myImgBtn.removeAttribute('onclick');
+        myImgBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            downloadImage(currentUserProfile);
+        });
+    }
+}
+
+// ========================================
+// ENHANCED ERROR HANDLING AND PWA STABILITY
+// ========================================
+
+// Prevent PWA crashes by handling errors gracefully
+window.addEventListener('error', function(e) {
+    console.error('Global error caught:', e.error);
+    
+    // Don't let errors crash the PWA
+    if (isPWAInstalled()) {
+        e.preventDefault();
+        
+        // Show user-friendly error message
+        const errorMsg = document.createElement('div');
+        errorMsg.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff4444;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10002;
+            font-size: 14px;
+            max-width: 90%;
+            text-align: center;
+        `;
+        errorMsg.textContent = 'An error occurred. The app is still working normally.';
+        
+        document.body.appendChild(errorMsg);
+        setTimeout(() => errorMsg.remove(), 3000);
+    }
+});
+
+// Prevent unhandled promise rejections from crashing PWA
+window.addEventListener('unhandledrejection', function(e) {
+    console.error('Unhandled promise rejection:', e.reason);
+    
+    if (isPWAInstalled()) {
+        e.preventDefault();
+        
+        // Show user-friendly message
+        const errorMsg = document.createElement('div');
+        errorMsg.style.cssText = `
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff6b35;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10002;
+            font-size: 14px;
+            max-width: 90%;
+            text-align: center;
+        `;
+        errorMsg.textContent = 'A network or processing error occurred. Please try again.';
+        
+        document.body.appendChild(errorMsg);
+        setTimeout(() => errorMsg.remove(), 4000);
+    }
+});
+
+// Enhanced navigation handling for PWA
+function handleNavigationSafely(pageFunction) {
+    try {
+        if (typeof pageFunction === 'function') {
+            pageFunction();
+        }
+    } catch (error) {
+        console.error('Navigation error:', error);
+        
+        if (isPWAInstalled()) {
+            // Fallback to main page on navigation error
+            setTimeout(() => {
+                showMainPage();
+            }, 100);
+        }
+    }
+}
+
+
+
 
 function showLoginPage() {
     showPage('loginPage');
@@ -2770,19 +2923,24 @@ function updateMyProfileUI() {
             document.getElementById('developerModal').style.display = 'none';
         }
 
+
+
+
+
+
+
+
+
+
+
         // ========================================
-        // PWA FUNCTIONS
- // ========================================
-// RELIABLE PWA INSTALLATION SCRIPT
-// ========================================
-// ========================================
-// RELIABLE PWA INSTALLATION SCRIPT
+// ENHANCED PWA DETECTION AND INSTALLATION
 // ========================================
 
 // PWA Variables
-// PWA Variables
 let deferredPrompt = null;
 let pwaInstalled = false;
+let installPromptShown = false; // Track if we've already shown the prompt
 
 // Detect device type and browser
 function getDeviceInfo() {
@@ -2809,8 +2967,6 @@ function getDeviceInfo() {
 
 // Enhanced function to check if PWA is installed
 function isPWAInstalled() {
-    const deviceInfo = getDeviceInfo();
-    
     // Check if running in standalone mode (installed PWA)
     if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
         console.log('PWA detected: running in standalone mode');
@@ -2818,41 +2974,54 @@ function isPWAInstalled() {
     }
     
     // iOS specific check
-    if (deviceInfo.isIOS && window.navigator.standalone === true) {
+    if (window.navigator.standalone === true) {
         console.log('PWA detected: iOS standalone mode');
         return true;
     }
     
     // Android specific checks
-    if (deviceInfo.isAndroid) {
-        // Check for TWA (Trusted Web Activity)
-        if (document.referrer.startsWith('android-app://')) {
-            console.log('PWA detected: Android TWA mode');
-            return true;
-        }
+    if (document.referrer.startsWith('android-app://')) {
+        console.log('PWA detected: Android TWA mode');
+        return true;
     }
     
-    // Windows specific check - look for app installation indicators
-    if (deviceInfo.isWindows) {
-        // Check for Windows PWA installation indicators
-        if (window.navigator.userAgentData && window.navigator.userAgentData.mobile === false) {
-            // Desktop environment check
-            const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-            if (isStandalone) {
-                console.log('PWA detected: Windows standalone mode');
-                return true;
-            }
-        }
-    }
-    
-    // Check memory flag for installation tracking
-    if (window.pwaInstallationInProgress) {
-        console.log('PWA installation in progress');
+    // Check for PWA environment indicators
+    if (window.matchMedia('(display-mode: fullscreen)').matches ||
+        window.matchMedia('(display-mode: minimal-ui)').matches) {
+        console.log('PWA detected: fullscreen or minimal-ui mode');
         return true;
     }
     
     console.log('PWA not installed');
     return false;
+}
+
+// Only show install prompt if truly needed
+function shouldShowInstallPrompt() {
+    // Don't show if already installed
+    if (isPWAInstalled()) {
+        return false;
+    }
+    
+    // Don't show if already shown in this session
+    if (installPromptShown) {
+        return false;
+    }
+    
+    // Don't show if user dismissed it recently (check localStorage)
+    const lastDismissed = localStorage.getItem('pwa_install_dismissed');
+    if (lastDismissed) {
+        const dismissTime = new Date(lastDismissed);
+        const now = new Date();
+        const hoursSinceDismissed = (now - dismissTime) / (1000 * 60 * 60);
+        
+        // Don't show again for 24 hours after dismissal
+        if (hoursSinceDismissed < 24) {
+            return false;
+        }
+    }
+    
+    return true;
 }
 
 // Create PWA Install Popup HTML
@@ -2878,7 +3047,7 @@ function createPWAPopup() {
         description = 'Add to home screen for quick access';
     }
 
-    // Create popup HTML
+    // Create popup HTML with better styling
     const popup = document.createElement('div');
     popup.id = 'pwaPopup';
     popup.style.cssText = `
@@ -2934,8 +3103,7 @@ function createPWAPopup() {
                 align-items: center;
                 justify-content: center;
                 transition: background 0.2s ease;
-            " onmouseover="this.style.background='rgba(255,255,255,0.3)'" 
-               onmouseout="this.style.background='rgba(255,255,255,0.2)'">✕</button>
+            ">✕</button>
         </div>
         
         <div style="display: flex; gap: 12px; margin-top: 18px;">
@@ -2951,8 +3119,7 @@ function createPWAPopup() {
                 cursor: pointer;
                 transition: all 0.2s ease;
                 box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 25px rgba(0,0,0,0.15)'" 
-               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 15px rgba(0,0,0,0.1)'">
+            ">
                 ${installText}
             </button>
             <button id="pwaLaterBtn" style="
@@ -2965,8 +3132,7 @@ function createPWAPopup() {
                 font-weight: 600;
                 cursor: pointer;
                 transition: all 0.2s ease;
-            " onmouseover="this.style.background='rgba(255,255,255,0.25)'" 
-               onmouseout="this.style.background='rgba(255,255,255,0.15)'">
+            ">
                 Later
             </button>
         </div>
@@ -2974,12 +3140,7 @@ function createPWAPopup() {
 
     document.body.appendChild(popup);
     
-    // Add event listeners to prevent event bubbling and handle clicks properly
-    popup.addEventListener('click', function(e) {
-        e.stopPropagation();
-    });
-    
-    // Add specific event listeners for buttons
+    // Add event listeners
     document.getElementById('pwaCloseBtn').addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -3001,21 +3162,20 @@ function createPWAPopup() {
     return popup;
 }
 
-// Show PWA popup with animation
+// Show PWA popup only when appropriate
 function showPWAPopup() {
-    console.log('Attempting to show PWA popup...');
+    console.log('Checking if should show PWA popup...');
     
-    // Double check if PWA is installed
-    if (isPWAInstalled()) {
-        console.log('PWA already installed, not showing popup');
+    if (!shouldShowInstallPrompt()) {
+        console.log('Install prompt not needed, skipping...');
         return;
     }
     
     const deviceInfo = getDeviceInfo();
     console.log('Device info:', deviceInfo);
     
-    // Show popup every time user opens the website
-    console.log('Showing PWA popup on every visit...');
+    // Mark as shown in this session
+    installPromptShown = true;
     
     // For iOS, show custom instructions
     if (deviceInfo.isIOS) {
@@ -3024,8 +3184,8 @@ function showPWAPopup() {
         return;
     }
     
-    // For Windows/Android/Desktop - create and show the popup
-    console.log('Creating popup for Windows/Android/Desktop...');
+    // For other platforms - create and show the popup
+    console.log('Creating popup for other platforms...');
     const popup = createPWAPopup();
     
     // Animate popup into view with delay
@@ -3040,6 +3200,9 @@ function hidePWAPopup() {
     console.log('Hiding PWA popup...');
     const popup = document.getElementById('pwaPopup');
     if (popup) {
+        // Store dismissal time
+        localStorage.setItem('pwa_install_dismissed', new Date().toISOString());
+        
         // Animate out
         popup.style.bottom = '-200px';
         
@@ -3049,10 +3212,125 @@ function hidePWAPopup() {
         }, 400);
     }
     
-    console.log('PWA popup hidden');
+    console.log('PWA popup hidden and dismissal tracked');
 }
 
-// iOS specific PWA install instructions
+// Enhanced PWA Detection and Setup
+function setupPWA() {
+    console.log('Setting up PWA...');
+    const deviceInfo = getDeviceInfo();
+    
+    // Check if already installed first
+    if (isPWAInstalled()) {
+        pwaInstalled = true;
+        console.log('PWA is already installed, skipping setup');
+        return;
+    }
+    
+    console.log('PWA not installed, setting up install prompt...');
+    
+    // Listen for install prompt (Android, Desktop Chrome, etc.)
+    if (deviceInfo.supportsInstallPrompt) {
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('beforeinstallprompt event fired');
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+        
+        // Listen for successful installation
+        window.addEventListener('appinstalled', (e) => {
+            console.log('PWA was installed successfully');
+            pwaInstalled = true;
+            hidePWAPopup();
+            
+            // Show success message
+            const deviceInfo = getDeviceInfo();
+            let successMessage = '✅ App installed successfully!';
+            
+            if (deviceInfo.isWindows) {
+                successMessage = '✅ Desktop app installed! Check your desktop and start menu.';
+            } else if (deviceInfo.isAndroid) {
+                successMessage = '✅ App added to home screen!';
+            }
+            
+            showInstallSuccessMessage(successMessage);
+        });
+    }
+    
+    // Show popup after delay, but only if needed
+    setTimeout(() => {
+        showPWAPopup();
+    }, 3000); // Increased delay to 3 seconds
+}
+
+// Install PWA function
+function installPWA() {
+    console.log('Install PWA triggered...');
+    const deviceInfo = getDeviceInfo();
+    
+    // iOS specific handling
+    if (deviceInfo.isIOS) {
+        showIOSInstallInstructions();
+        return;
+    }
+    
+    // Other platforms
+    if (deferredPrompt) {
+        console.log('Using deferred prompt...');
+        deferredPrompt.prompt();
+        
+        deferredPrompt.userChoice.then((choiceResult) => {
+            console.log('PWA install choice:', choiceResult.outcome);
+            
+            if (choiceResult.outcome === 'accepted') {
+                console.log('User accepted PWA installation');
+                pwaInstalled = true;
+                hidePWAPopup();
+            } else {
+                console.log('User dismissed PWA installation');
+                hidePWAPopup();
+            }
+            
+            deferredPrompt = null;
+        });
+    } else {
+        console.log('No deferred prompt available');
+        alert('Install option not available. You can bookmark this page for quick access.');
+        hidePWAPopup();
+    }
+}
+
+// Show install success message
+function showInstallSuccessMessage(customMessage = '✅ App installed successfully!') {
+    const message = document.createElement('div');
+    message.style.cssText = `
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #4CAF50;
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-weight: 600;
+        z-index: 10001;
+        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        font-size: 16px;
+        text-align: center;
+        max-width: 90%;
+    `;
+    message.textContent = customMessage;
+    
+    document.body.appendChild(message);
+    
+    setTimeout(() => {
+        message.style.opacity = '0';
+        message.style.transform = 'translateX(-50%) translateY(-20px)';
+        setTimeout(() => message.remove(), 300);
+    }, 4000);
+}
+
+// iOS install instructions
 function showIOSInstallInstructions() {
     const isIOSSafari = getDeviceInfo().isIOSSafari;
     
@@ -3061,126 +3339,27 @@ function showIOSInstallInstructions() {
         return;
     }
     
-    // Create iOS install modal
-    const modal = document.createElement('div');
-    modal.id = 'iosInstallModal';
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.85);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 10000;
-        padding: 20px;
-        box-sizing: border-box;
-        backdrop-filter: blur(5px);
-    `;
-    
-    modal.innerHTML = `
-        <div style="
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 380px;
-            width: 100%;
-            text-align: center;
-            position: relative;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        ">
-            <button onclick="hideIOSInstallModal()" style="
-                position: absolute;
-                top: 15px;
-                right: 20px;
-                background: #f0f0f0;
-                border: none;
-                font-size: 18px;
-                cursor: pointer;
-                color: #666;
-                width: 30px;
-                height: 30px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            ">✕</button>
-            
-            <div style="font-size: 50px; margin-bottom: 15px;">📱</div>
-            <h3 style="margin: 0 0 25px 0; color: #333; font-size: 24px;">Install Our App</h3>
-            
-            <div style="text-align: left; margin-bottom: 25px;">
-                <div style="margin: 15px 0; display: flex; align-items: center;">
-                    <span style="
-                        display: inline-block;
-                        width: 32px;
-                        height: 32px;
-                        background: #007AFF;
-                        color: white;
-                        text-align: center;
-                        line-height: 32px;
-                        border-radius: 50%;
-                        margin-right: 15px;
-                        font-weight: bold;
-                        font-size: 14px;
-                    ">1</span>
-                    <span>Tap the Share button <strong style="font-size: 20px;">⎙</strong> below</span>
-                </div>
-                
-                <div style="margin: 15px 0; display: flex; align-items: center;">
-                    <span style="
-                        display: inline-block;
-                        width: 32px;
-                        height: 32px;
-                        background: #007AFF;
-                        color: white;
-                        text-align: center;
-                        line-height: 32px;
-                        border-radius: 50%;
-                        margin-right: 15px;
-                        font-weight: bold;
-                        font-size: 14px;
-                    ">2</span>
-                    <span>Select <strong>"Add to Home Screen"</strong></span>
-                </div>
-                
-                <div style="margin: 15px 0; display: flex; align-items: center;">
-                    <span style="
-                        display: inline-block;
-                        width: 32px;
-                        height: 32px;
-                        background: #007AFF;
-                        color: white;
-                        text-align: center;
-                        line-height: 32px;
-                        border-radius: 50%;
-                        margin-right: 15px;
-                        font-weight: bold;
-                        font-size: 14px;
-                    ">3</span>
-                    <span>Tap <strong>"Add"</strong> to install</span>
-                </div>
-            </div>
-            
-            <button onclick="hideIOSInstallModal();" style="
-                background: #007AFF;
-                color: white;
-                border: none;
-                padding: 15px 30px;
-                border-radius: 10px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                width: 100%;
-            ">Got it!</button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-    console.log('iOS install modal shown');
+    alert(`Install Instructions:
+
+1. Tap the Share button (⎙) at the bottom
+2. Scroll down and select "Add to Home Screen"
+3. Tap "Add" to install
+
+The app will then be available on your home screen like a native app!`);
 }
+        // ========================================
+        // PWA FUNCTIONS
+ // ========================================
+// RELIABLE PWA INSTALLATION SCRIPT
+// ========================================
+// ========================================
+// RELIABLE PWA INSTALLATION SCRIPT
+// ========================================
+
+// PWA Variables
+// PWA Variables
+
+
 
 // Hide iOS install modal
 function hideIOSInstallModal() {
@@ -3278,50 +3457,6 @@ function hideInstallingMessage() {
     }
 }
 
-// Enhanced install function
-function installPWA() {
-    console.log('Install PWA triggered...');
-    const deviceInfo = getDeviceInfo();
-    
-    // iOS specific handling
-    if (deviceInfo.isIOS) {
-        hideIOSInstallModal();
-        showIOSInstallInstructions();
-        return;
-    }
-    
-    // Windows specific handling for desktop app
-    if (deviceInfo.isWindows) {
-        installWindowsDesktopApp();
-        return;
-    }
-    
-    // Android and other platforms
-    if (deferredPrompt) {
-        console.log('Using deferred prompt...');
-        deferredPrompt.prompt();
-        
-        deferredPrompt.userChoice.then((choiceResult) => {
-            console.log('PWA install choice:', choiceResult.outcome);
-            
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted PWA installation');
-                pwaInstalled = true;
-                hidePWAPopup();
-                showInstallSuccessMessage('App installed successfully!');
-            } else {
-                console.log('User dismissed PWA installation');
-                hidePWAPopup();
-            }
-            
-            deferredPrompt = null;
-        });
-    } else {
-        console.log('No deferred prompt available, showing manual instructions...');
-        showManualInstallInstructions();
-    }
-}
-
 // Windows manual install instructions
 function showWindowsManualInstall() {
     const deviceInfo = getDeviceInfo();
@@ -3353,36 +3488,6 @@ Please open this website in Chrome or Edge browser to install it as a desktop ap
     hidePWAPopup();
 }
 
-// Show install success message
-function showInstallSuccessMessage(customMessage = '✅ App installed successfully!') {
-    const message = document.createElement('div');
-    message.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #4CAF50;
-        color: white;
-        padding: 15px 25px;
-        border-radius: 10px;
-        font-weight: 600;
-        z-index: 10001;
-        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
-        font-size: 16px;
-        text-align: center;
-        max-width: 90%;
-    `;
-    message.textContent = customMessage;
-    
-    document.body.appendChild(message);
-    
-    setTimeout(() => {
-        message.style.opacity = '0';
-        message.style.transform = 'translateX(-50%) translateY(-20px)';
-        setTimeout(() => message.remove(), 300);
-    }, 4000);
-}
-
 // Manual install instructions for other platforms
 function showManualInstallInstructions() {
     const deviceInfo = getDeviceInfo();
@@ -3404,94 +3509,6 @@ function showManualInstallInstructions() {
     
     alert('Install Instructions:\n\n' + instructions);
     hidePWAPopup();
-}
-
-// Enhanced PWA Detection and Setup
-function setupPWA() {
-    console.log('Setting up PWA...');
-    const deviceInfo = getDeviceInfo();
-    
-    // Check if already installed first
-    if (isPWAInstalled()) {
-        pwaInstalled = true;
-        console.log('PWA is already installed, skipping setup');
-        return;
-    }
-    
-    console.log('PWA not installed, setting up install prompt...');
-    
-    // Listen for install prompt (Android, Desktop Chrome, etc.)
-    if (deviceInfo.supportsInstallPrompt) {
-        window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('beforeinstallprompt event fired');
-            e.preventDefault();
-            deferredPrompt = e;
-            
-            // For Windows, we can immediately show the popup since we have the install capability
-            if (deviceInfo.isWindows && !isPWAInstalled()) {
-                console.log('Windows device with install capability detected');
-                // Don't auto-show, wait for the scheduled popup
-            }
-        });
-        
-        // Listen for successful installation
-        window.addEventListener('appinstalled', (e) => {
-            console.log('PWA was installed successfully via appinstalled event');
-            pwaInstalled = true;
-            window.pwaInstallationInProgress = false;
-            hidePWAPopup();
-            hideInstallingMessage();
-            
-            // Determine success message based on platform
-            const deviceInfo = getDeviceInfo();
-            let successMessage = '✅ App installed successfully!';
-            
-            if (deviceInfo.isWindows) {
-                successMessage = '✅ Desktop app installed! Check your desktop and start menu.';
-            } else if (deviceInfo.isAndroid) {
-                successMessage = '✅ App added to home screen!';
-            }
-            
-            showInstallSuccessMessage(successMessage);
-        });
-    }
-    
-    // Force show popup after page loads
-    setTimeout(() => {
-        console.log('Force showing PWA popup after timeout...');
-        if (!isPWAInstalled()) {
-            showPWAPopup();
-        }
-    }, 1000);
-    
-    // For iOS, monitor standalone mode changes
-    if (deviceInfo.isIOS) {
-        let wasStandalone = window.navigator.standalone;
-        
-        const checkStandalone = setInterval(() => {
-            if (!wasStandalone && window.navigator.standalone) {
-                console.log('App installed on iOS (standalone mode detected)');
-                pwaInstalled = true;
-                clearInterval(checkStandalone);
-                showInstallSuccessMessage('✅ App added to home screen!');
-            }
-            wasStandalone = window.navigator.standalone;
-        }, 1000);
-    }
-    
-    // Windows specific - monitor for installation completion
-    if (deviceInfo.isWindows) {
-        // Monitor for display mode changes indicating installation
-        const mediaQuery = window.matchMedia('(display-mode: standalone)');
-        mediaQuery.addListener((e) => {
-            if (e.matches && !pwaInstalled) {
-                console.log('Windows PWA installed - standalone mode activated');
-                pwaInstalled = true;
-                window.pwaInstallationInProgress = false;
-                showInstallSuccessMessage('✅ Desktop app installed! Check your desktop and start menu.');
-            }
-        });
-    }
 }
 
 // Force show popup function for testing
@@ -3578,15 +3595,30 @@ function showUpdateAvailable() {
     }, 8000);
 }
 
-// Initialize everything
+// ========================================
+// INITIALIZATION
+// ========================================
+
+// Initialize PWA features only when appropriate
 function initializePWA() {
     console.log('Initializing PWA system...');
     
     // Register service worker first
-    registerServiceWorker();
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+                console.log('Service Worker registered successfully:', registration.scope);
+            })
+            .catch((error) => {
+                console.error('Service Worker registration failed:', error);
+            });
+    }
     
     // Setup PWA install functionality
     setupPWA();
+    
+    // Setup enhanced download buttons
+    setupDownloadButtons();
     
     console.log('PWA system initialized');
 }
@@ -3871,122 +3903,370 @@ function displayHOD(hodProfiles, departmentName) {
         // DOWNLOAD FUNCTIONS
         // ========================================
 
-        function downloadPDF() {
-             if (!currentUserProfile) return;
+        // Fixed function to download PDF for any profile (not just current user)
+function downloadPDF(profileData = null) {
+    // Use provided profile data or fall back to current user profile
+    const profile = profileData || currentUserProfile;
+    
+    if (!profile) {
+        alert('No profile data available for download');
+        return;
+    }
+    
+    // Check if PDF libraries are loaded
+    if (!window.html2canvas || !window.jspdf) {
+        alert('PDF libraries not loaded. Please refresh the page and try again.');
+        return;
+    }
+    
+    // Create a temporary profile view for download
+    const tempDiv = document.createElement('div');
+    tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px; font-family: Arial, sans-serif;';
+    
+    tempDiv.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #8B5CF6; margin: 0 0 10px 0;">VVPIET Staff Profile</h2>
+            <hr style="border: 1px solid #8B5CF6; width: 200px;">
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px; border: 3px solid #8B5CF6;">
+                ${profile.profile_image ? 
+                    `<img src="${profile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onerror="this.style.display='none'; this.parentElement.innerHTML='👤';">` : 
+                    '👤'
+                }
+            </div>
+            <h2 style="margin: 0 0 5px 0; color: #333; font-size: 28px;">${profile.name}</h2>
+            <p style="margin: 0; color: #666; font-size: 18px; font-weight: 600;">${profile.department_name || 'Department'}</p>
+            <p style="margin: 5px 0 0 0; color: #888; font-size: 16px;">${profile.designation}</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
+                <strong style="color: #333; font-size: 16px;">Experience:</strong>
+                <span style="margin-left: 10px; font-size: 16px;">${profile.experience} years</span>
+            </div>
             
-            // Create a temporary profile view for download
-            const tempDiv = document.createElement('div');
-            tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px;';
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
+                <strong style="color: #333; font-size: 16px;">Expertise:</strong>
+                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
+                    ${profile.research_papers || 'No expertise listed yet'}
+                </div>
+            </div>
             
-           tempDiv.innerHTML = `
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h3 style="color: #8B5CF6; margin: 0;">VVPIET Staff Profile</h3>         
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
+                <strong style="color: #333; font-size: 16px;">Achievements:</strong>
+                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
+                    ${profile.achievements || 'No achievements listed yet'}
                 </div>
-                
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px;">
-                        ${currentUserProfile.profile_image ? 
-                            `<img src="${currentUserProfile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
-                            '👤'
-                        }
-                    </div>
-                    <h2 style="margin: 0 0 5px 0; color: #333;">${currentUserProfile.name}</h2>
-                    <p style="margin: 0; color: #666; font-size: 16px;">${currentUserProfile.department_name}</p>
-                    <p style="margin: 5px 0 0 0; color: #888; font-size: 14px;">${currentUserProfile.designation}</p>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Experience:</strong>
-                        <span style="margin-left: 10px;">${currentUserProfile.experience} years</span>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Expertise:</strong>
-                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                            ${currentUserProfile.research_papers || 'No Expertise listed yet'}
-                        </div>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Achievements:</strong>
-                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                            ${currentUserProfile.achievements || 'No achievements listed'}
-                        </div>
-                    </div>
-                    
-                    ${getCustomFieldsHTML(currentUserProfile.custom_fields)}
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
-                    <p style="font-size: 12px; color: #666; margin: 0;">© All rights reserved, Staff Profile by Yahya Mundewadi</p>
-                </div>
-            `;
+            </div>
             
-            document.body.appendChild(tempDiv);
+            ${getCustomFieldsHTML(profile.custom_fields)}
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding: 20px; border-top: 2px solid #8B5CF6;">
+            <p style="font-size: 12px; color: #666; margin: 0;">Generated from VVPIET Staff Profile System</p>
+            <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">© All rights reserved</p>
+        </div>
+    `;
+    
+    document.body.appendChild(tempDiv);
+    
+    // Generate PDF with better error handling
+    html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        logging: false,
+        timeout: 10000
+    }).then(canvas => {
+        try {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'mm', 'a4');
             
-            html2canvas(tempDiv, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: false,
-                backgroundColor: '#ffffff'
-            }).then(canvas => {
-               if (!window.html2canvas || !window.jspdf) {
-    alert('PDF libraries not loaded. Please refresh the page.');
-    return;
-}
-const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210;
-                const pageHeight = 295;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                
-                let position = 0;
-                
+            const imgData = canvas.toDataURL('image/png');
+            const imgWidth = 210;
+            const pageHeight = 295;
+            const imgHeight = (canvas.height * imgWidth) / canvas.width;
+            let heightLeft = imgHeight;
+            
+            let position = 0;
+            
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+            heightLeft -= pageHeight;
+            
+            while (heightLeft >= 0) {
+                position = heightLeft - imgHeight;
+                pdf.addPage();
                 pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
                 heightLeft -= pageHeight;
-                
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-                
-                pdf.save(`${currentUserProfile.name}_profile.pdf`);
-                document.body.removeChild(tempDiv);
-            }).catch(error => {
-                console.error('Error generating PDF:', error);
-                alert('Failed to generate PDF. Please try again.');
-                document.body.removeChild(tempDiv);
-            });
-        }
-
-
-        function downloadImage() {
-            const profileElement = document.getElementById('profileForDownload');
+            }
             
-            html2canvas(profileElement, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: false,
-                backgroundColor: '#ffffff'
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `${document.getElementById('viewProfileName').textContent || 'profile'}_profile.png`;
-                link.href = canvas.toDataURL('image/png');
-                
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            }).catch(error => {
-                console.error('Error generating image:', error);
-                alert('Failed to generate image. Please try again.');
-            });
+            pdf.save(`${profile.name}_profile.pdf`);
+            console.log('PDF generated successfully');
+        } catch (pdfError) {
+            console.error('PDF generation error:', pdfError);
+            alert('Failed to generate PDF. Please try again or refresh the page.');
         }
+        
+        document.body.removeChild(tempDiv);
+    }).catch(error => {
+        console.error('Canvas generation error:', error);
+        alert('Failed to generate PDF. Please try again or refresh the page.');
+        document.body.removeChild(tempDiv);
+    });
+}
+
+// Fixed function to download image for any profile
+function downloadImage(profileData = null) {
+    // Use provided profile data or fall back to current user profile
+    const profile = profileData || currentUserProfile;
+    
+    if (!profile) {
+        alert('No profile data available for download');
+        return;
+    }
+    
+    // Check if html2canvas is loaded
+    if (!window.html2canvas) {
+        alert('Image library not loaded. Please refresh the page and try again.');
+        return;
+    }
+    
+    // Create a temporary profile view for download
+    const tempDiv = document.createElement('div');
+    tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px; font-family: Arial, sans-serif;';
+    
+    tempDiv.innerHTML = `
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h2 style="color: #8B5CF6; margin: 0 0 10px 0;">VVPIET Staff Profile</h2>
+            <hr style="border: 1px solid #8B5CF6; width: 200px;">
+        </div>
+        
+        <div style="text-align: center; margin-bottom: 30px;">
+            <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px; border: 3px solid #8B5CF6;">
+                ${profile.profile_image ? 
+                    `<img src="${profile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onerror="this.style.display='none'; this.parentElement.innerHTML='👤';">` : 
+                    '👤'
+                }
+            </div>
+            <h2 style="margin: 0 0 5px 0; color: #333; font-size: 28px;">${profile.name}</h2>
+            <p style="margin: 0; color: #666; font-size: 18px; font-weight: 600;">${profile.department_name || 'Department'}</p>
+            <p style="margin: 5px 0 0 0; color: #888; font-size: 16px;">${profile.designation}</p>
+        </div>
+        
+        <div style="margin-bottom: 20px;">
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
+                <strong style="color: #333; font-size: 16px;">Experience:</strong>
+                <span style="margin-left: 10px; font-size: 16px;">${profile.experience} years</span>
+            </div>
+            
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
+                <strong style="color: #333; font-size: 16px;">Expertise:</strong>
+                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
+                    ${profile.research_papers || 'No expertise listed yet'}
+                </div>
+            </div>
+            
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
+                <strong style="color: #333; font-size: 16px;">Achievements:</strong>
+                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
+                    ${profile.achievements || 'No achievements listed yet'}
+                </div>
+            </div>
+            
+            ${getCustomFieldsHTML(profile.custom_fields)}
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding: 20px; border-top: 2px solid #8B5CF6;">
+            <p style="font-size: 12px; color: #666; margin: 0;">Generated from VVPIET Staff Profile System</p>
+            <p style="font-size: 12px; color: #666; margin: 5px 0 0 0;">© All rights reserved</p>
+        </div>
+    `;
+    
+    document.body.appendChild(tempDiv);
+    
+    // Generate image with better error handling
+    html2canvas(tempDiv, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: '#ffffff',
+        logging: false,
+        timeout: 10000
+    }).then(canvas => {
+        try {
+            const link = document.createElement('a');
+            link.download = `${profile.name}_profile.png`;
+            link.href = canvas.toDataURL('image/png');
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            console.log('Image downloaded successfully');
+        } catch (downloadError) {
+            console.error('Image download error:', downloadError);
+            alert('Failed to download image. Please try again.');
+        }
+        
+        document.body.removeChild(tempDiv);
+    }).catch(error => {
+        console.error('Canvas generation error:', error);
+        alert('Failed to generate image. Please try again or refresh the page.');
+        document.body.removeChild(tempDiv);
+    });
+}
+
+// Helper function for custom fields HTML
+function getCustomFieldsHTML(customFields) {
+    if (!customFields || Object.keys(customFields).length === 0) {
+        return '';
+    }
+    
+    let html = '';
+    Object.entries(customFields).forEach(([key, value]) => {
+        html += `
+            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
+                <strong style="color: #333; font-size: 16px;">${key}:</strong>
+                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
+                    ${value}
+                </div>
+            </div>
+        `;
+    });
+    
+    return html;
+}
+function handleFormSubmissionSafely(formElement, handler) {
+    if (!formElement) return;
+    
+    formElement.addEventListener('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        try {
+            // Disable form temporarily to prevent double submission
+            const submitBtn = formElement.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = 'Processing...';
+                
+                // Re-enable after delay
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = originalText;
+                }, 3000);
+            }
+            
+            // Call the actual handler
+            handler(e);
+        } catch (error) {
+            console.error('Form submission error:', error);
+            
+            // Re-enable form on error
+            const submitBtn = formElement.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                const originalText = submitBtn.getAttribute('data-original-text') || 'Submit';
+                submitBtn.textContent = originalText;
+            }
+        }
+    });
+}
+
+// Enhanced form submission to prevent PWA crashes
+async function handleFormSubmission(formHandler, formData, buttonElement) {
+    if (!formHandler || typeof formHandler !== 'function') {
+        console.error('Invalid form handler');
+        return;
+    }
+    
+    // Disable button and show loading state
+    if (buttonElement) {
+        buttonElement.disabled = true;
+        const originalText = buttonElement.textContent;
+        buttonElement.textContent = 'Processing...';
+        
+        // Timeout to re-enable button if something goes wrong
+        const timeoutId = setTimeout(() => {
+            buttonElement.disabled = false;
+            buttonElement.textContent = originalText;
+        }, 10000);
+        
+        try {
+            await formHandler(formData);
+            clearTimeout(timeoutId);
+            buttonElement.disabled = false;
+            buttonElement.textContent = originalText;
+        } catch (error) {
+            console.error('Form submission error:', error);
+            clearTimeout(timeoutId);
+            buttonElement.disabled = false;
+            buttonElement.textContent = originalText;
+            
+            // Show error message
+            alert('An error occurred. Please try again.');
+        }
+    } else {
+        try {
+            await formHandler(formData);
+        } catch (error) {
+            console.error('Form submission error:', error);
+            alert('An error occurred. Please try again.');
+        }
+    }
+}
+// Set up all event listeners in a PWA-safe manner
+function setupPWAEventListeners() {
+    console.log('Setting up PWA-safe event listeners...');
+    
+    // Profile form
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        handleFormSubmissionSafely(profileForm, handleProfileCreation);
+    }
+    
+    // Login form
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        handleFormSubmissionSafely(loginForm, handleLogin);
+    }
+    
+    // Register form
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        handleFormSubmissionSafely(registerForm, handleRegistration);
+    }
+    
+    // Download buttons
+    setupDownloadButtons();
+    
+    // Navigation buttons - wrap in safe handler
+    document.querySelectorAll('button[onclick*="show"]').forEach(btn => {
+        const originalOnclick = btn.getAttribute('onclick');
+        btn.removeAttribute('onclick');
+        
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            try {
+                // Execute the original function safely
+                eval(originalOnclick);
+            } catch (error) {
+                console.error('Navigation error:', error);
+                // Fallback navigation
+                showMainPage();
+            }
+        });
+    });
+    
+    console.log('PWA-safe event listeners set up');
+}
+
+
 
         function downloadMyProfilePDF() {
             if (!currentUserProfile) return;
@@ -4158,27 +4438,48 @@ const { jsPDF } = window.jspdf;
             });
         }
 
-        function getCustomFieldsHTML(customFields) {
-            if (!customFields || Object.keys(customFields).length === 0) {
-                return '';
+       // Enhanced download button handling
+function setupDownloadButtons() {
+    // PDF download buttons
+    document.querySelectorAll('[onclick*="downloadPDF"]').forEach(button => {
+        button.removeAttribute('onclick');
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Get profile data from button's data attributes or current context
+            const profileId = this.dataset.profileId;
+            const profileData = profileId ? getProfileDataById(profileId) : currentUserProfile;
+            
+            try {
+                downloadPDF(profileData);
+            } catch (error) {
+                console.error('PDF download error:', error);
+                alert('Failed to download PDF. Please try again.');
             }
-
-            let html = '';
-            Object.entries(customFields).forEach(([key, value]) => {
-                if (value && value.trim() !== '') {
-                    html += `
-                        <div style="margin-bottom: 15px;">
-                            <strong style="color: #333;">${key}:</strong>
-                            <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                                ${value}
-                            </div>
-                        </div>
-                    `;
-                }
-            });
-            return html;
-        }
-
+        });
+    });
+    
+    // Image download buttons
+    document.querySelectorAll('[onclick*="downloadImage"]').forEach(button => {
+        button.removeAttribute('onclick');
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Get profile data from button's data attributes or current context
+            const profileId = this.dataset.profileId;
+            const profileData = profileId ? getProfileDataById(profileId) : currentUserProfile;
+            
+            try {
+                downloadImage(profileData);
+            } catch (error) {
+                console.error('Image download error:', error);
+                alert('Failed to download image. Please try again.');
+            }
+        });
+    });
+}
         // ========================================
         // INITIALIZATION
         // ========================================
@@ -4394,6 +4695,62 @@ function bindButtonEvents() {
         addFieldBtn.addEventListener('click', addCustomField);
     }
 }
+
+
+// ========================================
+// COMPLETE INITIALIZATION
+// ========================================
+
+// Complete app initialization
+async function initializeCompleteApp() {
+    console.log('Starting complete app initialization...');
+    
+    try {
+        // Initialize Supabase and auth
+        if (typeof initializeApp === 'function') {
+            await initializeApp();
+        }
+        
+        // Set up PWA-safe event listeners
+        setupPWAEventListeners();
+        
+        // Initialize PWA features
+        initializePWA();
+        
+        console.log('Complete app initialization finished');
+        
+    } catch (error) {
+        console.error('App initialization error:', error);
+        
+        // Still try to initialize PWA features
+        try {
+            initializePWA();
+        } catch (pwaError) {
+            console.error('PWA initialization error:', pwaError);
+        }
+    }
+}
+
+// Start initialization when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeCompleteApp);
+} else {
+    initializeCompleteApp();
+}
+
+// Export functions for global access
+window.PWAUtils = {
+    showInstallPopup: () => shouldShowInstallPrompt() ? showPWAPopup() : console.log('Install prompt not needed'),
+    hideInstallPopup: hidePWAPopup,
+    checkInstallStatus: isPWAInstalled,
+    downloadPDF: downloadPDF,
+    downloadImage: downloadImage,
+    clearInstallTracking: () => {
+        localStorage.removeItem('pwa_install_dismissed');
+        installPromptShown = false;
+        console.log('Install tracking cleared');
+    }
+};
     </script>
 </body>
 </html>
