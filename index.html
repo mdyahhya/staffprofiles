@@ -5,4759 +5,636 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VVPIET Staff Profiles</title>
     <link rel="manifest" href="manifest.json">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
     <meta name="theme-color" content="#8B5CF6">
-    <!-- Add these libraries -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    
-
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #fff; color: #000; padding-bottom: 80px;
         }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: white;
-            color: black;
-            overflow-x: hidden;
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { text-align: center; padding: 30px 0; border-bottom: 2px solid #8B5CF6; position: relative; }
+        .header h1 { font-size: 28px; color: #8B5CF6; margin-bottom: 10px; }
+        .developer-btn { position: absolute; top: 20px; right: 20px; background: #8B5CF6; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .developer-btn:hover { opacity: 0.9; }
+        .logo-section { text-align: center; margin: 30px 0; }
+        .logo-section img { width: 120px; height: auto; }
+        .logo-section p { margin-top: 15px; color: #666; font-size: 16px; }
+        
+        .leadership { margin: 40px 0; }
+        .leadership h2 { text-align: center; color: #8B5CF6; margin-bottom: 30px; font-size: 24px; }
+        .leadership-grid { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+        .leader-card { text-align: center; width: 200px; }
+        .leader-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #8B5CF6; }
+        .leader-card .name { font-weight: 600; margin-top: 15px; font-size: 16px; }
+        .leader-card .position { color: #666; font-size: 14px; margin-top: 5px; }
+        
+        .dept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 40px 0; }
+        .dept-btn { 
+            background: #fff; border: 2px solid #8B5CF6; padding: 30px 20px; 
+            text-align: center; cursor: pointer; border-radius: 10px; transition: all 0.3s;
         }
+        .dept-btn:hover { background: #8B5CF6; color: #fff; transform: translateY(-5px); }
+        .dept-btn small { display: block; margin-top: 8px; font-size: 13px; opacity: 0.8; }
+        
+        .taskbar { 
+            position: fixed; bottom: 0; left: 0; right: 0; background: #fff; 
+            border-top: 2px solid #8B5CF6; display: flex; justify-content: space-around; padding: 10px 0;
+        }
+        .taskbar button { 
+            background: none; border: none; cursor: pointer; padding: 8px 20px; 
+            font-size: 13px; color: #000; transition: color 0.3s;
+        }
+        .taskbar button:hover { color: #8B5CF6; }
+        .taskbar .icon { font-size: 20px; margin-bottom: 5px; }
+        
+        .pwa-popup { 
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1000; max-width: 400px; border: 2px solid #8B5CF6;
+        }
+        .pwa-popup.show { display: block; }
+        .pwa-popup h3 { color: #8B5CF6; margin-bottom: 15px; }
+        .pwa-popup p { margin-bottom: 20px; color: #666; }
+        .pwa-buttons { display: flex; gap: 10px; }
+        .pwa-buttons button { 
+            flex: 1; padding: 12px; border: 2px solid #8B5CF6; background: #fff; 
+            cursor: pointer; border-radius: 8px; font-weight: 600;
+        }
+        .pwa-buttons button.install { background: #8B5CF6; color: #fff; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal.show { display: flex; }
+        .modal-content { background: #fff; padding: 40px; border-radius: 15px; max-width: 500px; width: 90%; border: 2px solid #8B5CF6; position: relative; text-align: center; }
+        .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 28px; cursor: pointer; color: #8B5CF6; }
+        .developer-img { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 3px solid #8B5CF6; overflow: hidden; }
+        .developer-img img { width: 100%; height: 100%; object-fit: cover; }
+        .developer-name { font-size: 24px; font-weight: 600; color: #8B5CF6; margin-bottom: 8px; }
+        .developer-title { color: #666; font-size: 16px; margin-bottom: 15px; }
+        .developer-desc { line-height: 1.6; margin-bottom: 20px; color: #333; }
+        .contact-icons { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+        .contact-icons a { display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; background: #8B5CF6; color: #fff; text-decoration: none; font-size: 20px; transition: transform 0.3s; }
+        .contact-icons a:hover { transform: scale(1.1); }
+        
+        .tpc-section { 
+            margin: 40px 0; padding: 30px; background: #f9f9f9; 
+            border-radius: 10px; border: 2px solid #8B5CF6;
+        }
+        .tpc-section h2 { text-align: center; color: #8B5CF6; margin-bottom: 20px; }
 
-        .container {
-            max-width: 375px;
-            margin: 0 auto;
-            min-height: 100vh;
-            padding-bottom: 80px;
+         /* Enhanced Developer Modal and Image Zoom */
+        .developer-img {
             position: relative;
-        }
-
-        /* Header */
-        .header {
-    padding: 20px;
-    text-align: center;
-    position: relative;
-    border-bottom: 1px solid #e5e5e5;
-}
-
-.header h1 {
-    color: #8B5CF6;
-    font-size: 24px;
-    font-weight: 600;
-    margin: 0; /* Remove default margin */
-}
-
-.developer-link {
-    background: transparent;
-    color: #8B5CF6;
-    border: 1px solid #8B5CF6;
-    padding: 3px 8px;
-    font-size: 10px;
-    font-weight: 500;
-    border-radius: 3px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    position: absolute;
-    top: 15px;
-    right: 15px;
-}
-
-.developer-link:hover {
-    background: #8B5CF6;
-    color: white;
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
-}
-
-.developer-link:active {
-    transform: translateY(0);
-}
-
-/* For mobile responsiveness */
-@media (max-width: 480px) {
-    
-    .developer-link {
-        font-size: 8px;
-        padding: 2px 6px;
-        top: 10px;
-        right: 10px;
-    }
-}
-
-
-        .developer-icon {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            width: 40px;
-            height: 40px;
-            background: #8B5CF6;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
             cursor: pointer;
-            font-size: 18px;
+            transition: transform 0.3s ease;
         }
-
-        /* Department Buttons */
-        .departments {
-            padding: 20px;
+        
+        .developer-img:hover {
+            transform: scale(1.05);
         }
-
-        .dept-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        .dept-btn {
-            padding: 15px;
-            background: white;
-            border: 2px solid #8B5CF6;
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 12px;
-            font-weight: 500;
-        }
-
-        .dept-btn:hover {
-            background: #8B5CF6;
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
-        }
-
-        /* College Info */
-        .college-info {
-            text-align: center;
-            padding: 20px;
-        }
-
-        .college-logo {
+        
+        .developer-img img {
             width: 120px;
             height: 120px;
-            background: #f3f4f6;
             border-radius: 50%;
-            margin: 0 auto 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 48px;
+            border: 4px solid #8B5CF6;
+            transition: all 0.3s ease;
         }
-
-       
         
-        .college-desc {
-    text-align: center;
-    font-size: 16px;
-    color: #666;
-    margin: 0;
-    padding: 0 20px; /* Add some padding for mobile */
-}
-
-
-
-        /* Footer */
-        .footer {
-            padding: 20px;
-            border-top: 1px solid #e5e5e5;
-            text-align: center;
-            margin-top: 40px;
-        }
-
-        .footer p {
-            font-size: 12px;
-            color: #666;
-        }
-
-        /* Taskbar */
-        .taskbar {
-            position: fixed;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100%;
-            max-width: 375px;
-            background: white;
-            border-top: 1px solid #e5e5e5;
-            display: flex;
-            justify-content: space-around;
-            padding: 15px;
-            z-index: 1000;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-        }
-
-        .taskbar-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            background: none;
-            border: none;
-            color: #666;
-            cursor: pointer;
-            font-size: 12px;
-            transition: color 0.3s;
-        }
-
-        .taskbar-btn.active {
-            color: #8B5CF6;
-        }
-
-        .taskbar-btn:hover {
-            color: #8B5CF6;
-        }
-
-        .taskbar-btn .icon {
-            font-size: 20px;
-            margin-bottom: 4px;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
+        /* Image Zoom Modal */
+        .image-zoom-modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 10000;
+            display: flex;
             align-items: center;
             justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
-
+        
+        .image-zoom-modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .image-zoom-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+            animation: zoomIn 0.3s ease;
+        }
+        
+        .image-zoom-content img {
+            width: auto;
+            height: auto;
+            max-width: 500px;
+            max-height: 500px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+        }
+        
+        .image-zoom-close {
+            position: absolute;
+            top: -15px;
+            right: -15px;
+            background: #8B5CF6;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+        }
+        
+        .image-zoom-close:hover {
+            background: #7C3AED;
+            transform: scale(1.1);
+        }
+        
+        @keyframes zoomIn {
+            from {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Enhanced modal styling */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        
         .modal-content {
             background: white;
-            border-radius: 12px;
+            border-radius: 20px;
             padding: 30px;
-            max-width: 320px;
+            max-width: 500px;
             width: 90%;
-            text-align: center;
-            animation: modalSlideUp 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(50px);
+            transition: transform 0.3s ease;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
         }
-
-        @keyframes modalSlideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        
+        .modal.show .modal-content {
+            transform: translateY(0);
         }
-
+        
         .modal-close {
             position: absolute;
             top: 15px;
             right: 15px;
-            background: none;
+            background: #f0f0f0;
             border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-        }
-
-        /* Developer image container - THIS IS THE KEY PART */
-.developer-img {
-    width: 120px;
-    height: 120px;
-    margin: 0 auto 15px auto;
-    border-radius: 50%;
-    overflow: hidden; /* This prevents image from expanding outside */
-    border: 3px solid #8B5CF6;
-}
-
-/* Developer image itself */
-.developer-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; /* This keeps image proportional and fills the circle */
-    display: block; /* Removes default inline spacing */
-}
-
-
-        .developer-name {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #8B5CF6;
-        }
-
-        .developer-title {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .developer-desc {
-            font-size: 12px;
-            color: #666;
-            line-height: 1.5;
-            margin-bottom: 20px;
-        }
-
-        .contact-icons {
-            display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 15px;
-        }
-
-        .contact-icon {
-            width: 40px;
-            height: 40px;
-            background: #8B5CF6;
-            color: white;
             border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            font-size: 18px;
+            cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            text-decoration: none;
-            font-size: 16px;
-            transition: transform 0.3s;
+            transition: all 0.3s ease;
+            color: #666;
         }
-
-        .contact-icon:hover {
+        
+        .modal-close:hover {
+            background: #e0e0e0;
+            color: #333;
             transform: scale(1.1);
         }
-
-        .contact-text {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        /* Pages */
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
-
-        /* Department Page */
-        .dept-header {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid #e5e5e5;
-        }
-
-        .dept-title {
-            color: #8B5CF6;
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-        }
-
-        .back-btn {
-            position: absolute;
-            left: 20px;
-            top: 25px;
-            background: none;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            color: #8B5CF6;
-        }
-
-        .hod-section {
-            padding: 20px;
-            background: #f8fafc;
-        }
-
-        .hod-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #8B5CF6;
-        }
-
-       /* Staff Card Container - BIGGER SIZE */
-.staff-card {
-    display: flex;
-    align-items: center;
-    padding: 20px;
-    border: 1px solid #e5e5e5;
-    border-radius: 10px;
-    background-color: #ffffff;
-    margin-bottom: 16px;
-    cursor: pointer;
-    transition: box-shadow 0.3s ease, transform 0.2s ease;
-    box-sizing: border-box;
-    width: 100%;
-    max-width: 500px;
-}
-
-/* Hover Effects */
-.staff-card:hover {
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    transform: translateY(-3px);
-}
-
-.staff-card:active {
-    transform: translateY(0);
-}
-
-/* Staff Image Container - BIGGER */
-.staff-img {
-    width: 90px;
-    height: 90px;
-    min-width: 75px;
-    border-radius: 50%;
-    overflow: hidden;
-    margin-right: 20px;
-    background-color: #f5f5f5;
-    border: 3px solid #e5e5e5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 30px;
-    color: #999999;
-}
-
-/* Image inside staff-img container */
-.staff-img img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    border-radius: 50%;
-}
-
-/* Staff Info Section */
-.staff-info {
-    flex-grow: 1;
-    min-width: 0;
-    overflow: hidden;
-}
-
-/* Staff Name - BIGGER TEXT */
-.staff-name {
-    font-size: 20px;
-    font-weight: 700;
-    color: #222222;
-    margin-bottom: 8px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
-}
-
-/* Staff Designation - BIGGER TEXT */
-.staff-designation {
-    font-size: 16px;
-    color: #666666;
-    margin-bottom: 6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
-}
-
-/* Staff Experience - BIGGER TEXT */
-.staff-experience {
-    font-size: 14px;
-    color: #999999;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    line-height: 1.3;
-}
-
-/* Tablet Responsive (768px and below) */
-@media (max-width: 768px) {
-    .staff-card {
-        max-width: 100%;
-        padding: 16px;
-        margin-bottom: 14px;
-    }
-
-    .staff-img {
-        width: 80px;
-        height: 80px;
-        min-width: 65px;
-        margin-right: 16px;
-        font-size: 26px;
-    }
-
-    .staff-name {
-        font-size: 18px;
-    }
-
-    .staff-designation {
-        font-size: 15px;
-    }
-
-    .staff-experience {
-        font-size: 13px;
-    }
-}
-
-/* Mobile Responsive (480px and below) */
-@media (max-width: 480px) {
-    .staff-card {
-        padding: 14px;
-        margin-bottom: 12px;
-    }
-
-    .staff-img {
-        width: 80px;
-        height: 80px;
-        min-width: 60px;
-        margin-right: 14px;
-        font-size: 24px;
-    }
-
-    .staff-name {
-        font-size: 16px;
-    }
-
-    .staff-designation {
-        font-size: 14px;
-    }
-
-    .staff-experience {
-        font-size: 12px;
-    }
-}
-
-/* Small Mobile (320px and below) */
-@media (max-width: 320px) {
-    .staff-card {
-        padding: 12px;
-        margin-bottom: 10px;
-    }
-
-    .staff-img {
-        width: 65px;
-        height: 65px;
-        min-width: 55px;
-        margin-right: 12px;
-        font-size: 22px;
-    }
-
-    .staff-name {
-        font-size: 15px;
-    }
-
-    .staff-designation {
-        font-size: 13px;
-    }
-
-    .staff-experience {
-        font-size: 11px;
-    }
-}
-
-/* Focus states for accessibility */
-.staff-card:focus {
-    outline: 2px solid #8B5CF6;
-    outline-offset: 2px;
-}
-
-/* Loading state (optional) */
-.staff-card.loading {
-    opacity: 0.7;
-    pointer-events: none;
-}
-
-.staff-card.loading .staff-img {
-    background-color: #e0e0e0;
-    animation: pulse 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.5; }
-}
-
-
-        .check-profile-btn {
-            background: #8B5CF6;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .check-profile-btn:hover {
-            background: #7C3AED;
-        }
-
-        .staff-section {
-            padding: 20px;
-        }
-
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #8B5CF6;
-        }
-
-        /* Forms */
-        .form-container {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 500;
-            color: #374151;
-        }
-
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #e5e5e5;
-            border-radius: 8px;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: #8B5CF6;
-        }
-
-        .form-textarea {
-            height: 80px;
-            resize: vertical;
-        }
-
-        .form-btn {
-            width: 100%;
-            background: #8B5CF6;
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .form-btn:hover {
-            background: #7C3AED;
-        }
-
-        .form-btn:disabled {
-            background: #9CA3AF;
-            cursor: not-allowed;
-        }
-
-        /* PWA Install Popup */
-        .pwa-popup {
-            position: fixed;
-            bottom: 100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            max-width: 320px;
-            width: 90%;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-            display: none;
-            z-index: 1500;
-        }
-
-        .pwa-popup.show {
-            display: block;
-            animation: popupSlideUp 0.3s ease;
-        }
-
-        @keyframes popupSlideUp {
-            from { transform: translateX(-50%) translateY(50px); opacity: 0; }
-            to { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-
-        .pwa-popup h3 {
-            color: #8B5CF6;
-            margin-bottom: 10px;
-        }
-
-        .pwa-popup p {
-            font-size: 14px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-
-        .pwa-buttons {
-            display: flex;
-            gap: 10px;
-        }
-
-        .pwa-btn {
-            flex: 1;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            border: 1px solid #e5e5e5;
-            transition: all 0.3s;
-        }
-
-        .pwa-install {
-            background: #8B5CF6;
-            color: white;
-            border-color: #8B5CF6;
-        }
-
-        .pwa-later {
-            background: white;
-            color: #666;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* Profile Page */
-        .profile-header {
-            text-align: center;
-            padding: 20px;
-            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
-            color: white;
-        }
-
-        .profile-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: white;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: #8B5CF6;
-        }
-
-        .profile-name {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .profile-dept {
-            font-size: 14px;
-            opacity: 0.9;
-        }
-
-        .profile-content {
-            padding: 20px;
-        }
-
-        .profile-field {
-            margin-bottom: 20px;
-        }
-
-        .profile-field-label {
-            font-size: 12px;
-            color: #8B5CF6;
-            font-weight: 600;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-        }
-
-        .profile-field-value {
-            font-size: 14px;
-            line-height: 1.5;
-        }
-
-        .profile-actions {
-            padding: 20px;
-            display: flex;
-            gap: 10px;
-        }
-
-        .action-btn {
-            flex: 1;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            cursor: pointer;
-            border: 1px solid #8B5CF6;
-            background: white;
-            color: #8B5CF6;
-            transition: all 0.3s;
-        }
-
-        .action-btn:hover {
-            background: #8B5CF6;
-            color: white;
-        }
-        .developer-button {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  background: transparent;
-  color: white;
-  padding: 4px 8px;
-  cursor: pointer;
-  font-size: 10px;
-  text-align: center;
-  line-height: 1.1;
-  border-radius: 3px;
-  transition: border-color 0.3s ease;
-  min-width: 45px;
-}
-
-.developer-button:hover {
-  border-color: rgba(255, 255, 255, 0.6);
-}
-
-
-
-.crop-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.8);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.crop-content {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    text-align: center;
-    max-width: 90vw;
-    max-height: 90vh;
-}
-
-.crop-area {
-    position: relative;
-    width: 280px;
-    height: 280px;
-    margin: 20px auto;
-    border: 2px solid #8B5CF6;
-    border-radius: 50%;
-    overflow: hidden;
-    touch-action: none;
-}
-
-.crop-image {
-    position: absolute;
-    cursor: move;
-    touch-action: none;
-}
-/* Add to your existing CSS - Image expansion styles */
-.delete-btn {
-    background-color: #dc2626 !important;
-    color: white !important;
-}
-
-.delete-btn:hover {
-    background-color: #b91c1c !important;
-}
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Main Page -->
-        <div id="mainPage" class="page active">
-            <div class="header">
-                <h1>VVPIET Staff Profiles</h1>
-                <button class="developer-link" onclick="showDeveloperModal()">About Developer</button>
-            </div>
-            
-            <div class="departments">
-                <div class="dept-grid">
-                    <div class="dept-btn" onclick="showDepartment('CSE')">
-                        CSE<br><small>Computer Science & Engineering</small>
-                    </div>
-                    <div class="dept-btn" onclick="showDepartment('AIDS')">
-                        AI&DS<br><small>Artificial Intelligence & Data Science</small>
-                    </div>
-                    <div class="dept-btn" onclick="showDepartment('ENTC')">
-                        ENTC<br><small>Electronics & Telecommunications</small>
-                    </div>
-                    <div class="dept-btn" onclick="showDepartment('EE')">
-                        Electrical<br><small>Electrical Engineering</small>
-                    </div>
-                    <div class="dept-btn" onclick="showDepartment('ME')">
-                        Mechanical<br><small>Mechanical Engineering</small>
-                    </div>
-                    <div class="dept-btn" onclick="showDepartment('CE')">
-                        Civil<br><small>Civil Engineering</small>
-                    </div>
-                </div>
-            </div>
-
-            <div class="college-logo-section">
-                <img src="vvplogo.jpeg" alt="VVPIET Logo" class="college-logo">
-            </div>
-            <p class="college-desc">Here you can check the staff profiles of VVPIET</p>
+        <!-- Header Section -->
+        <div class="header">
+            <h1>VVPIET Staff Profiles</h1>
+            <button class="developer-btn" onclick="showDeveloperModal()">About Developer</button>
         </div>
-
-        <!-- Department Page -->
-        <div id="departmentPage" class="page">
-            <div class="dept-header">
-                <button class="back-btn" onclick="showMainPage()">←</button>
-                <h2 class="dept-title" id="deptTitle">Department</h2>
-            </div>
-
-            <div class="hod-section">
-                <h3 class="hod-title">Head of Department</h3>
-                <div id="hodContainer">
-                    <div class="staff-card">
-                        <div class="staff-name">Head Of Department</div>
-                        <div class="staff-designation">Profile not created yet</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="staff-section">
-                <h3 class="section-title">Staff Members</h3>
-                <div id="staffContainer">
-                    <div class="staff-card">
-                        <div class="staff-name">Staff members</div>
-                        <div class="staff-designation">Register to create profiles</div>
-                    </div>
-                </div>
+        
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <img src="vvplogo.jpeg" alt="VVPIET Logo">
+            <p>Explore staff profiles across all departments</p>
+        </div>
+        
+        <!-- Leadership Section -->
+        <div class="leadership">
+            <h2>Leadership</h2>
+            <div class="leadership-grid" id="leadershipGrid">
+                <div class="loading">Loading leadership...</div>
             </div>
         </div>
-
-        <!-- Auth Pages -->
-        <div id="loginPage" class="page">
-            <div class="form-container">
-                <button class="back-btn" onclick="showMainPage()">←</button>
-                <h2 style="text-align: center; color: #8B5CF6; margin-bottom: 30px;">Staff Login</h2>
-                
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-input" id="loginEmail" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-input" id="loginPassword" required>
-                    </div>
-                    
-                    <button type="submit" class="form-btn">Login</button>
-                </form>
-                
-                <p style="text-align: center; margin-top: 20px; font-size: 14px;">
-                    Don't have an account? <a href="javascript:void(0)" onclick="showRegisterPage()" style="color: #8B5CF6;">Register here</a>
-                </p>
-            </div>
+        
+        <!-- Departments Section -->
+        <!-- Departments Section -->
+<div>
+    <h2 style="text-align: center; color: #8B5CF6; margin: 40px 0 30px;">Departments</h2>
+    <div class="dept-grid">
+        <!-- Computer Science & Engineering -->
+        <div class="dept-btn" onclick="handleDeptNavigation('CSE')">
+            CSE<br><small>Computer Science & Engineering</small>
         </div>
-
-        <div id="registerPage" class="page">
-            <div class="form-container">
-                <button class="back-btn" onclick="showMainPage()">←</button>
-                <h2 style="text-align: center; color: #8B5CF6; margin-bottom: 30px;">Staff Registration</h2>
-                
-                <form id="registerForm">
-                    <div class="form-group">
-                        <label class="form-label">Email</label>
-                        <input type="email" class="form-input" id="registerEmail" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-input" id="registerPassword" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Department</label>
-                        <select class="form-select" id="registerDepartment" required>
-                            <option value="">Select Department</option>
-                            <option value="1">Computer Science & Engineering</option>
-                            <option value="2">Artificial Intelligence & Data Science</option>
-                            <option value="3">Electronics & Telecommunications</option>
-                            <option value="4">Electrical Engineering</option>
-                            <option value="5">Mechanical Engineering</option>
-                            <option value="6">Civil Engineering</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Department Code</label>
-                        <input type="text" class="form-input" id="registerCode" maxlength="6" placeholder="6-digit code" required>
-                    </div>
-                    
-                    <button type="submit" class="form-btn">Register</button>
-                </form>
-                
-                <p style="text-align: center; margin-top: 20px; font-size: 14px;">
-                    Already have an account? <a href="javascript:void(0)" onclick="showLoginPage()" style="color: #8B5CF6;">Login here</a>
-                </p>
-            </div>
+        
+        <!-- Artificial Intelligence & Data Science -->
+        <div class="dept-btn" onclick="handleDeptNavigation('AIDS')">
+            AI&DS<br><small>Artificial Intelligence & Data Science</small>
         </div>
-
-        <!-- My Profile Page (LinkedIn-style view) -->
-        <div id="myProfilePage" class="page">
-            <div class="form-container">
-                <button class="back-btn" onclick="showMainPage()">←</button>
-                <h2 style="text-align: center; color: #8B5CF6; margin-bottom: 30px;">My Profile</h2>
-                
-                <div id="profileViewSection" style="display: none;">
-                    <div class="profile-card">
-                        <div class="profile-header">
-                            <div class="profile-img" id="myProfileImg">👤</div>
-                            <div class="profile-info">
-                                <div class="profile-name" id="myProfileName">Name</div>
-                                <div class="profile-dept" id="myProfileDept">Department</div>
-                                <div class="profile-designation" id="myProfileDesignation">Designation</div>
-                            </div>
-                        </div>
-                        
-                        <div class="profile-details">
-                            <div class="profile-field">
-                                <div class="profile-field-label">Experience</div>
-                                <div class="profile-field-value" id="myProfileExperience">-</div>
-                            </div>
-                            
-                            <div class="profile-field">
-                                <div class="profile-field-label">Expertise</div>
-                                <div class="profile-field-value" id="myProfileResearch">-</div>
-                            </div>
-                            
-                            <div class="profile-field">
-                                <div class="profile-field-label">Achievements</div>
-                                <div class="profile-field-value" id="myProfileAchievements">-</div>
-                            </div>
-
-                            <!-- Custom Fields Section -->
-                            <div id="customFieldsSection"></div>
-                        </div>
-                        
-                        <div class="profile-actions">
-                            <button class="action-btn" onclick="editProfile()">✏️ Edit Profile</button>
-                            <!-- <button class="action-btn" onclick="downloadMyProfilePDF()">📄 Download PDF</button>
-                            <button class="action-btn" onclick="downloadMyProfileImage()">🖼️ Download Image</button> -->
-                            <button class="action-btn" onclick="downloadPDF(currentUserProfile)">Download PDF 📄</button>
-                            <button class="action-btn" onclick="downloadImage(currentUserProfile)">Download Image 🖼️</button>
-                            <button class="action-btn delete-btn" onclick="deleteProfile()">🗑️ Delete Profile</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div id="noProfileSection">
-                    <div style="text-align: center; padding: 40px;">
-                        <p style="margin-bottom: 20px;">You haven't created your profile yet.</p>
-                        <button class="form-btn" onclick="showCreateProfilePage()">Create Profile</button>
-                    </div>
-                </div>
-            </div>
+        
+        <!-- Electronics & Telecommunications -->
+        <div class="dept-btn" onclick="handleDeptNavigation('ENTC')">
+            ENTC<br><small>Electronics & Telecommunications</small>
         </div>
-
-        <!-- Create/Edit Profile Page -->
-        <div id="createProfilePage" class="page">
-            <div class="form-container">
-                <button class="back-btn" onclick="handleBackFromCreateProfile()">←</button>
-                <h2 style="text-align: center; color: #8B5CF6; margin-bottom: 30px;" id="profileFormTitle">Create Profile</h2>
-                
-                <form id="profileForm">
-                    <div class="form-group">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" class="form-input" id="profileName" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Department</label>
-                        <select class="form-select" id="profileDepartment" required>
-                            <option value="">Select Department</option>
-                            <option value="1">Computer Science & Engineering</option>
-                            <option value="2">Artificial Intelligence & Data Science</option>
-                            <option value="3">Electronics & Telecommunications</option>
-                            <option value="4">Electrical Engineering</option>
-                            <option value="5">Mechanical Engineering</option>
-                            <option value="6">Civil Engineering</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Designation</label>
-                        <select class="form-select" id="profileDesignation" required>
-                            <option value="">Select Designation</option>
-                            <option value="HOD">Head of Department</option>
-                            <option value="Professor">Professor</option>
-                            <option value="Associate Professor">Associate Professor</option>
-                            <option value="Assistant Professor">Assistant Professor</option>
-                            <option value="Lecturer">Lecturer</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Experience (Years)</label>
-                        <input type="number" class="form-input" id="profileExperience" min="0" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Expertise</label>
-                        <textarea class="form-textarea" id="profileResearch" placeholder="List your Expertise..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Achievements</label>
-                        <textarea class="form-textarea" id="profileAchievements" placeholder="List your achievements..."></textarea>
-                    </div>
-
-                    <!-- Custom Fields Section -->
-                    <div id="customFieldsFormSection">
-                        <div class="form-group">
-                            <label class="form-label">Custom Fields</label>
-                            <div id="customFieldsList"></div>
-                            <button type="button" class="add-field-btn" onclick="addCustomField()">+ Add Custom Field</button>
-                        </div>
-                    </div>
-                    
-                    <input type="file" id="profileImage" accept="image/*" onchange="openCropModal(this)">
-
-<div class="crop-modal" id="cropModal">
-    <div class="crop-content">
-        <h3>Crop Your Image</h3>
-        <div class="crop-area" id="cropArea">
-            <img id="cropImage" class="crop-image">
+        
+        <!-- Electrical Engineering -->
+        <div class="dept-btn" onclick="handleDeptNavigation('EE')">
+            EE<br><small>Electrical Engineering</small>
         </div>
-        <div>
-            <button type="button" onclick="applyCrop()">Use This Image</button>
-            <button type="button" onclick="closeCropModal()">Cancel</button>
+        
+        <!-- Mechanical Engineering -->
+        <div class="dept-btn" onclick="handleDeptNavigation('ME')">
+            ME<br><small>Mechanical Engineering</small>
+        </div>
+        
+        <!-- Civil Engineering -->
+        <div class="dept-btn" onclick="handleDeptNavigation('CE')">
+            CE<br><small>Civil Engineering</small>
+        </div>
+        
+        <!-- Bachelor of Computer Applications -->
+        <div class="dept-btn" onclick="handleDeptNavigation('BCA')">
+            BCA<br><small>Bachelor of Computer Applications</small>
+        </div>
+        
+        <!-- Master of Computer Applications -->
+        <div class="dept-btn" onclick="handleDeptNavigation('MCA')">
+            MCA<br><small>Master of Computer Applications</small>
         </div>
     </div>
 </div>
-<canvas id="cropCanvas" style="display: none;"></canvas>
-                    
-                    <button type="submit" class="form-btn" id="profileFormSubmitBtn">Create Profile</button>
-                </form>
-            </div>
-        </div>
 
-        <!-- Profile View Page (for viewing other profiles) -->
-        <div id="profileViewPage" class="page">
-            <div id="profileForDownload">
-                <button class="back-btn" onclick="goBackFromProfile()" style="position: fixed; top: 20px; left: 20px; z-index: 100; background: rgba(255,255,255,0.9);">←</button>
-                
-                <div class="profile-header">
-                    <div class="college-branding" style="text-align: center; margin-bottom: 20px;">
-                        <img src="vvplogo.jpeg" alt="VVPIET Logo" style="height: 60px; margin-bottom: 10px;">
-                        <h3 style="color: #8B5CF6; margin: 0;">VVPIET Staff Profiles</h3>
-                    </div>
-                    
-                    <div class="profile-img" id="viewProfileImg">👤</div>
-                    <div class="profile-name" id="viewProfileName">Name</div>
-                    <div class="profile-dept" id="viewProfileDept">Department</div>
-                </div>
-                
-                <div class="profile-content">
-                    <div class="profile-field">
-                        <div class="profile-field-label">Designation</div>
-                        <div class="profile-field-value" id="viewProfileDesignation">-</div>
-                    </div>
-                    
-                    <div class="profile-field">
-                        <div class="profile-field-label">Experience</div>
-                        <div class="profile-field-value" id="viewProfileExperience">-</div>
-                    </div>
-                    
-                    <div class="profile-field">
-                        <div class="profile-field-label">Expertise</div>
-                        <div class="profile-field-value" id="viewProfileResearch">-</div>
-                    </div>
-                    
-                    <div class="profile-field">
-                        <div class="profile-field-label">Achievements</div>
-                        <div class="profile-field-value" id="viewProfileAchievements">-</div>
-                    </div>
-
-                    <!-- Custom Fields for viewing -->
-                    <div id="viewCustomFieldsSection"></div>
-                </div>
-                
-                <div class="copyright-section" style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
-                    <p style="font-size: 12px; color: #666;">© All rights reserved, Staff Profile by Yahya Mundewadi</p>
-                </div>
-            </div>
-            
-            <!-- <div class="profile-actions" style="position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: white; padding: 10px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">
-                <button class="action-btn" onclick="downloadPDF()" style="margin: 0 10px;">📄 Download PDF</button>
-                <button class="action-btn" onclick="downloadImage()" style="margin: 0 10px;">🖼️ Download Image</button>
-                <button class="action-btn" onclick="downloadPDF(currentViewingProfile)" style="margin: 0 10px;">Download PDF 📄</button>
-                <button class="action-btn" onclick="downloadImage(currentViewingProfile)" style="margin: 0 10px;">Download Image 🖼️</button>
-            </div> -->
-        </div>
-
-        <div class="taskbar">
-    <button class="taskbar-btn active" onclick="showMainPage()">
-        <div class="icon">🏠</div>
-        <span>Home</span>
-    </button>
-    <button class="taskbar-btn" onclick="handleCreateProfile()">
-        <div class="icon">👤</div>
-        <span>Profile</span>
-    </button>
-    <button class="taskbar-btn" onclick="handleAuthAction()">
-        <div class="icon">🚪</div>
-        <span id="logoutText">Login</span>
-    </button>
+<!-- Training & Placement Section -->
+<div class="tpc-section">
+    <h2>Training & Placement Cell</h2>
+    <div style="text-align:center;">
+        <button class="dept-btn" style="display:inline-block;width:auto;min-width:250px;" onclick="handleTPONavigation()">
+            View TPO Profile
+        </button>
+    </div>
 </div>
-        <!-- Enhanced PWA Install Popup -->
-<div class="pwa-popup" id="pwaPopup">
-    <div class="pwa-popup-content">
-        <div class="pwa-header">
-            <!-- <img src="stafflogo.jpg" alt="VVPIET Logo" class="pwa-icon"> -->
-            <h3>Install VVPIET Staff App</h3>
-        </div>
-        <p>Get quick access to staff profiles anytime, anywhere!</p>
-        <div class="pwa-features">
-            <div class="pwa-feature">✓ Works offline</div>
-            <div class="pwa-feature">✓ Fast loading</div>
-            <div class="pwa-feature">✓ Home screen access</div>
-        </div>
+
+    
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <button onclick="location.href='index.html'">
+            <div class="icon">🏠</div>
+            <span>Home</span>
+        </button>
+        <button onclick="location.href='stafflogin.html'">
+            <div class="icon">👤</div>
+            <span>Profile</span>
+        </button>
+        <button onclick="handleAuth()">
+            <div class="icon">🚪</div>
+            <span id="authText">Login</span>
+        </button>
+    </div>
+    
+    <!-- PWA Popup -->
+    <div class="pwa-popup" id="pwaPopup">
+        <h3>Install VVPIET App</h3>
+        <p>Access staff profiles anytime with our app!</p>
         <div class="pwa-buttons">
-            <button class="pwa-btn pwa-install" onclick="installPWA()">Install App</button>
-            <button class="pwa-btn pwa-later" onclick="hidePWAPopup()">Maybe Later</button>
+            <button class="install" onclick="installPWA()">Install</button>
+            <button onclick="hidePWA()">Later</button>
         </div>
     </div>
-</div>
-
-    </div>
-
-    <!-- Developer Modal -->
+    
+    <!-- Enhanced Developer Modal -->
     <div class="modal" id="developerModal">
         <div class="modal-content">
             <button class="modal-close" onclick="hideDeveloperModal()">×</button>
-           <div class="developer-img">
-        <img src="yahyadp.jpg" alt="Developer" class="developer-img" onclick="toggleDeveloperImage()">
-    </div>
-
+            <div class="developer-img" onclick="showImageZoom('yahyadp.jpg', 'Yahya Mundewadi')">
+                <img src="yahyadp.jpg" alt="Yahya Mundewadi">
+            </div>
             <div class="developer-name">Yahya Mundewadi</div>
             <div class="developer-title">Founder of Continental Group</div>
             <div class="developer-desc">
-                Passionate developer creating innovative solutions for educational institutions and businesses. Specialized in modern web technologies and mobile applications.
+                Passionate developer creating innovative solutions for educational institutions and businesses. 
+                Specialized in modern web technologies and mobile applications.
             </div>
             <div class="contact-icons">
-                <a href="mailto:ctgroupteam@gmail.com" class="contact-icon">✉️</a>
-                <a href="tel:+919307426215" class="contact-icon">📞</a>
-                <a href="https://wa.me/919307426215?text=Hello, I want to discuss a project" class="contact-icon" target="_blank">
+                <a href="mailto:ctgroupteam@gmail.com" title="Email">✉</a>
+                <a href="tel:+919307426215" title="Phone">📞</a>
+                <a href="https://wa.me/919307426215?text=Hello, I want to discuss a project" target="_blank" title="WhatsApp">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.885 3.206"/>
                     </svg>
                 </a>
             </div>
-            <div class="contact-text">Have a website/app idea? Click here to contact</div>
+            <p style="margin-top:20px;font-size:14px;color:#8B5CF6;font-weight:600;">Have a website/app idea? Contact me!</p>
         </div>
     </div>
-
+    
+    <!-- Image Zoom Modal -->
+    <div class="image-zoom-modal" id="imageZoomModal">
+        <div class="image-zoom-content">
+            <button class="image-zoom-close" onclick="hideImageZoom()">×</button>
+            <img id="zoomedImage" src="" alt="">
+        </div>
+    </div>    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Complete VVPIET Staff Portfolio JavaScript with Enhanced Features
-
-        // ========================================
-        // SUPABASE CONFIGURATION
-        // ========================================
-
-        const SUPABASE_URL = 'https://nsnacwwcrszpjmanskti.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4';
-
-        let supabaseClient = null;
-        if (typeof supabase !== 'undefined') {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        }
-
-
-
-
-        let selectedImageFile = null;
-
-let isDragging = false;
-let startX, startY;
-let imageX = 0, imageY = 0;
-let croppedImageBlob = null;
-
-function openCropModal(input) {
-    const file = input.files[0];
-    if (!file) return;
-    
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        const img = document.getElementById('cropImage');
-        img.src = e.target.result;
-        img.style.left = '0px';
-        img.style.top = '0px';
-        imageX = 0;
-        imageY = 0;
+        const sb = supabase.createClient('https://nsnacwwcrszpjmanskti.supabase.co', 
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4');
         
-        img.onload = function() {
-            // Scale image to fit crop area
-            const cropArea = document.getElementById('cropArea');
-            const scale = Math.max(280 / img.naturalWidth, 280 / img.naturalHeight);
-            img.style.width = (img.naturalWidth * scale) + 'px';
-            img.style.height = (img.naturalHeight * scale) + 'px';
-            
-            setupImageDrag();
-        };
+        let deferredPrompt;
         
-        document.getElementById('cropModal').style.display = 'flex';
-    };
-    reader.readAsDataURL(file);
-}
-
-function setupImageDrag() {
-    const img = document.getElementById('cropImage');
-    
-    // Mouse events
-    img.addEventListener('mousedown', startDrag);
-    document.addEventListener('mousemove', drag);
-    document.addEventListener('mouseup', stopDrag);
-    
-    // Touch events
-    img.addEventListener('touchstart', startDragTouch);
-    document.addEventListener('touchmove', dragTouch);
-    document.addEventListener('touchend', stopDrag);
-}
-
-function startDrag(e) {
-    isDragging = true;
-    startX = e.clientX - imageX;
-    startY = e.clientY - imageY;
-    e.preventDefault();
-}
-
-function startDragTouch(e) {
-    isDragging = true;
-    const touch = e.touches[0];
-    startX = touch.clientX - imageX;
-    startY = touch.clientY - imageY;
-    e.preventDefault();
-}
-
-function drag(e) {
-    if (!isDragging) return;
-    
-    imageX = e.clientX - startX;
-    imageY = e.clientY - startY;
-    updateImagePosition();
-    e.preventDefault();
-}
-
-function dragTouch(e) {
-    if (!isDragging) return;
-    
-    const touch = e.touches[0];
-    imageX = touch.clientX - startX;
-    imageY = touch.clientY - startY;
-    updateImagePosition();
-    e.preventDefault();
-}
-
-function stopDrag() {
-    isDragging = false;
-}
-
-function updateImagePosition() {
-    const img = document.getElementById('cropImage');
-    img.style.left = imageX + 'px';
-    img.style.top = imageY + 'px';
-}
-
-function applyCrop() {
-    const img = document.getElementById('cropImage');
-    const canvas = document.getElementById('cropCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = 280;
-    canvas.height = 280;
-    
-    // Create circular clip
-    ctx.beginPath();
-    ctx.arc(140, 140, 140, 0, 2 * Math.PI);
-    ctx.clip();
-    
-    // Draw the image at current position
-    ctx.drawImage(img, imageX, imageY, parseInt(img.style.width), parseInt(img.style.height));
-    
-    // Convert to blob
-    canvas.toBlob(function(blob) {
-        croppedImageBlob = blob;
-        const croppedFile = new File([blob], 'cropped_image.jpg', {
-            type: 'image/jpeg',
-            lastModified: Date.now()
-        });
+        // Cache for fast loading
+        let cachedLeadership = null;
+        let cachedDepartments = {};
         
-        // Update file input
-        const dt = new DataTransfer();
-        dt.items.add(croppedFile);
-        document.getElementById('profileImage').files = dt.files;
-        
-        closeCropModal();
-        alert('Image cropped successfully!');
-    }, 'image/jpeg', 0.9);
-}
-
-function closeCropModal() {
-    document.getElementById('cropModal').style.display = 'none';
-    if (!croppedImageBlob) {
-        document.getElementById('profileImage').value = '';
-    }
-}
-
-
-function handleImageSelect(input) {
-    const file = input.files[0];
-    if (file) {
-        selectedImageFile = file;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.getElementById('cropImage').src = e.target.result;
-            document.getElementById('cropContainer').style.display = 'block';
-            document.getElementById('cropControls').style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-function cropImage() {
-    const img = document.getElementById('cropImage');
-    const canvas = document.getElementById('cropCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = 300;
-    canvas.height = 300;
-    
-    // Draw circular crop
-    ctx.beginPath();
-    ctx.arc(150, 150, 150, 0, 2 * Math.PI);
-    ctx.clip();
-    
-    ctx.drawImage(img, 0, 0, 300, 300);
-    
-    // Convert to blob and create new file
-    canvas.toBlob(function(blob) {
-        const croppedFile = new File([blob], selectedImageFile.name, {
-            type: selectedImageFile.type,
-            lastModified: Date.now()
-        });
-        
-        // Update the file input
-        const dt = new DataTransfer();
-        dt.items.add(croppedFile);
-        document.getElementById('profileImage').files = dt.files;
-        
-        // Hide crop interface
-        cancelCrop();
-        
-        alert('Image cropped successfully!');
-    }, selectedImageFile.type);
-}
-
-function cancelCrop() {
-    document.getElementById('cropContainer').style.display = 'none';
-    document.getElementById('cropControls').style.display = 'none';
-    document.getElementById('profileImage').value = '';
-    selectedImageFile = null;
-}
-
-        // ========================================
-        // GLOBAL VARIABLES
-        // ========================================
-
-        let currentUser = null;
-        let currentDepartment = null;
-        
-        let isEditMode = false;
-        let currentUserProfile = null;
-
-        const departmentMap = {
-            'CSE': { id: 1, name: 'Computer Science & Engineering' },
-            'AIDS': { id: 2, name: 'Artificial Intelligence & Data Science' },
-            'ENTC': { id: 3, name: 'Electronics & Telecommunications' },
-            'EE': { id: 4, name: 'Electrical Engineering' },
-            'ME': { id: 5, name: 'Mechanical Engineering' },
-            'CE': { id: 6, name: 'Civil Engineering' }
-        };
-
-        // ========================================
-        // AUTHENTICATION FUNCTIONS
-        // ========================================
-
-        async function initializeAuth() {
-            if (!supabaseClient) {
-                console.warn('Supabase not initialized, using mock mode');
-                return;
+        // PWA Installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (!localStorage.getItem('pwaInstalled')) {
+                document.getElementById('pwaPopup').classList.add('show');
             }
-
-            try {
-                const { data: { session } } = await supabaseClient.auth.getSession();
-                if (session) {
-                    currentUser = session.user;
-                    await loadUserProfile();
-                    updateUIForLoggedInUser();
+        });
+        
+        async function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    localStorage.setItem('pwaInstalled', 'true');
                 }
-
-               supabaseClient.auth.onAuthStateChange(async (event, session) => {
-    if (session) {
-        currentUser = session.user;
-        await loadUserProfile(); // This loads the profile data
-        updateUIForLoggedInUser(); // This will now correctly show/hide UI based on profile
-    } else {
-        currentUser = null;
-        currentUserProfile = null;
-        updateUIForLoggedOutUser();
-    }
-});
-            } catch (error) {
-                console.error('Auth initialization error:', error);
+                deferredPrompt = null;
             }
-        }
-
-        async function loadUserProfile() {
-    if (!supabaseClient || !currentUser) return;
-
-    try {
-        // Get the integer database user ID by email
-        const { data: dbUser, error: userError } = await supabaseClient
-            .from('users')
-            .select('user_id')
-            .eq('email', currentUser.email)
-            .single();
-
-        if (userError || !dbUser) {
-            console.log('No database user found');
-            currentUserProfile = null;
-            return;
-        }
-
-        // Store for future use
-        localStorage.setItem('db_user_id', dbUser.user_id);
-
-        // Get profile using integer user ID
-        const { data: profileData, error: profileError } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('user_id', dbUser.user_id)
-            .single();
-
-        if (profileError) {
-            console.log('No profile found for user:', profileError);
-            currentUserProfile = null;
-            return;
-        }
-
-        // Get department info separately
-        const { data: deptData, error: deptError } = await supabaseClient
-            .from('departments')
-            .select('dept_name, dept_short_name')
-            .eq('dept_id', profileData.department)
-            .single();
-
-        if (!deptError && deptData) {
-            currentUserProfile = {
-                ...profileData,
-                department_name: deptData.dept_name,
-                department_short: deptData.dept_short_name
-            };
-        } else {
-            currentUserProfile = profileData;
+            hidePWA();
         }
         
-        console.log('User profile loaded:', currentUserProfile);
-    } catch (error) {
-        console.error('Error loading user profile:', error);
-        currentUserProfile = null;
-    }
-}
-        // ========================================
-        // PAGE NAVIGATION
-        // ========================================
-
-        function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(page => {
-        page.classList.remove('active');
-    });
-    document.getElementById(pageId).classList.add('active');
-    
-    document.querySelectorAll('.taskbar-btn').forEach(btn => {
-        btn.classList.remove('active');
-    });
-    
-    if (pageId === 'mainPage') {
-        document.querySelectorAll('.taskbar-btn')[0].classList.add('active');
-    }
-    
-    // Push to navigation history and browser history
-    pushToHistory(pageId);
-    if (!isNavigatingBack) {
-        history.pushState({page: pageId}, '', '');
-    }
-}
-        function showMainPage() {
-    showPage('mainPage');
-    // Reset department context when going to main page
-    currentDepartment = null;
-}
-        async function showDepartment(dept) {
-            currentDepartment = dept;
-            document.getElementById('deptTitle').textContent = departmentMap[dept].name;
-            await loadDepartmentStaff(dept);
-            showPage('departmentPage');
+        function hidePWA() {
+            document.getElementById('pwaPopup').classList.remove('show');
         }
-
         
-        function showLoginPage() {
-    showPage('loginPage');
-}
-
-function showRegisterPage() {
-    showPage('registerPage');
-}
-
-function showCreateProfilePage() {
-    isEditMode = false;
-    clearProfileForm();
-    document.getElementById('profileFormTitle').textContent = 'Create Profile';
-    document.getElementById('profileFormSubmitBtn').textContent = 'Create Profile';
-    showPage('createProfilePage');
-}
-
-
-// function showMyProfile() {
-//     if (currentUserProfile) {
-//         displayMyProfile();
-//         document.getElementById('profileViewSection').style.display = 'block';
-//         document.getElementById('noProfileSection').style.display = 'none';
-//     } else {
-//         document.getElementById('profileViewSection').style.display = 'none';
-//         document.getElementById('noProfileSection').style.display = 'block';
-//     }
-//     showPage('myProfilePage');
-// }
-function showMyProfile() {
-    updateMyProfileUI();
-    showPage('myProfilePage');
-}
-// Store current viewing profile data for downloads
-let currentViewingProfile = null;
-
-// Enhanced profile view function that stores profile data for downloads
-async function showProfileView(profileId) {
-    try {
-        let profile = null;
+        // Developer Modal Functions
+        function showDeveloperModal() {
+            document.getElementById('developerModal').classList.add('show');
+        }
         
-        if (supabaseClient) {
-            const { data: profileData, error: profileError } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('profile_id', profileId)
-                .single();
-
-            if (!profileError && profileData) {
-                // Get department info separately
-                const { data: deptData, error: deptError } = await supabaseClient
-                    .from('departments')
-                    .select('dept_name, dept_short_name')
-                    .eq('dept_id', profileData.department)
-                    .single();
-
-                if (!deptError && deptData) {
-                    profile = {
-                        ...profileData,
-                        department_name: deptData.dept_name,
-                        department_short: deptData.dept_short_name
-                    };
-                } else {
-                    profile = profileData;
+        function hideDeveloperModal() {
+            document.getElementById('developerModal').classList.remove('show');
+        }
+        
+        // Image Zoom Functions
+        function showImageZoom(imageSrc, imageAlt) {
+            const modal = document.getElementById('imageZoomModal');
+            const img = document.getElementById('zoomedImage');
+            
+            img.src = imageSrc;
+            img.alt = imageAlt;
+            modal.classList.add('show');
+            
+            // Prevent body scroll when modal is open
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function hideImageZoom() {
+            document.getElementById('imageZoomModal').classList.remove('show');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modals when clicking outside
+        window.addEventListener('click', (e) => {
+            // Close developer modal
+            if (e.target.id === 'developerModal') {
+                hideDeveloperModal();
+            }
+            
+            // Close image zoom modal
+            if (e.target.id === 'imageZoomModal') {
+                hideImageZoom();
+            }
+        });
+        
+        // Escape key to close modals
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideDeveloperModal();
+                hideImageZoom();
+            }
+        });
+        
+        // Preload all department data for fast access
+        async function preloadAllData() {
+            try {
+                // Load all departments with staff count
+                const { data: deptStats } = await sb
+                    .from('department_stats')
+                    .select('*');
+                
+                // Update department buttons with staff counts
+                deptStats?.forEach(dept => {
+                    const deptBtn = Array.from(document.querySelectorAll('.dept-btn')).find(btn => 
+                        btn.getAttribute('onclick').includes(dept.dept_short_name)
+                    );
+                    if (deptBtn) {
+                        const small = deptBtn.querySelector('small');
+                        if (small && dept.total_profiles > 0) {
+                            small.innerHTML = `${small.textContent} <span style="color:#8B5CF6;font-weight:600;">(${dept.total_profiles} Staff)</span>`;
+                        }
+                    }
+                });
+                
+                // Preload all profiles for instant access
+                const { data: allProfiles } = await sb
+                    .from('profile_complete')
+                    .select('*')
+                    .eq('is_published', true);
+                
+                // Cache by department
+                if (allProfiles) {
+                    allProfiles.forEach(profile => {
+                        const deptShort = profile.department_short;
+                        if (!cachedDepartments[deptShort]) {
+                            cachedDepartments[deptShort] = [];
+                        }
+                        cachedDepartments[deptShort].push(profile);
+                    });
+                    
+                    // Sort each department: HODs first, then by name
+                    Object.keys(cachedDepartments).forEach(dept => {
+                        cachedDepartments[dept].sort((a, b) => {
+                            if (a.designation === 'HOD' && b.designation !== 'HOD') return -1;
+                            if (b.designation === 'HOD' && a.designation !== 'HOD') return 1;
+                            return a.name.localeCompare(b.name);
+                        });
+                    });
                 }
                 
-                // Store profile for downloads
-              console.log('Set currentViewingProfile:', currentViewingProfile);
+            } catch (error) {
+                console.error('Error preloading data:', error);
             }
         }
         
-        if (profile) {
-            document.getElementById('viewProfileName').textContent = profile.name;
-            document.getElementById('viewProfileDept').textContent = profile.department_name || 'Department not found';
-            document.getElementById('viewProfileDesignation').textContent = profile.designation;
-            document.getElementById('viewProfileExperience').textContent = profile.experience + ' years';
-            document.getElementById('viewProfileResearch').textContent = profile.research_papers || 'No Expertise listed yet';
-            document.getElementById('viewProfileAchievements').textContent = profile.achievements || 'No achievements listed yet';
-            
-            if (profile.profile_image) {
-                document.getElementById('viewProfileImg').innerHTML = `<img src="${profile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-            } else {
-                document.getElementById('viewProfileImg').innerHTML = '👤';
-            }
-
-            // Display custom fields
-            displayCustomFields('viewCustomFieldsSection', profile.custom_fields);
-            
-            // Update download buttons to use current viewing profile
-            updateDownloadButtons();
-            
-            showPage('profileViewPage');
-        } else {
-            alert('Profile not found');
-        }
-    } catch (error) {
-        console.error('Error loading profile:', error);
-        alert('Error loading profile: ' + error.message);
+        // Department navigation with caching
+        // Replace the handleDeptNavigation function with this:
+function handleDeptNavigation(deptShort) {
+    // Store department data in sessionStorage for next page
+    if (cachedDepartments[deptShort]) {
+        sessionStorage.setItem('deptProfiles', JSON.stringify(cachedDepartments[deptShort]));
+        sessionStorage.setItem('currentDept', deptShort);
     }
+    
+    // Navigate to profiles page - this is the key redirect
+    window.location.href = `profiles.html?dept=${deptShort}`;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-// Update download buttons with proper event handlers
-function updateDownloadButtons() {
-    // PDF download button for profile view
-    const pdfBtn = document.querySelector('#profileViewPage button[onclick*="downloadPDF"]');
-    if (pdfBtn) {
-        pdfBtn.removeAttribute('onclick');
-        pdfBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            downloadPDF(currentViewingProfile);
-        });
-    }
-    
-    // Image download button for profile view
-    const imgBtn = document.querySelector('#profileViewPage button[onclick*="downloadImage"]');
-    if (imgBtn) {
-        imgBtn.removeAttribute('onclick');
-        imgBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            downloadImage(currentViewingProfile);
-        });
-    }
-    
-    // My profile download buttons
-    const myPdfBtn = document.querySelector('#myProfilePage button[onclick*="downloadMyProfilePDF"]');
-    if (myPdfBtn) {
-        myPdfBtn.removeAttribute('onclick');
-        myPdfBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            downloadPDF(currentUserProfile);
-        });
-    }
-    
-    const myImgBtn = document.querySelector('#myProfilePage button[onclick*="downloadMyProfileImage"]');
-    if (myImgBtn) {
-        myImgBtn.removeAttribute('onclick');
-        myImgBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            downloadImage(currentUserProfile);
-        });
-    }
-}
-
-// ========================================
-// ENHANCED ERROR HANDLING AND PWA STABILITY
-// ========================================
-
-
-// Enhanced navigation handling for PWA
-function handleNavigationSafely(pageFunction) {
+// Also add this function to handle TPO navigation
+// REPLACE handleTPONavigation function in index.html
+async function handleTPONavigation() {
     try {
-        if (typeof pageFunction === 'function') {
-            pageFunction();
+        // Get TPO ID from database
+        const { data: tpo, error } = await sb
+            .from('tpo')
+            .select('tpo_id')
+            .eq('is_active', true)
+            .single();
+        
+        if (error || !tpo) {
+            alert('TPO profile not available');
+            return;
         }
+        
+        // Go directly to TPO profile
+        window.location.href = `staff-profile.html?tpo=${tpo.tpo_id}`;
+        
     } catch (error) {
-        console.error('Navigation error:', error);
-        
-        if (isPWAInstalled()) {
-            // Fallback to main page on navigation error
-            setTimeout(() => {
-                showMainPage();
-            }, 100);
-        }
+        console.error('Error loading TPO:', error);
+        alert('Failed to load TPO profile');
     }
 }
 
-
-
-
-function showLoginPage() {
-    showPage('loginPage');
-    // Rebind form events after page is shown
-    setTimeout(() => {
-        bindFormEvents();
-    }, 100);
-}
-
-function showRegisterPage() {
-    showPage('registerPage');
-    // Rebind form events after page is shown
-    setTimeout(() => {
-        bindFormEvents();
-    }, 100);
-}
-
-        function editProfile() {
-            if (!currentUserProfile) return;
-            
-            isEditMode = true;
-            document.getElementById('profileFormTitle').textContent = 'Edit Profile';
-            document.getElementById('profileFormSubmitBtn').textContent = 'Update Profile';
-            
-            // Populate form with existing data
-            document.getElementById('profileName').value = currentUserProfile.name || '';
-            document.getElementById('profileDepartment').value = currentUserProfile.department || '';
-            document.getElementById('profileDesignation').value = currentUserProfile.designation || '';
-            document.getElementById('profileExperience').value = currentUserProfile.experience || '';
-            document.getElementById('profileResearch').value = currentUserProfile.research_papers || '';
-            document.getElementById('profileAchievements').value = currentUserProfile.achievements || '';
-            
-            // Load custom fields
-            loadCustomFieldsInForm();
-            
-            showPage('createProfilePage');
-        }
-
-        function handleBackFromCreateProfile() {
-    handleBackNavigation();
-}
-
-function goBackFromProfile() {
-    handleBackNavigation();
-}
-
-function cleanupUserData() {
-    currentUser = null;
-    currentUserProfile = null;
-    localStorage.removeItem('db_user_id');
-}
-
-
-function validateRegistrationForm() {
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    
-    if (!email.includes('@')) {
-        alert('Please enter a valid email');
-        return false;
-    }
-    if (password.length < 6) {
-        alert('Password must be at least 6 characters');
-        return false;
-    }
-    return true;
-}
-
-// Add loading state to buttons
-function setButtonLoading(buttonId, isLoading) {
-    const btn = document.getElementById(buttonId);
-    if (btn) {
-        btn.disabled = isLoading;
-        btn.textContent = isLoading ? 'Loading...' : btn.getAttribute('data-original-text');
-    }
-}
-
-
-
-        // ========================================
-        // DEPARTMENT FUNCTIONS
-        // ========================================
 
         
-        // ========================================
-        // PROFILE DISPLAY FUNCTIONS
-        // ========================================
-
-        function displayMyProfile() {
-            if (!currentUserProfile) return;
-
-            document.getElementById('myProfileName').textContent = currentUserProfile.name;
-            document.getElementById('myProfileDept').textContent = currentUserProfile.department_name;
-            document.getElementById('myProfileDesignation').textContent = currentUserProfile.designation;
-            document.getElementById('myProfileExperience').textContent = currentUserProfile.experience + ' years';
-            document.getElementById('myProfileResearch').textContent = currentUserProfile.research_papers || 'No Expertise listed yet';
-            document.getElementById('myProfileAchievements').textContent = currentUserProfile.achievements || 'No achievements listed yet';
-            
-            if (currentUserProfile.profile_image) {
-                document.getElementById('myProfileImg').innerHTML = `<img src="${currentUserProfile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
-            } else {
-                document.getElementById('myProfileImg').innerHTML = '👤';
-            }
-
-            // Display custom fields
-            displayCustomFields('customFieldsSection', currentUserProfile.custom_fields);
-        }
-
-       
-        // ========================================
-        // CUSTOM FIELDS FUNCTIONS
-        // ========================================
-
-        function displayCustomFields(containerId, customFields) {
-            const container = document.getElementById(containerId);
-            if (!customFields || Object.keys(customFields).length === 0) {
-                container.innerHTML = '';
+        async function loadLeadership() {
+            if (cachedLeadership) {
+                displayLeadership(cachedLeadership);
                 return;
             }
-
-            let html = '';
-            Object.entries(customFields).forEach(([key, value]) => {
-                if (value && value.trim() !== '') {
-                    html += `
-                        <div class="profile-field">
-                            <div class="profile-field-label">${key}</div>
-                            <div class="profile-field-value">${value}</div>
+            
+            try {
+                const { data, error } = await sb.from('leadership').select('*').eq('is_active', true).order('display_order');
+                if (error) throw error;
+                
+                cachedLeadership = data;
+                displayLeadership(data);
+            } catch (error) {
+                console.error('Error loading leadership:', error);
+                document.getElementById('leadershipGrid').innerHTML = '<p style="text-align:center;color:#666;">Leadership data unavailable</p>';
+            }
+        }
+        
+        function displayLeadership(data) {
+            const grid = document.getElementById('leadershipGrid');
+            if (data && data.length > 0) {
+                grid.innerHTML = data.map(l => {
+                    const initials = l.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+                    const avatar = l.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Crect fill='%238B5CF6' width='120' height='120'/%3E%3Ctext x='50%25' y='50%25' font-size='48' fill='white' text-anchor='middle' dy='.3em'%3E${initials}%3C/text%3E%3C/svg%3E`;
+                    
+                    return `
+                        <div class="leader-card">
+                            <img src="${avatar}" alt="${l.name}" onclick="showImageZoom('${avatar}', '${l.name}')" style="cursor: pointer;">
+                            <div class="name">${l.name}</div>
+                            <div class="position">${l.position}</div>
+                            ${l.bio ? `<div class="bio">${l.bio}</div>` : ''}
                         </div>
                     `;
-                }
-            });
-            container.innerHTML = html;
-        }
-
-        function addCustomField() {
-            const container = document.getElementById('customFieldsList');
-            const fieldId = Date.now();
-            
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'custom-field-item';
-            fieldDiv.style.cssText = 'margin-bottom: 15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;';
-            
-            fieldDiv.innerHTML = `
-                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                    <input type="text" placeholder="Field Name (e.g., Skills, Certifications)" 
-                           class="form-input custom-field-name" style="flex: 1;" data-field-id="${fieldId}">
-                    <button type="button" onclick="removeCustomField(this)" 
-                            style="background: #ff4757; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">×</button>
-                </div>
-                <textarea placeholder="Field Value" class="form-textarea custom-field-value" 
-                          data-field-id="${fieldId}" style="width: 100%; min-height: 60px;"></textarea>
-            `;
-            
-            container.appendChild(fieldDiv);
-        }
-
-        function removeCustomField(button) {
-            button.closest('.custom-field-item').remove();
-        }
-
-        function loadCustomFieldsInForm() {
-            const container = document.getElementById('customFieldsList');
-            container.innerHTML = '';
-            
-            if (currentUserProfile && currentUserProfile.custom_fields) {
-                Object.entries(currentUserProfile.custom_fields).forEach(([key, value]) => {
-                    if (key && value) {
-                        addCustomField();
-                        const fieldItems = container.querySelectorAll('.custom-field-item');
-                        const lastItem = fieldItems[fieldItems.length - 1];
-                        lastItem.querySelector('.custom-field-name').value = key;
-                        lastItem.querySelector('.custom-field-value').value = value;
-                    }
-                });
+                }).join('');
+            } else {
+                grid.innerHTML = '<p style="text-align:center;color:#666;">Leadership information will be updated soon</p>';
             }
         }
-
-        function collectCustomFields() {
-            const customFields = {};
-            const fieldNames = document.querySelectorAll('.custom-field-name');
-            const fieldValues = document.querySelectorAll('.custom-field-value');
-            
-            fieldNames.forEach((nameInput, index) => {
-                const name = nameInput.value.trim();
-                const value = fieldValues[index].value.trim();
-                
-                if (name && value) {
-                    customFields[name] = value;
-                }
-            });
-            
-            return customFields;
-        }
-
-        // ========================================
-        // FORM HANDLERS
-        // ========================================
-
-        async function handleRegistration(e) {
-    e.preventDefault();
-    
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    const department = document.getElementById('registerDepartment').value;
-    const code = document.getElementById('registerCode').value;
-    
-    if (!supabaseClient) {
-        alert('Database connection not available');
-        return;
-    }
-    
-    if (!validateRegistrationForm()) {
-        return;
-    }
-    
-    if (!department || !code) {
-        alert('Please select a department and enter the code');
-        return;
-    }
-    
-    try {
-        // Validate department code first
-        const { data: deptData, error: validateError } = await supabaseClient
-            .from('departments')
-            .select('dept_code')
-            .eq('dept_id', parseInt(department))
-            .single();
-
-        if (validateError || !deptData || deptData.dept_code !== code) {
-            alert('Invalid department code!');
-            return;
-        }
         
-        // Register with Supabase Auth
-        const { data: authData, error: authError } = await supabaseClient.auth.signUp({
-            email: email,
-            password: password
-        });
-
-        if (authError) throw authError;
-
-        // Set current user immediately
-        currentUser = authData.user;
-
-        // Insert into users table to get integer ID
-        const { data: userData, error: userError } = await supabaseClient
-            .from('users')
-            .insert([{
-                email: email,
-                password: password, // Consider removing this for security
-                department: parseInt(department),
-                role: 'Staff',
-                is_active: true
-            }])
-            .select()
-            .single();
-
-        if (userError) throw userError;
-
-        // Store the integer user ID
-        localStorage.setItem('db_user_id', userData.user_id);
-        
-        // Update UI for logged in user
-        updateUIForLoggedInUser();
-
-        alert('Registration successful! You are now logged in.');
-        showMainPage();
-        
-        // Clear form
-        document.getElementById('registerForm').reset();
-        
-    } catch (error) {
-        console.error('Registration error:', error);
-        alert('Registration failed: ' + error.message);
-    }
-}
- async function handleLogin(e) {
-    e.preventDefault();
-    
-    const email = document.getElementById('loginEmail').value;
-    const password = document.getElementById('loginPassword').value;
-    
-    if (!supabaseClient) {
-        alert('Database connection not available');
-        return;
-    }
-    
-    if (!email || !password) {
-        alert('Please enter both email and password');
-        return;
-    }
-    
-    try {
-        const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: password
-        });
-        
-        if (error) throw error;
-        
-        // Set user state immediately
-        currentUser = data.user;
-        
-        // Get the database user ID
-        const { data: dbUser, error: userError } = await supabaseClient
-            .from('users')
-            .select('user_id')
-            .eq('email', email)
-            .single();
-        
-        if (userError || !dbUser) {
-            console.error('Database user lookup error:', userError);
-            // Handle case where auth user exists but db user doesn't
-            alert('Account setup incomplete. Please contact administrator.');
-            return;
-        }
-        
-        localStorage.setItem('db_user_id', dbUser.user_id);
-        
-        // Load user profile and update UI
-        await loadUserProfile();
-        updateUIForLoggedInUser();
-        
-        alert('Login successful!');
-        showMainPage();
-        
-        // Clear the login form
-        document.getElementById('loginForm').reset();
-        
-    } catch (error) {
-        console.error('Login error:', error);
-        alert('Login failed: ' + error.message);
-    }
-}
-
-        async function handleProfileCreation(e) {
-    e.preventDefault();
-    
-    console.log('Profile form submitted');
-    
-    if (!currentUser) {
-        alert('Please login first!');
-        return;
-    }
-    
-    if (!supabaseClient) {
-        alert('Database connection not available');
-        return;
-    }
-    
-   
-    const name = document.getElementById('profileName').value.trim();
-    const department = document.getElementById('profileDepartment').value;
-    const designation = document.getElementById('profileDesignation').value;
-    const experience = document.getElementById('profileExperience').value;
-    const research = document.getElementById('profileResearch').value.trim();
-    const achievements = document.getElementById('profileAchievements').value.trim();
-    const imageFile = document.getElementById('profileImage').files[0];
-    const customFields = collectCustomFields();
-    
-    
-    if (!name || !department || !designation || !experience) {
-        alert('Please fill in all required fields');
-        return;
-    }
-    
-    console.log('Form data collected:', { name, department, designation, experience });
-    
-    try {
-        // Get current user
-        const { data: { user } } = await supabaseClient.auth.getUser();
-
-        if (!user) {
-            alert('Authentication error. Please login again.');
-            return;
-        }
-
-        // Get the database user ID
-        let dbUserId = localStorage.getItem('db_user_id');
-        if (!dbUserId) {
-            // Try to find by email if not in localStorage
-            const { data: dbUser, error: userError } = await supabaseClient
-                .from('users')
-                .select('user_id')
-                .eq('email', user.email)
-                .single();
-            
-            if (userError || !dbUser) {
-                alert('User session error. Please register again.');
-                return;
-            }
-            dbUserId = dbUser.user_id;
-            localStorage.setItem('db_user_id', dbUserId);
-        }
-
-        console.log('Database user ID:', dbUserId);
-        
-        let imageUrl = null;
-        
-        // Upload image if provided
-        if (imageFile) {
-            console.log('Uploading image...');
-            const fileExt = imageFile.name.split('.').pop();
-            const timestamp = Date.now();
-            const fileName = `${user.id}/profile_${timestamp}.${fileExt}`;
-            
-            // If updating, delete old image first
-            if (isEditMode && currentUserProfile && currentUserProfile.profile_image) {
-                try {
-                    // Extract old filename from URL
-                    const oldUrl = currentUserProfile.profile_image;
-                    const urlParts = oldUrl.split('/');
-                    const fileNameWithQuery = urlParts[urlParts.length - 1];
-                    const oldFileName = fileNameWithQuery.split('?')[0]; // Remove query params
-                    const oldFilePath = `${user.id}/${oldFileName}`;
-                    
-                    console.log('Deleting old image:', oldFilePath);
-                    const { error: deleteError } = await supabaseClient.storage
-                        .from('profile-images')
-                        .remove([oldFilePath]);
-                    
-                    if (deleteError) {
-                        console.warn('Could not delete old image:', deleteError);
-                    } else {
-                        console.log('Old image deleted successfully');
-                    }
-                } catch (deleteError) {
-                    console.warn('Error during old image deletion:', deleteError);
-                }
-            }
-            
-            // Upload new image
-            const { data: uploadData, error: uploadError } = await supabaseClient.storage
-                .from('profile-images')
-                .upload(fileName, imageFile, {
-                    cacheControl: '0', // Disable caching for immediate updates
-                    upsert: false // Don't overwrite, create new file
-                });
-            
-            if (uploadError) {
-                console.error('Image upload error:', uploadError);
-                // Fallback: try with random suffix if file exists
-                if (uploadError.message && uploadError.message.includes('already exists')) {
-                    const randomSuffix = Math.random().toString(36).substr(2, 9);
-                    const fallbackName = `${user.id}/profile_${timestamp}_${randomSuffix}.${fileExt}`;
-                    
-                    console.log('Retrying with fallback name:', fallbackName);
-                    const { data: retryData, error: retryError } = await supabaseClient.storage
-                        .from('profile-images')
-                        .upload(fallbackName, imageFile, { 
-                            cacheControl: '0',
-                            upsert: false 
-                        });
-                    
-                    if (!retryError) {
-                        const { data: urlData } = supabaseClient.storage
-                            .from('profile-images')
-                            .getPublicUrl(fallbackName);
-                        imageUrl = urlData.publicUrl + `?v=${timestamp}`;
-                        console.log('Fallback image uploaded:', imageUrl);
-                    } else {
-                        console.error('Fallback upload also failed:', retryError);
-                    }
-                } else {
-                    console.error('Upload failed with non-duplicate error:', uploadError);
+        function handleAuth() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            if (user) {
+                if (confirm('Are you sure you want to logout?')) {
+                    localStorage.removeItem('user');
+                    location.reload();
                 }
             } else {
-                const { data: urlData } = supabaseClient.storage
-                    .from('profile-images')
-                    .getPublicUrl(fileName);
-                
-                imageUrl = urlData.publicUrl + `?v=${timestamp}`; // Cache busting
-                console.log('Image uploaded successfully:', imageUrl);
-            }
-        } else if (isEditMode && currentUserProfile && currentUserProfile.profile_image) {
-            // Keep existing image if no new image provided during edit
-            imageUrl = currentUserProfile.profile_image;
-        }
-        
-        // Prepare profile data using database user ID (integer)
-        const profileData = {
-            user_id: parseInt(dbUserId),  // Use integer ID
-            name: name,
-            department: parseInt(department),
-            designation: designation,
-            experience: parseInt(experience),
-            research_papers: research || null,
-            achievements: achievements || null,
-            custom_fields: Object.keys(customFields).length > 0 ? customFields : null,
-            profile_image: imageUrl,
-            is_published: true
-        };
-        
-        console.log('Profile data to save:', profileData);
-        
-        let result;
-        if (isEditMode && currentUserProfile) {
-            console.log('Updating existing profile...');
-            // Update existing profile
-            result = await supabaseClient
-                .from('profiles')
-                .update(profileData)
-                .eq('profile_id', currentUserProfile.profile_id) // Use profile_id instead
-                .select();
-        } else {
-            console.log('Creating new profile...');
-            // Check if profile already exists
-            const { data: existingProfile } = await supabaseClient
-                .from('profiles')
-                .select('profile_id')
-                .eq('user_id', parseInt(dbUserId))
-                .single();     
-                
-            if (existingProfile) {
-                alert('Profile already exists! Switching to edit mode.');
-                isEditMode = true;
-                await loadUserProfile();
-                editProfile();
-                return;
-            }
-            
-            // Create new profile
-            result = await supabaseClient
-                .from('profiles')
-                .insert([profileData])
-                .select();
-        }
-        
-        const { data, error } = result;
-        
-        if (error) {
-            console.error('Database error:', error);
-            throw error;
-        }
-        
-        console.log('Profile saved successfully:', data);
-        
-        alert(isEditMode ? 'Profile updated successfully!' : 'Profile created successfully!');
-        
-        // Reload user profile
-        await loadUserProfile();
-        showMyProfile();
-        
-        // Clear form
-        clearProfileForm();
-        isEditMode = false;
-        
-    } catch (error) {
-        console.error('Profile operation error:', error);
-        alert('Failed to save profile: ' + error.message);
-    }
-}
-
-async function deleteProfile() {
-    if (!currentUserProfile || !currentUser || !supabaseClient) {
-        alert('Unable to delete profile');
-        return;
-    }
-    
-    // Confirm deletion
-    if (!confirm('Are you sure you want to delete your profile? This action cannot be undone.')) {
-        return;
-    }
-    
-    try {
-        // Delete profile image from storage if exists
-        if (currentUserProfile.profile_image) {
-            try {
-                // Extract filename from URL more robustly
-                const imageUrl = currentUserProfile.profile_image;
-                console.log('Image URL to delete:', imageUrl);
-                
-                // Handle different URL formats
-                let fileName;
-                if (imageUrl.includes('/profile-images/')) {
-                    // Extract everything after '/profile-images/'
-                    const parts = imageUrl.split('/profile-images/');
-                    if (parts.length > 1) {
-                        fileName = parts[1].split('?')[0]; // Remove query parameters
-                    }
-                } else {
-                    // Fallback: try to extract filename from end of URL
-                    const urlParts = imageUrl.split('/');
-                    const fileNameWithQuery = urlParts[urlParts.length - 1];
-                    fileName = fileNameWithQuery.split('?')[0];
-                    
-                    // If it doesn't include user path, prepend it
-                    if (!fileName.includes(currentUser.id)) {
-                        fileName = `${currentUser.id}/${fileName}`;
-                    }
-                }
-                
-                if (fileName) {
-                    console.log('Deleting profile image:', fileName);
-                    const { error: deleteError } = await supabaseClient.storage
-                        .from('profile-images')
-                        .remove([fileName]);
-                    
-                    if (deleteError) {
-                        console.warn('Could not delete profile image:', deleteError);
-                        
-                        // Try alternative deletion methods
-                        const alternativeNames = [
-                            `${currentUser.id}/profile.jpg`,
-                            `${currentUser.id}/profile.png`,
-                            `${currentUser.id}/profile.jpeg`,
-                            fileName.replace(currentUser.id + '/', '') // Try without user ID prefix
-                        ];
-                        
-                        for (const altName of alternativeNames) {
-                            try {
-                                const { error: altError } = await supabaseClient.storage
-                                    .from('profile-images')
-                                    .remove([altName]);
-                                
-                                if (!altError) {
-                                    console.log('Successfully deleted with alternative name:', altName);
-                                    break;
-                                }
-                            } catch (altDeleteError) {
-                                console.warn('Alternative deletion failed:', altName, altDeleteError);
-                            }
-                        }
-                    } else {
-                        console.log('Profile image deleted successfully');
-                    }
-                } else {
-                    console.warn('Could not extract filename from URL:', imageUrl);
-                }
-            } catch (error) {
-                console.warn('Error during image deletion process:', error);
+                location.href = 'stafflogin.html';
             }
         }
         
-        // Delete profile from database
-        const { error: profileDeleteError } = await supabaseClient
-            .from('profiles')
-            .delete()
-            .eq('profile_id', currentUserProfile.profile_id);
-            
-        if (profileDeleteError) {
-            console.error('Profile deletion error:', profileDeleteError);
-            throw profileDeleteError;
+        function updateAuthButton() {
+            const user = JSON.parse(localStorage.getItem('user') || 'null');
+            document.getElementById('authText').textContent = user ? 'Logout' : 'Login';
         }
         
-        console.log('Profile deleted from database successfully');
-        
-        // Clear profile data
-        currentUserProfile = null;
-        
-        alert('Profile deleted successfully!');
-        showMyProfile(); // This will show the "no profile" section
-        
-    } catch (error) {
-        console.error('Delete profile error:', error);
-        alert('Failed to delete profile: ' + error.message);
-    }
-}
-        function clearProfileForm() {
-            document.getElementById('profileForm').reset();
-            document.getElementById('customFieldsList').innerHTML = '';
-        }
-
-
-        function handleAuthAction() {
-    if (currentUser) {
-        handleLogout();
-    } else {
-        showLoginPage();
-    }
-}
-
-
-function toggleDeveloperImage() {
-    const img = document.querySelector('.developer-img img');
-    const modalContent = document.querySelector('.modal-content');
-    const modal = document.getElementById('developerModal');
-    
-    if (!img || !modalContent) return;
-    
-    if (img.classList.contains('expanded')) {
-        // Collapse image back to original size
-        img.classList.remove('expanded');
-        modalContent.classList.remove('image-expanded');
-        
-        // COMPLETELY RESET IMAGE STYLES
-        img.removeAttribute('style'); // Remove all inline styles
-        img.style.cssText = `
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            cursor: pointer;
-        `;
-        
-        // Remove close button and overlay
-        const overlay = modal.querySelector('.image-overlay');
-        const closeBtn = modal.querySelector('.image-close-btn');
-        if (overlay) overlay.remove();
-        if (closeBtn) closeBtn.remove();
-        
-        // Reset modal styles completely
-        modal.style.zIndex = '2000';
-        modalContent.removeAttribute('style'); // Remove all inline styles
-        modalContent.style.cssText = `
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 320px;
-            width: 90%;
-            text-align: center;
-            animation: modalSlideUp 0.3s ease;
-        `;
-        
-    } else {
-        // Expand image to fill modal area
-        img.classList.add('expanded');
-        modalContent.classList.add('image-expanded');
-        
-        // Expand modal content
-        modal.style.zIndex = '3000';
-        modalContent.style.cssText = `
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 90vw;
-            width: 90vw;
-            max-height: 90vh;
-            position: relative;
-            text-align: center;
-        `;
-        
-        // Create overlay for better visibility
-        const overlay = document.createElement('div');
-        overlay.className = 'image-overlay';
-        overlay.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.7);
-            z-index: 100;
-            border-radius: 12px;
-        `;
-        modalContent.appendChild(overlay);
-        
-        // Create expanded image styles
-        img.style.cssText = `
-            position: absolute !important;
-            top: 20px !important;
-            left: 20px !important;
-            right: 20px !important;
-            bottom: 20px !important;
-            width: calc(100% - 40px) !important;
-            height: calc(100% - 40px) !important;
-            object-fit: contain !important;
-            border-radius: 8px !important;
-            background: white !important;
-            z-index: 101 !important;
-            cursor: zoom-out !important;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
-            border: 3px solid #8B5CF6 !important;
-            padding: 10px !important;
-            box-sizing: border-box !important;
-        `;
-        
-        // Create big black close button ON the image
-        const closeBtn = document.createElement('button');
-        closeBtn.className = 'image-close-btn';
-        closeBtn.innerHTML = '✕';
-        closeBtn.style.cssText = `
-            position: absolute !important;
-            top: 30px !important;
-            right: 30px !important;
-            background: rgba(0,0,0,0.8) !important;
-            color: white !important;
-            border: 2px solid white !important;
-            border-radius: 50% !important;
-            width: 50px !important;
-            height: 50px !important;
-            font-size: 24px !important;
-            font-weight: bold !important;
-            cursor: pointer !important;
-            z-index: 102 !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            transition: all 0.2s ease !important;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
-        `;
-        
-        // Add hover effect via JavaScript
-        closeBtn.onmouseenter = function() {
-            this.style.background = 'rgba(0,0,0,1)';
-            this.style.transform = 'scale(1.1)';
-        };
-        closeBtn.onmouseleave = function() {
-            this.style.background = 'rgba(0,0,0,0.8)';
-            this.style.transform = 'scale(1)';
-        };
-        
-        // Close button click handler
-        closeBtn.onclick = function(e) {
-            e.stopPropagation();
-            toggleDeveloperImage();
-        };
-        
-        modalContent.appendChild(closeBtn);
-    }
-}
-
-// ENHANCED hideDeveloperModal function with complete cleanup
-function hideDeveloperModal() {
-    const modal = document.getElementById('developerModal');
-    if (!modal) return;
-    
-    modal.style.display = 'none';
-    
-    // FORCE RESET everything
-    const img = modal.querySelector('.developer-img img');
-    const modalContent = modal.querySelector('.modal-content');
-    const overlay = modal.querySelector('.image-overlay');
-    const closeBtn = modal.querySelector('.image-close-btn');
-    
-    // Remove expanded state
-    if (img) {
-        img.classList.remove('expanded');
-        img.removeAttribute('style'); // Complete reset
-        img.style.cssText = `
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            cursor: pointer;
-        `;
-    }
-    
-    // Reset modal content
-    if (modalContent) {
-        modalContent.classList.remove('image-expanded');
-        modalContent.removeAttribute('style'); // Complete reset
-        modalContent.style.cssText = `
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            max-width: 320px;
-            width: 90%;
-            text-align: center;
-            animation: modalSlideUp 0.3s ease;
-        `;
-    }
-    
-    // Remove overlay and close button
-    if (overlay) overlay.remove();
-    if (closeBtn) closeBtn.remove();
-    
-    // Reset modal z-index
-    modal.style.zIndex = '2000';
-}
-
-
-
-
-        // ========================================
-// MOBILE BACK BUTTON HANDLING
-// ========================================
-
-let navigationHistory = [];
-let isNavigatingBack = false;
-
-function pushToHistory(pageId) {
-    if (!isNavigatingBack) {
-        navigationHistory.push(pageId);
-        console.log('Navigation history:', navigationHistory);
-    }
-}
-
-function handleBackNavigation() {
-    if (navigationHistory.length <= 1) {
-        // We're at home page or history is empty, stay here
-        if (navigationHistory[navigationHistory.length - 1] !== 'mainPage') {
-            showMainPageAndClearHistory();
-        }
-        return false; // Don't let browser handle back
-    }
-    
-    // Remove current page from history
-    navigationHistory.pop();
-    
-    // Get previous page
-    const previousPage = navigationHistory[navigationHistory.length - 1];
-    
-    isNavigatingBack = true;
-    
-    // Navigate to previous page based on what it is
-    if (previousPage === 'mainPage') {
-        showMainPageAndClearHistory();
-    } else if (previousPage === 'departmentPage') {
-        // Go back to current department
-        if (currentDepartment) {
-            showDepartment(currentDepartment);
-        } else {
-            showMainPageAndClearHistory();
-        }
-    } else if (previousPage === 'profileViewPage') {
-        // Go back to department page
-        if (currentDepartment) {
-            showDepartment(currentDepartment);
-        } else {
-            showMainPageAndClearHistory();
-        }
-    } else if (previousPage === 'myProfilePage') {
-        showMyProfile();
-    } else if (previousPage === 'createProfilePage') {
-        if (isEditMode) {
-            showMyProfile();
-        } else {
-            showMainPageAndClearHistory();
-        }
-    } else {
-        // Default to main page
-        showMainPageAndClearHistory();
-    }
-    
-    setTimeout(() => {
-        isNavigatingBack = false;
-    }, 100);
-    
-    return false; // Prevent default browser back behavior
-}
-
-function showMainPageAndClearHistory() {
-    showMainPage();
-    navigationHistory = ['mainPage'];
-    console.log('History cleared, at main page');
-}
-
-// Handle browser/mobile back button
-window.addEventListener('popstate', function(event) {
-    event.preventDefault();
-    handleBackNavigation();
-});
-
-// Push initial state
-window.addEventListener('load', function() {
-    if (history.state === null) {
-        history.pushState({page: 'mainPage'}, '', '');
-        navigationHistory = ['mainPage'];
-    }
-});
-
-
-
-        // ========================================
-        // UI HELPER FUNCTIONS
-        // ========================================
-
-        async function handleCreateProfile() {
-    // Force refresh auth state
-    if (supabaseClient) {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (session) {
-            currentUser = session.user;
-            await loadUserProfile();
-            updateUIForLoggedInUser();
-        } else {
-            currentUser = null;
-            currentUserProfile = null;
-            updateUIForLoggedOutUser();
-        }
-    }
-    
-    if (currentUser) {
-        showMyProfile();
-    } else {
-        showLoginPage();
-    }
-}
-
-
-async function handleLogout() {
-    if (currentUser) {
-        // Show confirmation dialog
-        const confirmLogout = confirm('Are you sure you want to logout?');
-        
-        if (!confirmLogout) {
-            return; // User cancelled, don't logout
+        // Initialize everything
+        async function initializeApp() {
+            updateAuthButton();
+            await loadLeadership();
+            await preloadAllData();
         }
         
-        if (supabaseClient) {
-            await supabaseClient.auth.signOut();
-        }
+        // Start the app
+        initializeApp();
         
-        // Clear all user data
-        currentUser = null;
-        currentUserProfile = null;
-        localStorage.removeItem('db_user_id');
-        
-        // Update UI BEFORE showing main page
-        updateUIForLoggedOutUser();
-        
-        showMainPage();
-        alert('Logged out successfully!');
-    } else {
-        showLoginPage();
-    }
-}
-
-        function updateUIForLoggedInUser() {
-    document.getElementById('logoutText').textContent = 'Logout';
-    // Make sure the button calls the right function
-    const authBtn = document.querySelectorAll('.taskbar-btn')[2];
-    if (authBtn) {
-        authBtn.setAttribute('onclick', 'handleLogout()');
-    }
-    
-    // Update My Profile page UI based on profile existence
-    updateMyProfileUI();
-}
-
-function updateUIForLoggedOutUser() {
-    document.getElementById('logoutText').textContent = 'Login';
-    // Make sure the button calls the right function
-    const authBtn = document.querySelectorAll('.taskbar-btn')[2];
-    if (authBtn) {
-        authBtn.setAttribute('onclick', 'showLoginPage()');
-    }
-    
-    // Hide profile-related UI elements
-    document.getElementById('profileViewSection').style.display = 'none';
-    document.getElementById('noProfileSection').style.display = 'block';
-}
-
-// Add this new helper function
-function updateMyProfileUI() {
-    if (currentUserProfile) {
-        document.getElementById('profileViewSection').style.display = 'block';
-        document.getElementById('noProfileSection').style.display = 'none';
-        displayMyProfile(); // Make sure profile data is displayed
-    } else {
-        document.getElementById('profileViewSection').style.display = 'none';
-        document.getElementById('noProfileSection').style.display = 'block';
-    }
-}
-
-        // ========================================
-        // MODAL FUNCTIONS
-        // ========================================
-
-        function showDeveloperModal() {
-            document.getElementById('developerModal').style.display = 'flex';
-        }
-
-        function hideDeveloperModal() {
-            document.getElementById('developerModal').style.display = 'none';
-        }
-
-
-
-
-
-
-
-
-
-
-
-        // ========================================
-// ENHANCED PWA DETECTION AND INSTALLATION
-// ========================================
-
-// PWA Variables
-let deferredPrompt = null;
-let pwaInstalled = false;
-let installPromptShown = false; // Track if we've already shown the prompt
-
-// Detect device type and browser
-function getDeviceInfo() {
-    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-    const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-    const isIOSSafari = isIOS && /Safari/.test(userAgent) && !/CriOS|FxiOS/.test(userAgent);
-    const isAndroid = /android/i.test(userAgent);
-    const isWindows = /Win32|Win64|Windows|WinCE/.test(userAgent);
-    const isChrome = /Chrome/.test(userAgent) && /Google Inc/.test(navigator.vendor);
-    const isEdge = /Edg/.test(userAgent);
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-    
-    return {
-        isIOS,
-        isIOSSafari,
-        isAndroid,
-        isWindows,
-        isChrome,
-        isEdge,
-        isMobile,
-        supportsInstallPrompt: !isIOS
-    };
-}
-
-// Enhanced function to check if PWA is installed
-function isPWAInstalled() {
-    // Check display mode
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        return true;
-    }
-    
-    // iOS check
-    if (window.navigator.standalone === true) {
-        return true;
-    }
-    
-    // Check URL parameters that indicate PWA
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('utm_source') === 'pwa' || 
-        window.location.href.includes('?pwa=true') ||
-        document.referrer.includes('android-app://')) {
-        return true;
-    }
-    
-    return false;
-}
-// Only show install prompt if truly needed
-function shouldShowInstallPrompt() {
-    // Don't show if already installed
-    if (isPWAInstalled()) {
-        return false;
-    }
-    
-    // Don't show if already shown in this session
-    if (installPromptShown) {
-        return false;
-    }
-    
-    // Don't show if user dismissed it recently (check localStorage)
-    const lastDismissed = localStorage.getItem('pwa_install_dismissed');
-    if (lastDismissed) {
-        const dismissTime = new Date(lastDismissed);
-        const now = new Date();
-        const hoursSinceDismissed = (now - dismissTime) / (1000 * 60 * 60);
-        
-        // Don't show again for 24 hours after dismissal
-        if (hoursSinceDismissed < 24) {
-            return false;
-        }
-    }
-    
-    return true;
-}
-
-// Create PWA Install Popup HTML
-function createPWAPopup() {
-    console.log('Creating PWA popup...');
-    
-    // Remove existing popup if any
-    const existingPopup = document.getElementById('pwaPopup');
-    if (existingPopup) {
-        existingPopup.remove();
-    }
-
-    const deviceInfo = getDeviceInfo();
-    let installText = 'Install Now';
-    let description = 'Get instant access and offline features';
-    
-    // Customize text based on platform
-    if (deviceInfo.isWindows) {
-        installText = '🖥️ Install Desktop App';
-        description = 'Add shortcut to desktop and start menu';
-    } else if (deviceInfo.isAndroid) {
-        installText = '📱 Install App';
-        description = 'Add to home screen for quick access';
-    }
-
-    // Create popup HTML with better styling
-    const popup = document.createElement('div');
-    popup.id = 'pwaPopup';
-    popup.style.cssText = `
-        position: fixed;
-        bottom: -200px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 90%;
-        max-width: 400px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        border-radius: 16px;
-        padding: 20px;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        z-index: 10000;
-        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255,255,255,0.2);
-    `;
-
-    popup.innerHTML = `
-        <div style="display: flex; align-items: center; margin-bottom: 15px;">
-            <div style="
-                width: 55px;
-                height: 55px;
-                background: rgba(255,255,255,0.2);
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-right: 15px;
-                font-size: 28px;
-                box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            ">${deviceInfo.isWindows ? '🖥️' : '📱'}</div>
-            <div style="flex: 1;">
-                <h3 style="margin: 0; font-size: 19px; font-weight: 700; line-height: 1.2;">Install Our App</h3>
-                <p style="margin: 5px 0 0 0; font-size: 14px; opacity: 0.9; line-height: 1.3;">
-                    ${description}
-                </p>
-            </div>
-            <button id="pwaCloseBtn" style="
-                background: rgba(255,255,255,0.2);
-                border: none;
-                color: white;
-                font-size: 18px;
-                cursor: pointer;
-                padding: 8px;
-                border-radius: 50%;
-                width: 34px;
-                height: 34px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: background 0.2s ease;
-            ">✕</button>
-        </div>
-        
-        <div style="display: flex; gap: 12px; margin-top: 18px;">
-            <button id="pwaInstallBtn" style="
-                flex: 1;
-                background: white;
-                border: none;
-                color: #667eea;
-                padding: 14px 20px;
-                border-radius: 10px;
-                font-size: 16px;
-                font-weight: 700;
-                cursor: pointer;
-                transition: all 0.2s ease;
-                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            ">
-                ${installText}
-            </button>
-            <button id="pwaLaterBtn" style="
-                background: rgba(255,255,255,0.15);
-                border: 2px solid rgba(255,255,255,0.3);
-                color: white;
-                padding: 14px 20px;
-                border-radius: 10px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-                transition: all 0.2s ease;
-            ">
-                Later
-            </button>
-        </div>
-    `;
-
-    document.body.appendChild(popup);
-    
-    // Add event listeners
-    document.getElementById('pwaCloseBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        hidePWAPopup();
-    });
-    
-    document.getElementById('pwaInstallBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        installPWA();
-    });
-    
-    document.getElementById('pwaLaterBtn').addEventListener('click', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        hidePWAPopup();
-    });
-    
-    return popup;
-}
-
-// Show PWA popup only when appropriate
-function showPWAPopup() {
-    console.log('Checking if should show PWA popup...');
-    
-    if (!shouldShowInstallPrompt()) {
-        console.log('Install prompt not needed, skipping...');
-        return;
-    }
-    
-    const deviceInfo = getDeviceInfo();
-    console.log('Device info:', deviceInfo);
-    
-    // Mark as shown in this session
-    installPromptShown = true;
-    
-    // For iOS, show custom instructions
-    if (deviceInfo.isIOS) {
-        console.log('Showing iOS install instructions...');
-        showIOSInstallInstructions();
-        return;
-    }
-    
-    // For other platforms - create and show the popup
-    console.log('Creating popup for other platforms...');
-    const popup = createPWAPopup();
-    
-    // Animate popup into view with delay
-    setTimeout(() => {
-        popup.style.bottom = '20px';
-        console.log('PWA popup animated into view');
-    }, 200);
-}
-
-// Hide PWA popup and track dismissal
-function hidePWAPopup() {
-    console.log('Hiding PWA popup...');
-    const popup = document.getElementById('pwaPopup');
-    if (popup) {
-        // Store dismissal time
-        localStorage.setItem('pwa_install_dismissed', new Date().toISOString());
-        
-        // Animate out
-        popup.style.bottom = '-200px';
-        
-        // Remove after animation
-        setTimeout(() => {
-            popup.remove();
-        }, 400);
-    }
-    
-    console.log('PWA popup hidden and dismissal tracked');
-}
-
-function setupPWA() {
-    console.log('Setting up PWA...');
-    
-    // FIRST check if installed - if so, don't do anything else
-    if (isPWAInstalled()) {
-        pwaInstalled = true;
-        console.log('PWA already installed - no setup needed');
-        return; // Exit completely
-    }
-    
-    const deviceInfo = getDeviceInfo();
-    console.log('PWA not installed, device info:', deviceInfo);
-    
-    // Only proceed if NOT installed
-    if (deviceInfo.supportsInstallPrompt) {
-        window.addEventListener('beforeinstallprompt', (e) => {
-            console.log('beforeinstallprompt event fired');
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-        
-        window.addEventListener('appinstalled', (e) => {
-            console.log('PWA was installed successfully');
-            pwaInstalled = true;
-            hidePWAPopup();
-            showInstallSuccessMessage('App installed successfully!');
-        });
-    }
-    
-    // Only show popup if definitely not installed
-    setTimeout(() => {
-        if (!isPWAInstalled()) {
-            console.log('Showing install popup after timeout');
-            showPWAPopup();
-        }
-    }, 2000);
-}
-// Install PWA function
-function installPWA() {
-    console.log('Install PWA triggered...');
-    const deviceInfo = getDeviceInfo();
-    
-    // iOS specific handling
-    if (deviceInfo.isIOS) {
-        showIOSInstallInstructions();
-        return;
-    }
-    
-    // Other platforms
-    if (deferredPrompt) {
-        console.log('Using deferred prompt...');
-        deferredPrompt.prompt();
-        
-        deferredPrompt.userChoice.then((choiceResult) => {
-            console.log('PWA install choice:', choiceResult.outcome);
-            
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted PWA installation');
-                pwaInstalled = true;
-                hidePWAPopup();
-            } else {
-                console.log('User dismissed PWA installation');
-                hidePWAPopup();
-            }
-            
-            deferredPrompt = null;
-        });
-    } else {
-        console.log('No deferred prompt available');
-        alert('Install option not available. You can bookmark this page for quick access.');
-        hidePWAPopup();
-    }
-}
-
-// Show install success message
-function showInstallSuccessMessage(customMessage = '✅ App installed successfully!') {
-    const message = document.createElement('div');
-    message.style.cssText = `
-        position: fixed;
-        top: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: #4CAF50;
-        color: white;
-        padding: 15px 25px;
-        border-radius: 10px;
-        font-weight: 600;
-        z-index: 10001;
-        box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
-        font-size: 16px;
-        text-align: center;
-        max-width: 90%;
-    `;
-    message.textContent = customMessage;
-    
-    document.body.appendChild(message);
-    
-    setTimeout(() => {
-        message.style.opacity = '0';
-        message.style.transform = 'translateX(-50%) translateY(-20px)';
-        setTimeout(() => message.remove(), 300);
-    }, 4000);
-}
-
-// iOS install instructions
-function showIOSInstallInstructions() {
-    const isIOSSafari = getDeviceInfo().isIOSSafari;
-    
-    if (!isIOSSafari) {
-        alert('To install this app on iOS, please open it in Safari browser.');
-        return;
-    }
-    
-    alert(`Install Instructions:
-
-1. Tap the Share button (⎙) at the bottom
-2. Scroll down and select "Add to Home Screen"
-3. Tap "Add" to install
-
-The app will then be available on your home screen like a native app!`);
-}
-        // ========================================
-        // PWA FUNCTIONS
- // ========================================
-// RELIABLE PWA INSTALLATION SCRIPT
-// ========================================
-// ========================================
-// RELIABLE PWA INSTALLATION SCRIPT
-// ========================================
-
-// PWA Variables
-// PWA Variables
-
-
-
-// Hide iOS install modal
-function hideIOSInstallModal() {
-    const modal = document.getElementById('iosInstallModal');
-    if (modal) {
-        modal.remove();
-    }
-    console.log('iOS install modal hidden');
-}
-
-// Windows Desktop App Installation with proper icon and shortcuts
-function installWindowsDesktopApp() {
-    console.log('Installing Windows desktop app...');
-    
-    // Set installation flag
-    window.pwaInstallationInProgress = true;
-    
-    if (deferredPrompt) {
-        console.log('Using deferred prompt for Windows installation...');
-        
-        // Show browser's native install dialog
-        deferredPrompt.prompt();
-        
-        deferredPrompt.userChoice.then((choiceResult) => {
-            console.log('Windows PWA install choice:', choiceResult.outcome);
-            
-            if (choiceResult.outcome === 'accepted') {
-                console.log('User accepted Windows PWA installation');
-                
-                // Show installing message
-                showInstallingMessage();
-                
-                // Track installation
-                pwaInstalled = true;
-                hidePWAPopup();
-                
-                // Wait for installation to complete, then show success
-                setTimeout(() => {
-                    hideInstallingMessage();
-                    showInstallSuccessMessage('Desktop app installed! Check your desktop and start menu.');
-                }, 2000);
-                
-            } else {
-                console.log('User dismissed Windows PWA installation');
-                window.pwaInstallationInProgress = false;
-                hidePWAPopup();
-            }
-            
-            deferredPrompt = null;
-        });
-    } else {
-        console.log('No deferred prompt available for Windows, showing manual instructions...');
-        showWindowsManualInstall();
-    }
-}
-
-// Show installing message
-function showInstallingMessage() {
-    const message = document.createElement('div');
-    message.id = 'installingMessage';
-    message.style.cssText = `
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background: rgba(0,0,0,0.9);
-        color: white;
-        padding: 30px;
-        border-radius: 15px;
-        font-weight: 600;
-        z-index: 10002;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-        font-size: 18px;
-        text-align: center;
-        backdrop-filter: blur(10px);
-    `;
-    
-    message.innerHTML = `
-        <div style="margin-bottom: 15px; font-size: 40px;">⚙️</div>
-        <div>Installing desktop app...</div>
-        <div style="margin-top: 10px; font-size: 14px; opacity: 0.8;">
-            This will add a shortcut to your desktop and start menu
-        </div>
-    `;
-    
-    document.body.appendChild(message);
-}
-
-// Hide installing message
-function hideInstallingMessage() {
-    const message = document.getElementById('installingMessage');
-    if (message) {
-        message.style.opacity = '0';
-        setTimeout(() => message.remove(), 300);
-    }
-}
-
-// Windows manual install instructions
-function showWindowsManualInstall() {
-    const deviceInfo = getDeviceInfo();
-    let instructions = '';
-    
-    if (deviceInfo.isChrome) {
-        instructions = `To install the desktop app:
-
-1. Look for the install icon (⊞) in the address bar
-2. Click it and select "Install"
-3. Or go to Chrome menu (⋮) → "Install [App Name]"
-
-This will create a desktop shortcut and add the app to your start menu with the proper icon.`;
-    } else if (deviceInfo.isEdge) {
-        instructions = `To install the desktop app:
-
-1. Click the apps icon (⊞) in the address bar
-2. Select "Install this site as an app"
-3. Or go to Edge menu (⋯) → "Apps" → "Install this site as an app"
-
-This will create a desktop shortcut and add the app to your start menu.`;
-    } else {
-        instructions = `To get the best experience:
-
-Please open this website in Chrome or Edge browser to install it as a desktop app with proper shortcuts and icon.`;
-    }
-    
-    alert(instructions);
-    hidePWAPopup();
-}
-
-// Manual install instructions for other platforms
-function showManualInstallInstructions() {
-    const deviceInfo = getDeviceInfo();
-    let instructions = '';
-    
-    if (deviceInfo.isChrome && deviceInfo.isAndroid) {
-        instructions = '1. Tap the menu (⋮) in Chrome\n2. Select "Add to Home screen"\n3. Tap "Add" to install';
-    } else if (deviceInfo.isChrome && deviceInfo.isWindows) {
-        instructions = '1. Click the install icon (⊞) in the address bar\n2. Or go to Chrome menu → "Install app"\n3. This will add a desktop shortcut';
-    } else if (deviceInfo.isChrome) {
-        instructions = '1. Click the install icon in the address bar\n2. Or go to Chrome menu → "Install app"';
-    } else if (deviceInfo.isEdge && deviceInfo.isWindows) {
-        instructions = '1. Click the apps icon in the address bar\n2. Select "Install this site as an app"\n3. This will create a desktop shortcut';
-    } else if (deviceInfo.isAndroid) {
-        instructions = 'Please open this website in Chrome browser to install the app.';
-    } else {
-        instructions = 'Bookmark this page for quick access, or check your browser\'s install options.';
-    }
-    
-    alert('Install Instructions:\n\n' + instructions);
-    hidePWAPopup();
-}
-
-// Force show popup function for testing
-window.showPWAInstallPopup = function() {
-    console.log('Manually triggering PWA popup...');
-    // Clear any installation tracking
-    window.pwaInstallationInProgress = false;
-    pwaInstalled = false;
-    showPWAPopup();
-};
-
-// Clear all tracking function
-window.clearPWATracking = function() {
-    window.pwaInstallationInProgress = false;
-    pwaInstalled = false;
-    console.log('All PWA tracking cleared');
-};
-
-// Enhanced Service Worker registration with better error handling
-function registerServiceWorker() {
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then((registration) => {
-                    console.log('Service Worker registered successfully:', registration.scope);
-                    
-                    // Check for updates
-                    registration.addEventListener('updatefound', () => {
-                        console.log('Service Worker update found');
-                        const newWorker = registration.installing;
-                        
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                console.log('New version available');
-                                // Optionally show update notification
-                                showUpdateAvailable();
-                            }
-                        });
-                    });
-                })
-                .catch((error) => {
-                    console.error('Service Worker registration failed:', error);
-                });
-        });
-    } else {
-        console.log('Service Worker not supported in this browser');
-    }
-}
-
-// Show update available notification
-function showUpdateAvailable() {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #2196F3;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 10px;
-        font-weight: 600;
-        z-index: 10001;
-        box-shadow: 0 8px 25px rgba(33, 150, 243, 0.3);
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    `;
-    notification.innerHTML = `
-        <div>🔄 App update available</div>
-        <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">Click to refresh</div>
-    `;
-    
-    notification.addEventListener('click', () => {
-        window.location.reload();
-    });
-    
-    document.body.appendChild(notification);
-    
-    // Auto-hide after 8 seconds
-    setTimeout(() => {
-        notification.style.opacity = '0';
-        notification.style.transform = 'translateX(100%)';
-        setTimeout(() => notification.remove(), 300);
-    }, 8000);
-}
-
-// ========================================
-// INITIALIZATION
-// ========================================
-
-// Initialize PWA features only when appropriate
-function initializePWA() {
-    console.log('Initializing PWA system...');
-    
-    // Register service worker first
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
-            .then((registration) => {
-                console.log('Service Worker registered successfully:', registration.scope);
-            })
-            .catch((error) => {
-                console.error('Service Worker registration failed:', error);
-            });
-    }
-    
-    // Setup PWA install functionality
-    setupPWA();
-    
-    // Setup enhanced download buttons
-    setupDownloadButtons();
-    
-    console.log('PWA system initialized');
-}
-
-// Start when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializePWA);
-} else {
-    initializePWA();
-}
-
-// Enhanced initApp function
-async function initApp() {
-    console.log('Initializing app...');
-    
-    try {
-        // Your existing initialization code...
-        // await initializeSupabase();
-        // await initializeAuth();
-        // setupEventListeners();
-        // etc...
-        
-        // Initialize PWA features
-        initializePWA();
-        
-        console.log('App initialized successfully');
-        
-    } catch (error) {
-        console.error('App initialization error:', error);
-        // Still initialize PWA even if other parts fail
-        initializePWA();
-    }
-}
-
-// Global functions for external access
-window.pwaUtils = {
-    showInstallPopup: () => showPWAPopup(),
-    hideInstallPopup: () => hidePWAPopup(),
-    checkInstallStatus: () => isPWAInstalled(),
-    clearTracking: () => window.clearPWATracking(),
-    getDeviceInfo: () => getDeviceInfo(),
-    forceInstall: () => installPWA()
-};
-
-// function checkPWAInstallPrompt() {
-//     // Check if app is already installed
-//     if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
-//         console.log('App is running in standalone mode');
-//         return;
-//     }
-    
-//     // Show install prompt after delay if not already shown recently
-//     const lastPrompt = localStorage.getItem('pwa_prompt_shown');
-//     const now = Date.now();
-//     const dayInMs = 24 * 60 * 60 * 1000;
-    
-//     if (!lastPrompt || (now - parseInt(lastPrompt)) > dayInMs) {
-//         setTimeout(() => {
-//             if (deferredPrompt) {
-//                 showPWAPopup();
-//             }
-//         }, 5000); // Show after 5 seconds
-//     }
-// }
-// ========================================
-// DEPARTMENT STAFF LOADING
-// ========================================
-
-async function loadDepartmentStaff(dept, retryCount = 0) {
-    console.log(`Loading staff for department: ${dept}, retry count: ${retryCount}`);
-    
-    // Show loading state
-    const staffContainer = document.getElementById('staffContainer');
-    const hodContainer = document.getElementById('hodContainer');
-    
-    if (staffContainer) {
-        staffContainer.innerHTML = '<div class="loading-message">Loading staff members...</div>';
-    }
-    if (hodContainer) {
-        hodContainer.innerHTML = '<div class="loading-message">Loading HOD...</div>';
-    }
-    
-    if (!supabaseClient) {
-        console.warn('No database connection, showing default message');
-        displayNoStaffMessage();
-        return;
-    }
-
-    try {
-        // Get department ID
-        const deptInfo = departmentMap[dept];
-        if (!deptInfo) {
-            throw new Error(`Department ${dept} not found in department map`);
-        }
-
-        // Add small delay to prevent race conditions
-        await new Promise(resolve => setTimeout(resolve, 200));
-
-        // Fetch profiles with department information
-        const { data: profiles, error } = await supabaseClient
-            .from('profiles')
-            .select(`
-                profile_id,
-                name,
-                designation,
-                experience,
-                research_papers,
-                achievements,
-                profile_image,
-                custom_fields,
-                department,
-                is_published
-            `)
-            .eq('department', deptInfo.id)
-            .eq('is_published', true)
-            .order('designation', { ascending: true })
-            .order('name', { ascending: true });
-
-        if (error) {
-            console.error('Database query error:', error);
-            throw error;
-        }
-
-        console.log(`Found ${profiles?.length || 0} profiles for department ${dept}`);
-
-        // Get department name for display
-        const { data: deptData, error: deptError } = await supabaseClient
-            .from('departments')
-            .select('dept_name, dept_short_name')
-            .eq('dept_id', deptInfo.id)
-            .single();
-
-        let departmentName = deptInfo.name; // fallback
-        if (!deptError && deptData) {
-            departmentName = deptData.dept_name;
-        }
-
-        // Process and display profiles
-        if (profiles && profiles.length > 0) {
-            // Separate HOD and other staff
-            const hodProfiles = profiles.filter(p => p.designation === 'HOD');
-            const otherStaff = profiles.filter(p => p.designation !== 'HOD');
-
-            // Display HOD
-            displayHOD(hodProfiles, departmentName);
-            
-            // Display other staff members
-            displayStaffMembers(otherStaff, departmentName);
-            
-        } else {
-            // No profiles found
-            displayNoStaffMessage();
-        }
-
-    } catch (error) {
-        console.error('Error loading department staff:', error);
-        
-        // Retry mechanism
-        if (retryCount < 2) {
-            console.log(`Retrying in 1 second... (attempt ${retryCount + 1})`);
-            setTimeout(() => {
-                loadDepartmentStaff(dept, retryCount + 1);
-            }, 1000);
-            return;
-        }
-        
-        // Max retries reached, show error message
-        displayErrorMessage(error.message);
-    }
-}
-// Helper function to display staff members
-function displayStaffMembers(staffProfiles, departmentName) {
-    const staffContainer = document.getElementById('staffContainer');
-    if (!staffContainer) return;
-
-    if (staffProfiles.length > 0) {
-        staffContainer.innerHTML = staffProfiles.map(profile => `
-            <div class="staff-card" onclick="showProfileView('${profile.profile_id}')">
-                <div class="staff-img">${profile.profile_image ? 
-                    `<img src="${profile.profile_image}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
-                    '👤'}</div>
-                <div class="staff-info">
-                    <div class="staff-name">${profile.name}</div>
-                    <div class="staff-designation">${profile.designation}</div>
-                    <div class="staff-experience">${profile.experience} years experience</div>
-                </div>
-            </div>
-        `).join('');
-    } else {
-        staffContainer.innerHTML = `
-            <div class="staff-card no-click">
-                <div class="staff-img">👤</div>
-                <div class="staff-info">
-                    <div class="staff-name">No staff members yet</div>
-                    <div class="staff-designation">Be the first to create a profile!</div>
-                </div>
-            </div>
-        `;
-    }
-}
-// Helper function to display no staff message
-function displayNoStaffMessage() {
-    const staffContainer = document.getElementById('staffContainer');
-    const hodContainer = document.getElementById('hodContainer');
-    
-    if (hodContainer) {
-        hodContainer.innerHTML = `
-            <div class="staff-card no-click">
-                <div class="staff-img">👤</div>
-                <div class="staff-info">
-                    <div class="staff-name">Head of Department </div>
-                    <div class="staff-designation">Profile not created yet</div>
-                </div>
-            </div>
-        `;
-    }
-    
-    if (staffContainer) {
-        staffContainer.innerHTML = `
-            <div class="staff-card no-click">
-                <div class="staff-img">👤</div>
-                <div class="staff-info">
-                    <div class="staff-name">Staff members</div>
-                    <div class="staff-designation">Register to create profiles</div>
-                </div>
-            </div>
-        `;
-    }
-}
-
-// Helper function to display error message
-function displayErrorMessage(errorMessage) {
-    const staffContainer = document.getElementById('staffContainer');
-    const hodContainer = document.getElementById('hodContainer');
-    
-    const errorHtml = `
-        <div class="staff-card no-click error-card">
-            <div class="staff-img">⚠️</div>
-            <div class="staff-info">
-                <div class="staff-name">Error loading profiles</div>
-                <div class="staff-designation">Please try refreshing the page</div>
-            </div>
-        </div>
-    `;
-    
-    if (hodContainer) hodContainer.innerHTML = errorHtml;
-    if (staffContainer) staffContainer.innerHTML = errorHtml;
-}
-
-// Helper function to display HOD
-function displayHOD(hodProfiles, departmentName) {
-    const hodContainer = document.getElementById('hodContainer');
-    if (!hodContainer) return;
-
-    if (hodProfiles.length > 0) {
-        const hod = hodProfiles[0]; // Take first HOD if multiple
-        hodContainer.innerHTML = `
-            <div class="staff-card" onclick="showProfileView('${hod.profile_id}')">
-                <div class="staff-img">${hod.profile_image ? 
-                    `<img src="${hod.profile_image}" alt="${hod.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
-                    '👤'}</div>
-                <div class="staff-info">
-                    <div class="staff-name">${hod.name}</div>
-                    <div class="staff-designation">${hod.designation}</div>
-                    <div class="staff-experience">${hod.experience} years experience</div>
-                </div>
-            </div>
-        `;
-    } else {
-        hodContainer.innerHTML = `
-            <div class="staff-card no-click">
-                <div class="staff-img">👤</div>
-                <div class="staff-info">
-                    <div class="staff-name">Head of Department</div>
-                    <div class="staff-designation">Profile not created yet</div>
-                </div>
-            </div>
-        `;
-    }
-}
-        // ========================================
-        // DOWNLOAD FUNCTIONS
-        // ========================================
-
-        // Fixed function to download PDF for any profile (not just current user)
-function downloadPDF(profileData = null) {
-    // Determine which profile to use
-    let profile = profileData;
-    
-    if (!profile) {
-        // If we're on profile view page, use currentViewingProfile
-        const currentPage = document.querySelector('.page.active');
-        if (currentPage && currentPage.id === 'profileViewPage') {
-            profile = currentViewingProfile;
-        } else {
-            // Otherwise use current user profile
-            profile = currentUserProfile;
-        }
-    }
-    
-    if (!profile) {
-        alert('No profile data available for download');
-        return;
-    }
-    
-    console.log('Downloading PDF for:', profile.name);
-     
-    // Check if PDF libraries are loaded
-    if (!window.html2canvas || !window.jspdf) {
-        alert('PDF libraries not loaded. Please refresh the page and try again.');
-        return;
-    }
-    
-    // Create a temporary profile view for download
-    const tempDiv = document.createElement('div');
-    tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px; font-family: Arial, sans-serif;';
-    
-    tempDiv.innerHTML = `
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h2 style="color: #8B5CF6; margin: 0 0 10px 0;">VVPIET Staff Profiles</h2>
-        </div>
-        
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px; border: 3px solid #8B5CF6;">
-                ${profile.profile_image ? 
-                    `<img src="${profile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onerror="this.style.display='none'; this.parentElement.innerHTML='👤';">` : 
-                    '👤'
-                }
-            </div>
-            <h2 style="margin: 0 0 5px 0; color: #333; font-size: 28px;">${profile.name}</h2>
-            <p style="margin: 0; color: #666; font-size: 18px; font-weight: 600;">${profile.department_name || 'Department'}</p>
-            <p style="margin: 5px 0 0 0; color: #888; font-size: 16px;">${profile.designation}</p>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
-                <strong style="color: #333; font-size: 16px;">Experience:</strong>
-                <span style="margin-left: 10px; font-size: 16px;">${profile.experience} years</span>
-            </div>
-            
-            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
-                <strong style="color: #333; font-size: 16px;">Expertise:</strong>
-                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
-                    ${profile.research_papers || 'No expertise listed yet'}
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
-                <strong style="color: #333; font-size: 16px;">Achievements:</strong>
-                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
-                    ${profile.achievements || 'No achievements listed yet'}
-                </div>
-            </div>
-            
-            ${getCustomFieldsHTML(profile.custom_fields)}
-        </div>
-        
-        <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
-    <div style="margin-bottom: 15px;">
-        <a href="https://vvpstaff.netlify.app" target="_blank" style="display: inline-block; margin: 0 10px; padding: 8px 16px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-decoration: none; border-radius: 20px; font-size: 14px; transition: transform 0.2s ease;">
-            Visit vvpstaff.netlify.app to view the staff profiles of VVPIET.
-        </a>
-        
-        <span style="margin: 0 5px; color: #666;">or</span>
-        
-        <span style="font-size: 12px; color: #666;">scan QR to open Website</span>
-        
-        <div style="display: inline-block; margin-left: 10px; vertical-align: middle;">
-            <div style="width: 75px; height: 75px; background: white; border: 2px solid #667eea; border-radius: 6px; padding: 4px; display: inline-block;">
-                <img src="staffprofileQR.jpg" 
-                     alt="QR Code" 
-                     style="width: 100%; height: 100%;" />
-            </div>
-        </div>
-    </div>
-    
-    
-    
-    <p style="font-size: 12px; color: #666; margin: 0;">© All rights reserved, VVPIET Staff Profiles by Yahya Mundewadi (BTech CSE)</p>
-</div>
-    `;
-    
-    document.body.appendChild(tempDiv);
-    
-    // Generate PDF with better error handling
-    html2canvas(tempDiv, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: '#ffffff',
-        logging: false,
-        timeout: 10000
-    }).then(canvas => {
-        try {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            
-            const imgData = canvas.toDataURL('image/png');
-            const imgWidth = 210;
-            const pageHeight = 295;
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            let heightLeft = imgHeight;
-            
-            let position = 0;
-            
-            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-            
-            while (heightLeft >= 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-            
-            pdf.save(`${profile.name}_profile.pdf`);
-            console.log('PDF generated successfully');
-        } catch (pdfError) {
-            console.error('PDF generation error:', pdfError);
-            alert('Failed to generate PDF. Please try again or refresh the page.');
-        }
-        
-        document.body.removeChild(tempDiv);
-    }).catch(error => {
-        console.error('Canvas generation error:', error);
-        alert('Failed to generate PDF. Please try again or refresh the page.');
-        document.body.removeChild(tempDiv);
-    });
-}
-
-// Fixed function to download image for any profile
-function downloadImage(profileData = null) {
-    // Determine which profile to use
-    let profile = profileData;
-    
-    if (!profile) {
-        // If we're on profile view page, use currentViewingProfile
-        const currentPage = document.querySelector('.page.active');
-        if (currentPage && currentPage.id === 'profileViewPage') {
-            profile = currentViewingProfile;
-        } else {
-            // Otherwise use current user profile
-            profile = currentUserProfile;
-        }
-    }
-    
-    if (!profile) {
-        alert('No profile data available for download');
-        return;
-    }
-    
-    console.log('Downloading image for:', profile.name);
-    
-     
-    // Check if html2canvas is loaded
-    if (!window.html2canvas) {
-        alert('Image library not loaded. Please refresh the page and try again.');
-        return;
-    }
-    
-    // Create a temporary profile view for download
-    const tempDiv = document.createElement('div');
-    tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px; font-family: Arial, sans-serif;';
-    
-    tempDiv.innerHTML = `
-        <div style="text-align: center; margin-bottom: 30px;">
-            <h2 style="color: #8B5CF6; margin: 0 0 10px 0;">VVPIET Staff Profiles</h2>
-        </div>
-        
-        <div style="text-align: center; margin-bottom: 30px;">
-            <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px; border: 3px solid #8B5CF6;">
-                ${profile.profile_image ? 
-                    `<img src="${profile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;" onerror="this.style.display='none'; this.parentElement.innerHTML='👤';">` : 
-                    '👤'
-                }
-            </div>
-            <h2 style="margin: 0 0 5px 0; color: #333; font-size: 28px;">${profile.name}</h2>
-            <p style="margin: 0; color: #666; font-size: 18px; font-weight: 600;">${profile.department_name || 'Department'}</p>
-            <p style="margin: 5px 0 0 0; color: #888; font-size: 16px;">${profile.designation}</p>
-        </div>
-        
-        <div style="margin-bottom: 20px;">
-            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
-                <strong style="color: #333; font-size: 16px;">Experience:</strong>
-                <span style="margin-left: 10px; font-size: 16px;">${profile.experience} years</span>
-            </div>
-            
-            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
-                <strong style="color: #333; font-size: 16px;">Expertise:</strong>
-                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
-                    ${profile.research_papers || 'No expertise listed yet'}
-                </div>
-            </div>
-            
-            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
-                <strong style="color: #333; font-size: 16px;">Achievements:</strong>
-                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
-                    ${profile.achievements || 'No achievements listed yet'}
-                </div>
-            </div>
-            
-            ${getCustomFieldsHTML(profile.custom_fields)}
-        </div>
-        
-        <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
-    <div style="margin-bottom: 15px;">
-        <a href="https://vvpstaff.netlify.app" target="_blank" style="display: inline-block; margin: 0 10px; padding: 8px 16px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; text-decoration: none; border-radius: 20px; font-size: 14px; transition: transform 0.2s ease;">
-            Visit vvpstaff.netlify.app to view the staff profiles of VVPIET.
-        </a>
-        
-        <span style="margin: 0 5px; color: #666;">or</span>
-        
-        <span style="font-size: 12px; color: #666;">scan QR to open Website</span>
-        
-        <div style="display: inline-block; margin-left: 10px; vertical-align: middle;">
-            <div style="width: 75px; height: 75px; background: white; border: 2px solid #667eea; border-radius: 6px; padding: 4px; display: inline-block;">
-                <img src="staffprofileQR.jpg" 
-                     alt="QR Code" 
-                     style="width: 100%; height: 100%;" />
-            </div>
-        </div>
-    </div>
-    
-    
-    
-    <p style="font-size: 12px; color: #666; margin: 0;">© All rights reserved, VVPIET Staff Profiles by Yahya Mundewadi (BTech CSE)</p>
-</div>
-    `;
-    
-    document.body.appendChild(tempDiv);
-    
-    // Generate image with better error handling
-    html2canvas(tempDiv, {
-        scale: 2,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: '#ffffff',
-        logging: false,
-        timeout: 10000
-    }).then(canvas => {
-        try {
-            const link = document.createElement('a');
-            link.download = `${profile.name}_profile.png`;
-            link.href = canvas.toDataURL('image/png');
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            console.log('Image downloaded successfully');
-        } catch (downloadError) {
-            console.error('Image download error:', downloadError);
-            alert('Failed to download image. Please try again.');
-        }
-        
-        document.body.removeChild(tempDiv);
-    }).catch(error => {
-        console.error('Canvas generation error:', error);
-        alert('Failed to generate image. Please try again or refresh the page.');
-        document.body.removeChild(tempDiv);
-    });
-}
-
-// Helper function for custom fields HTML
-function getCustomFieldsHTML(customFields) {
-    if (!customFields || Object.keys(customFields).length === 0) {
-        return '';
-    }
-    
-    let html = '';
-    Object.entries(customFields).forEach(([key, value]) => {
-        html += `
-            <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #8B5CF6;">
-                <strong style="color: #333; font-size: 16px;">${key}:</strong>
-                <div style="margin-top: 8px; font-size: 14px; line-height: 1.6;">
-                    ${value}
-                </div>
-            </div>
-        `;
-    });
-    
-    return html;
-}
-function handleFormSubmissionSafely(formElement, handler) {
-    if (!formElement) return;
-    
-    formElement.addEventListener('submit', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        try {
-            // Disable form temporarily to prevent double submission
-            const submitBtn = formElement.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = true;
-                const originalText = submitBtn.textContent;
-                submitBtn.textContent = 'Processing...';
-                
-                // Re-enable after delay
-                setTimeout(() => {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = originalText;
-                }, 3000);
-            }
-            
-            // Call the actual handler
-            handler(e);
-        } catch (error) {
-            console.error('Form submission error:', error);
-            
-            // Re-enable form on error
-            const submitBtn = formElement.querySelector('button[type="submit"]');
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                const originalText = submitBtn.getAttribute('data-original-text') || 'Submit';
-                submitBtn.textContent = originalText;
-            }
-        }
-    });
-}
-
-// Enhanced form submission to prevent PWA crashes
-async function handleFormSubmission(formHandler, formData, buttonElement) {
-    if (!formHandler || typeof formHandler !== 'function') {
-        console.error('Invalid form handler');
-        return;
-    }
-    
-    // Disable button and show loading state
-    if (buttonElement) {
-        buttonElement.disabled = true;
-        const originalText = buttonElement.textContent;
-        buttonElement.textContent = 'Processing...';
-        
-        // Timeout to re-enable button if something goes wrong
-        const timeoutId = setTimeout(() => {
-            buttonElement.disabled = false;
-            buttonElement.textContent = originalText;
-        }, 10000);
-        
-        try {
-            await formHandler(formData);
-            clearTimeout(timeoutId);
-            buttonElement.disabled = false;
-            buttonElement.textContent = originalText;
-        } catch (error) {
-            console.error('Form submission error:', error);
-            clearTimeout(timeoutId);
-            buttonElement.disabled = false;
-            buttonElement.textContent = originalText;
-            
-            // Show error message
-            alert('An error occurred. Please try again.');
-        }
-    } else {
-        try {
-            await formHandler(formData);
-        } catch (error) {
-            console.error('Form submission error:', error);
-            alert('An error occurred. Please try again.');
-        }
-    }
-}
-// Set up all event listeners in a PWA-safe manner
-function setupPWAEventListeners() {
-    console.log('Setting up PWA-safe event listeners...');
-    
-    // Profile form
-    const profileForm = document.getElementById('profileForm');
-    if (profileForm) {
-        handleFormSubmissionSafely(profileForm, handleProfileCreation);
-    }
-    
-    // Login form
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        handleFormSubmissionSafely(loginForm, handleLogin);
-    }
-    
-    // Register form
-    const registerForm = document.getElementById('registerForm');
-    if (registerForm) {
-        handleFormSubmissionSafely(registerForm, handleRegistration);
-    }
-    
-    // Download buttons
-    setupDownloadButtons();
-    
-    // Navigation buttons - wrap in safe handler
-    document.querySelectorAll('button[onclick*="show"]').forEach(btn => {
-        const originalOnclick = btn.getAttribute('onclick');
-        btn.removeAttribute('onclick');
-        
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            try {
-                // Execute the original function safely
-                eval(originalOnclick);
-            } catch (error) {
-                console.error('Navigation error:', error);
-                // Fallback navigation
-                showMainPage();
-            }
-        });
-    });
-    
-    console.log('PWA-safe event listeners set up');
-}
-
-
-
-        function downloadMyProfilePDF() {
-            if (!currentUserProfile) return;
-            
-            // Create a temporary profile view for download
-            const tempDiv = document.createElement('div');
-            tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px;';
-            
-           tempDiv.innerHTML = `
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h3 style="color: #8B5CF6; margin: 0;">VVPIET Staff Profiles</h3>         
-                </div>
-                
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px;">
-                        ${currentUserProfile.profile_image ? 
-                            `<img src="${currentUserProfile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
-                            '👤'
-                        }
-                    </div>
-                    <h2 style="margin: 0 0 5px 0; color: #333;">${currentUserProfile.name}</h2>
-                    <p style="margin: 0; color: #666; font-size: 16px;">${currentUserProfile.department_name}</p>
-                    <p style="margin: 5px 0 0 0; color: #888; font-size: 14px;">${currentUserProfile.designation}</p>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Experience:</strong>
-                        <span style="margin-left: 10px;">${currentUserProfile.experience} years</span>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Expertise:</strong>
-                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                            ${currentUserProfile.research_papers || 'No Expertise listed yet'}
-                        </div>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Achievements:</strong>
-                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                            ${currentUserProfile.achievements || 'No achievements listed'}
-                        </div>
-                    </div>
-                    
-                    ${getCustomFieldsHTML(currentUserProfile.custom_fields)}
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
-                    <p style="font-size: 12px; color: #666; margin: 0;">© All rights reserved, VVPIET Staff Profiles by Yahya Mundewadi(BTech CSE)</p>
-                </div>
-            `;
-            
-            document.body.appendChild(tempDiv);
-            
-            html2canvas(tempDiv, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: false,
-                backgroundColor: '#ffffff'
-            }).then(canvas => {
-               if (!window.html2canvas || !window.jspdf) {
-    alert('PDF libraries not loaded. Please refresh the page.');
-    return;
-}
-const { jsPDF } = window.jspdf;
-                const pdf = new jsPDF('p', 'mm', 'a4');
-                
-                const imgData = canvas.toDataURL('image/png');
-                const imgWidth = 210;
-                const pageHeight = 295;
-                const imgHeight = (canvas.height * imgWidth) / canvas.width;
-                let heightLeft = imgHeight;
-                
-                let position = 0;
-                
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-                
-                pdf.save(`${currentUserProfile.name}_profile.pdf`);
-                document.body.removeChild(tempDiv);
-            }).catch(error => {
-                console.error('Error generating PDF:', error);
-                alert('Failed to generate PDF. Please try again.');
-                document.body.removeChild(tempDiv);
-            });
-        }
-
-        function downloadMyProfileImage() {
-            if (!currentUserProfile) return;
-            
-            // Create a temporary profile view for download
-            const tempDiv = document.createElement('div');
-            tempDiv.style.cssText = 'position: absolute; left: -9999px; width: 800px; background: white; padding: 40px;';
-            
-            tempDiv.innerHTML = `
-                <div style="all: unset; text-align: center; margin-bottom: 20px;">
-    <img src="vvplogo.jpeg" alt="VVPIET Logo" style="height: 60px; margin-bottom: 10px;">
-    <h3 style="
-    all: unset;
-    display: block;
-    width: 100%;
-    color: #8B5CF6;
-    font-size: 1.17em;
-    font-weight: bold;
-    margin: 0;
-    padding: 0;
-    border: none !important;
-    border-bottom: none !important;
-    text-decoration: none !important;
-    box-shadow: none !important;
-    outline: none !important;
-    background: none !important;
-    background-color: transparent !important;
-">
-    VVPIET Staff Profiles
-</h3>
-
-</div>
-
-                
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <div style="width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 15px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 48px;">
-                        ${currentUserProfile.profile_image ? 
-                            `<img src="${currentUserProfile.profile_image}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
-                            '👤'
-                        }
-                    </div>
-                    <h2 style="margin: 0 0 5px 0; color: #333;">${currentUserProfile.name}</h2>
-                    <p style="margin: 0; color: #666; font-size: 16px;">${currentUserProfile.department_name}</p>
-                    <p style="margin: 5px 0 0 0; color: #888; font-size: 14px;">${currentUserProfile.designation}</p>
-                </div>
-                
-                <div style="margin-bottom: 20px;">
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Experience:</strong>
-                        <span style="margin-left: 10px;">${currentUserProfile.experience} years</span>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Expertise:</strong>
-                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                            ${currentUserProfile.research_papers || 'No Expertise listed yet'}
-                        </div>
-                    </div>
-                    
-                    <div style="margin-bottom: 15px;">
-                        <strong style="color: #333;">Achievements:</strong>
-                        <div style="margin-top: 5px; padding: 10px; background: #f9f9f9; border-radius: 5px;">
-                            ${currentUserProfile.achievements || 'No achievements listed'}
-                        </div>
-                    </div>
-                    
-                    ${getCustomFieldsHTML(currentUserProfile.custom_fields)}
-                </div>
-                
-                <div style="text-align: center; margin-top: 30px; padding: 20px; border-top: 1px solid #eee;">
-                    <p style="font-size: 12px; color: #666; margin: 0;">© All rights reserved, VVPIET Staff Profiles by Yahya Mundewadi(BTech CSE)</p>
-                </div>
-            `;
-            
-            document.body.appendChild(tempDiv);
-            
-            html2canvas(tempDiv, {
-                scale: 2,
-                useCORS: true,
-                allowTaint: false,
-                backgroundColor: '#ffffff'
-            }).then(canvas => {
-                const link = document.createElement('a');
-                link.download = `${currentUserProfile.name}_profile.png`;
-                link.href = canvas.toDataURL('image/png');
-                
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                document.body.removeChild(tempDiv);
-            }).catch(error => {
-                console.error('Error generating image:', error);
-                alert('Failed to generate image. Please try again.');
-                document.body.removeChild(tempDiv);
-            });
-        }
-
-       // Enhanced download button handling
-function setupDownloadButtons() {
-    // PDF download buttons
-    document.querySelectorAll('[onclick*="downloadPDF"]').forEach(button => {
-        button.removeAttribute('onclick');
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Get profile data from button's data attributes or current context
-            const profileId = this.dataset.profileId;
-            const profileData = profileId ? getProfileDataById(profileId) : currentUserProfile;
-            
-            try {
-                downloadPDF(profileData);
-            } catch (error) {
-                console.error('PDF download error:', error);
-                alert('Failed to download PDF. Please try again.');
-            }
-        });
-    });
-    
-    // Image download buttons
-    document.querySelectorAll('[onclick*="downloadImage"]').forEach(button => {
-        button.removeAttribute('onclick');
-        button.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            // Get profile data from button's data attributes or current context
-            const profileId = this.dataset.profileId;
-            const profileData = profileId ? getProfileDataById(profileId) : currentUserProfile;
-            
-            try {
-                downloadImage(profileData);
-            } catch (error) {
-                console.error('Image download error:', error);
-                alert('Failed to download image. Please try again.');
-            }
-        });
-    });
-}
-        // ========================================
-        // INITIALIZATION
-        // ========================================
-
-        
-
-        async function loadDepartments() {
-            try {
-                let departments = [];
-                
-                if (supabaseClient) {
-                    const { data, error } = await supabaseClient
-                        .from('departments')
-                        .select('*')
-                        .order('dept_name');
-                    
-                    if (!error) {
-                        departments = data || [];
-                    }
-                } else {
-                    departments = Object.entries(departmentMap).map(([key, value]) => ({
-                        dept_id: value.id,
-                        dept_name: value.name
-                    }));
-                }
-                
-                const deptSelects = document.querySelectorAll('#registerDepartment, #profileDepartment');
-                deptSelects.forEach(select => {
-                    while (select.children.length > 1) {
-                        select.removeChild(select.lastChild);
-                    }
-                    
-                    departments.forEach(dept => {
-                        const option = document.createElement('option');
-                        option.value = dept.dept_id;
-                        option.textContent = dept.dept_name;
-                        select.appendChild(option);
-                    });
-                });
-            } catch (error) {
-                console.error('Error loading departments:', error);
-            }
-        }
-
-        function setupEventListeners() {
-            // Register form
-            const registerForm = document.getElementById('registerForm');
-            if (registerForm) {
-                registerForm.addEventListener('submit', handleRegistration);
-            }
-            
-            // Login form  
-            const loginForm = document.getElementById('loginForm');
-            if (loginForm) {
-                loginForm.addEventListener('submit', handleLogin);
-            }
-            
-            // Profile form
-            const profileForm = document.getElementById('profileForm');
-            if (profileForm) {
-                profileForm.addEventListener('submit', handleProfileCreation);
-            }
-            
-            // Developer modal
-            const developerModal = document.getElementById('developerModal');
-            if (developerModal) {
-                developerModal.addEventListener('click', function(e) {
-                    if (e.target === this) {
-                        hideDeveloperModal();
-                    }
-                });
-            }
-
-            console.log('Event listeners set up successfully');
-        }
-
-        // Force cache bypass on refresh
-window.addEventListener('beforeunload', () => {
-  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({action: 'forceRefresh'});
-  }
-});
-
-// Listen for service worker messages
-if (navigator.serviceWorker) {
-  navigator.serviceWorker.addEventListener('message', event => {
-    if (event.data.type === 'REFRESH') {
-      window.location.reload(true);
-    }
-  });
-}
-        // ========================================
-        // PWA EVENT LISTENERS
-        // ========================================
-
-        window.addEventListener('beforeinstallprompt', (e) => {
-            e.preventDefault();
-            deferredPrompt = e;
-        });
-
+        // Register service worker
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then((registration) => {
-                        console.log('SW registered: ', registration);
-                    })
-                    .catch((registrationError) => {
-                        console.log('SW registration failed: ', registrationError);
-                    });
-            });
+            navigator.serviceWorker.register('sw.js');
         }
-
-        // Make sure DOM is fully loaded before initializing
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', initApp);
-        } else {
-            // DOM is already loaded
-            initApp();
-        }
-        // ========================================
-// DOM INITIALIZATION AND EVENT BINDING
-// ========================================
-
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM loaded, initializing app...');
-    
-    // Initialize Supabase and check auth state
-    initializeApp();
-    
-    // Bind form event listeners
-    bindFormEvents();
-    
-    // Bind button event listeners
-    bindButtonEvents();
-    
-    // Load initial data
-    loadInitialData();
-    
-    // Set up auth state listener
-    setupAuthStateListener();
-});
-
-function bindFormEvents() {
-    // Login form
-    const loginForm = document.getElementById('loginForm');
-    if (loginForm) {
-        loginForm.addEventListener('submit', handleLogin);
-        console.log('Login form event bound');
-    } else {
-        console.warn('Login form not found');
-    }
-    
-    // Register form
-    const registerForm = document.getElementById('registerForm');
-    if (registerForm) {
-        registerForm.addEventListener('submit', handleRegistration);
-        console.log('Register form event bound');
-    } else {
-        console.warn('Register form not found');
-    }
-    
-    // Profile form
-    const profileForm = document.getElementById('profileForm');
-    if (profileForm) {
-        profileForm.addEventListener('submit', handleProfileCreation);
-        console.log('Profile form event bound');
-    } else {
-        console.warn('Profile form not found');
-    }
-}
-
-function bindButtonEvents() {
-    // Store original button text for loading states
-    const buttons = document.querySelectorAll('button[type="submit"]');
-    buttons.forEach(btn => {
-        if (!btn.getAttribute('data-original-text')) {
-            btn.setAttribute('data-original-text', btn.textContent);
-        }
-    });
-    
-    // Auth button (Login/Logout)
-    const authBtn = document.getElementById('authButton') || document.querySelector('[onclick*="handleAuthAction"]');
-    if (authBtn) {
-        authBtn.addEventListener('click', handleAuthAction);
-    }
-    
-    // Department buttons - bind dynamically when created
-    bindDepartmentButtons();
-    
-    // Profile buttons
-    const editProfileBtn = document.getElementById('editProfileBtn');
-    if (editProfileBtn) {
-        editProfileBtn.addEventListener('click', editProfile);
-    }
-    
-    const deleteProfileBtn = document.getElementById('deleteProfileBtn');
-    if (deleteProfileBtn) {
-        deleteProfileBtn.addEventListener('click', deleteProfile);
-    }
-    
-    // Navigation buttons
-    const backButtons = document.querySelectorAll('[onclick*="goBack"], [onclick*="handleBack"]');
-    backButtons.forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.preventDefault();
-            handleBackNavigation();
+        
+        // Handle online/offline status
+        window.addEventListener('online', () => {
+            console.log('App is online');
         });
-    });
-    
-    // Custom fields button
-    const addFieldBtn = document.getElementById('addCustomFieldBtn');
-    if (addFieldBtn) {
-        addFieldBtn.addEventListener('click', addCustomField);
-    }
-}
-
-
-// ========================================
-// COMPLETE INITIALIZATION
-// ========================================
-
-// Complete app initialization
-async function initializeCompleteApp() {
-    console.log('Starting complete app initialization...');
-    
-    try {
-        // Initialize Supabase and auth
-        if (typeof initializeApp === 'function') {
-            await initializeApp();
-        }
         
-        // Set up PWA-safe event listeners
-        setupPWAEventListeners();
-        
-        // Initialize PWA features
-        initializePWA();
-        
-        console.log('Complete app initialization finished');
-        
-    } catch (error) {
-        console.error('App initialization error:', error);
-        
-        // Still try to initialize PWA features
-        try {
-            initializePWA();
-        } catch (pwaError) {
-            console.error('PWA initialization error:', pwaError);
-        }
-    }
-}
-
-// Start initialization when DOM is ready
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeCompleteApp);
-} else {
-    initializeCompleteApp();
-}
-
-// Export functions for global access
-window.PWAUtils = {
-    showInstallPopup: () => shouldShowInstallPrompt() ? showPWAPopup() : console.log('Install prompt not needed'),
-    hideInstallPopup: hidePWAPopup,
-    checkInstallStatus: isPWAInstalled,
-    downloadPDF: downloadPDF,
-    downloadImage: downloadImage,
-    clearInstallTracking: () => {
-        localStorage.removeItem('pwa_install_dismissed');
-        installPromptShown = false;
-        console.log('Install tracking cleared');
-    }
-};
+        window.addEventListener('offline', () => {
+            console.log('App is offline');
+        });
     </script>
+
 </body>
 </html>
