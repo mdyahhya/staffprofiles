@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Profile - VVPIET</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #8B5CF6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .profile-header {
+            text-align: center;
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .profile-image {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            border: 5px solid white;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4em;
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .profile-name {
+            font-size: 2em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        
+        .profile-designation {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .profile-details {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .detail-item {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        
+        .detail-label {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #8B5CF6;
+            margin-bottom: 8px;
+        }
+        
+        .detail-value {
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #8B5CF6;
+        }
+    </style>
+</head>
+<body>
+    <button class="back-btn" onclick="goBack()">← Back</button>
+    
+    <div class="profile-container">
+        <div id="profileContent">
+            <div class="loading">Loading profile...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseClient = supabase.createClient('https://nsnacwwcrszpjmanskti.supabase.co', 
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4');
+        
+        // REPLACE goBack function and event listener
+function goBack() {
+    // Clear history and go to specific page
+    window.history.replaceState(null, null, window.location.href);
+    
+    const params = new URLSearchParams(window.location.search);
+    const isStaffProfile = window.location.pathname.includes('staff-profile.html');
+    const isProfilesPage = window.location.pathname.includes('profiles.html');
+    
+    if (isStaffProfile) {
+        // From staff profile, go back to department profiles page
+        const dept = sessionStorage.getItem('currentDept');
+        if (dept) {
+            window.location.replace(`profiles.html?dept=${dept}`);
+        } else {
+            window.location.replace('index.html');
+        }
+    } else if (isProfilesPage) {
+        // From profiles page, go back to home
+        window.location.replace('index.html');
+    } else {
+        // Default: go to home
+        window.location.replace('index.html');
+    }
+}
+
+// REMOVE the popstate event listener completely
+// Don't add any popstate event listener
+
+        
+        // Handle browser back button
+        window.addEventListener('popstate', function(event) {
+            goBack();
+        });
+        
+       async function loadStaffProfile() {
+    const params = new URLSearchParams(window.location.search);
+    const profileId = params.get('id');
+    const tpoId = params.get('tpo');
+    
+    if (tpoId) {
+        // TPO profile loading (keep existing TPO code)
+        try {
+            const { data: tpo, error } = await supabaseClient
+                .from('tpo')
+                .select('*')
+                .eq('tpo_id', tpoId)
+                .single();
+            
+            if (error || !tpo) {
+                document.getElementById('profileContent').innerHTML = '<div class="loading">TPO profile not found</div>';
+                return;
+            }
+            
+            // Load TPO posts
+            const { data: tpoPosts } = await supabaseClient
+                .from('posts')
+                .select('*')
+                .eq('author_type', 'tpo')
+                .eq('is_published', true)
+                .order('created_at', { ascending: false });
+            
+            document.getElementById('profileContent').innerHTML = `
+                <div class="profile-header">
+                    <div class="profile-image">
+                        ${tpo.profile_image ? 
+                            `<img src="${tpo.profile_image}" alt="${tpo.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                            '👤'}
+                    </div>
+                    <div class="profile-name">${tpo.name}</div>
+                    <div class="profile-designation">${tpo.designation}</div>
+                    <div style="margin-top: 10px; opacity: 0.8;">Training & Placement Officer</div>
+                </div>
+                
+                <div class="profile-details">
+                    ${tpo.description ? `
+                        <div class="detail-item">
+                            <div class="detail-label">About</div>
+                            <div class="detail-value">${tpo.description}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${tpo.contact_email ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value"><a href="mailto:${tpo.contact_email}" style="color:#8B5CF6;">${tpo.contact_email}</a></div>
+                        </div>
+                    ` : ''}
+                    
+                    ${tpo.contact_phone ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Phone</div>
+                            <div class="detail-value"><a href="tel:${tpo.contact_phone}" style="color:#8B5CF6;">${tpo.contact_phone}</a></div>
+                        </div>
+                    ` : ''}
+                    
+                    
+                    
+                    ${tpo.qualification ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Qualification</div>
+                            <div class="detail-value">${tpo.qualification}</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${tpo.experience ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Experience</div>
+                            <div class="detail-value">${tpo.experience} years</div>
+                        </div>
+                    ` : ''}
+                    
+                    ${tpo.specialization ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Specialization</div>
+                            <div class="detail-value">${tpo.specialization}</div>
+                        </div>
+                    ` : ''}
+                </div>
+                
+                ${tpoPosts && tpoPosts.length > 0 ? `
+                    <div class="posts-section" style="margin-top: 30px;">
+                        <h3 style="color: #8B5CF6; margin-bottom: 20px; font-size: 1.3em;">Recent Posts</h3>
+                        <div class="posts-grid">
+                            ${tpoPosts.map(post => `
+                                <div class="post-card" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                                    <img src="${post.image_url}" alt="Post" style="width: 100%; height: 200px; object-fit: cover;">
+                                    ${post.caption ? `<div style="padding: 15px; color: #333; line-height: 1.5;">${post.caption}</div>` : ''}
+                                    <div style="padding: 0 15px 15px; color: #666; font-size: 0.9em;">
+                                        ${new Date(post.created_at).toLocaleDateString()}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            `;
+            
+        } catch (error) {
+            console.error('Error loading TPO:', error);
+            document.getElementById('profileContent').innerHTML = '<div class="loading">Error loading TPO profile</div>';
+        }
+        return;
+    }
+    
+    // Load Staff Profile
+    if (!profileId) {
+        document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
+        return;
+    }
+    
+    try {
+        const { data: profile, error } = await supabaseClient
+            .from('profiles')
+            .select('*')
+            .eq('profile_id', profileId)
+            .single();
+        
+        if (error || !profile) {
+            document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
+            return;
+        }
+        
+        // Get department name
+        const { data: dept } = await supabaseClient
+            .from('departments')
+            .select('dept_name')
+            .eq('dept_id', profile.department)
+            .single();
+        
+        // Load staff posts
+        const { data: staffPosts } = await supabaseClient
+            .from('posts')
+            .select('*')
+            .eq('author_id', profile.user_id)
+            .eq('author_type', 'staff')
+            .eq('is_published', true)
+            .order('created_at', { ascending: false });
+        
+        document.getElementById('profileContent').innerHTML = `
+            <div class="profile-header">
+                <div class="profile-image">
+                    ${profile.profile_image ? 
+                        `<img src="${profile.profile_image}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                        '👤'}
+                </div>
+                <div class="profile-name">${profile.name}</div>
+                <div class="profile-designation">${profile.designation}</div>
+                <div style="margin-top: 10px; opacity: 0.8;">${dept?.dept_name || ''}</div>
+            </div>
+            
+            <div class="profile-details">
+                <div class="detail-item">
+                    <div class="detail-label">Experience</div>
+                    <div class="detail-value">${profile.experience} years</div>
+                </div>
+                
+                ${profile.research_papers ? `
+                    <div class="detail-item">
+                        <div class="detail-label">Research & Expertise</div>
+                        <div class="detail-value">${profile.research_papers}</div>
+                    </div>
+                ` : ''}
+                
+                ${profile.achievements ? `
+                    <div class="detail-item">
+                        <div class="detail-label">Achievements</div>
+                        <div class="detail-value">${profile.achievements}</div>
+                    </div>
+                ` : ''}
+                
+                ${profile.custom_fields && Object.keys(profile.custom_fields).length > 0 ? 
+                    Object.entries(profile.custom_fields).map(([key, value]) => `
+                        <div class="detail-item">
+                            <div class="detail-label">${key}</div>
+                            <div class="detail-value">${value}</div>
+                        </div>
+                    `).join('') : ''
+                }
+            </div>
+            
+            ${staffPosts && staffPosts.length > 0 ? `
+                <div class="posts-section" style="margin-top: 30px;">
+                    <h3 style="color: #8B5CF6; margin-bottom: 20px; font-size: 1.3em;">Recent Posts</h3>
+                    <div class="posts-grid">
+                        ${staffPosts.map(post => `
+                            <div class="post-card" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px;">
+                                <img src="${post.image_url}" alt="Post" style="width: 100%; height: 200px; object-fit: cover;">
+                                ${post.caption ? `<div style="padding: 15px; color: #333; line-height: 1.5;">${post.caption}</div>` : ''}
+                                <div style="padding: 0 15px 15px; color: #666; font-size: 0.9em;">
+                                    ${new Date(post.created_at).toLocaleDateString()}
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        `;
+        
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        document.getElementById('profileContent').innerHTML = '<div class="loading">Error loading profile</div>';
+    }
+}
+
+
+        loadStaffProfile();
+    </script>
+</body>
+</html>
