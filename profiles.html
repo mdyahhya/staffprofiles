@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Department Staff - VVPIET</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .dept-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .dept-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+            color: white;
+            border-radius: 15px;
+        }
+        
+        .dept-title {
+            font-size: 2.2em;
+            margin-bottom: 5px;
+            font-weight: 700;
+        }
+        
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #8B5CF6;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+        
+        .back-btn:hover {
+            background: #7C3AED;
+            transform: scale(1.05);
+        }
+        
+        .section-title {
+            font-size: 1.5em;
+            color: #8B5CF6;
+            margin: 30px 0 20px;
+            font-weight: 600;
+            border-bottom: 2px solid #8B5CF6;
+            padding-bottom: 10px;
+        }
+        
+        .staff-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .staff-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .staff-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.2);
+            border-color: #8B5CF6;
+        }
+        
+        .staff-card.no-click {
+            cursor: default;
+            opacity: 0.7;
+        }
+        
+        .staff-card.no-click:hover {
+            transform: none;
+            border-color: #e0e0e0;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .staff-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            border: 4px solid #f0f0f0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3em;
+            color: #8B5CF6;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .staff-card:hover .staff-img {
+            border-color: #8B5CF6;
+            transform: scale(1.1);
+        }
+        
+        .staff-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .staff-designation {
+            font-size: 1em;
+            color: #8B5CF6;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .staff-experience {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .loading-message {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+            color: #8B5CF6;
+        }
+        
+        .error-card .staff-img {
+            color: #FF6B6B;
+        }
+        
+        @media (max-width: 768px) {
+            .dept-container {
+                padding: 15px;
+            }
+            
+            .back-btn {
+                position: static;
+                margin-bottom: 20px;
+                width: 100%;
+            }
+            
+            .staff-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+   <button class="back-btn" onclick="goBack()">← Back</button>
+    
+    <div class="dept-container">
+        <div class="dept-header">
+            <div class="dept-title" id="deptTitle">Loading...</div>
+        </div>
+        
+        <!-- HOD Section -->
+        <div class="section-title">Head of Department</div>
+        <div class="staff-grid" id="hodContainer">
+            <div class="loading-message">Loading HOD...</div>
+        </div>
+        
+        <!-- Staff Section -->
+        <div class="section-title">Faculty Members</div>
+        <div class="staff-grid" id="staffContainer">
+            <div class="loading-message">Loading staff members...</div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseClient = supabase.createClient('https://nsnacwwcrszpjmanskti.supabase.co', 
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4');
+        
+        // Department mapping to match your database
+        const departmentMap = {
+            'CSE': { id: 1, name: 'Computer Science & Engineering' },
+            'AIDS': { id: 2, name: 'Artificial Intelligence & Data Science' },
+            'ENTC': { id: 3, name: 'Electronics & Telecommunications' },
+            'EE': { id: 4, name: 'Electrical Engineering' },
+            'ME': { id: 5, name: 'Mechanical Engineering' },
+            'CE': { id: 6, name: 'Civil Engineering' },
+            'BCA': { id: 7, name: 'Bachelor of Computer Applications' },
+            'MCA': { id: 8, name: 'Master of Computer Applications' }
+        };
+        
+        // Navigate to profile view
+        // REPLACE the showProfileView function
+function showProfileView(profileId) {
+    window.location.href = `staff-profile.html?id=${profileId}`;
+}
+
+        
+        // Your exact loadDepartmentStaff function
+        async function loadDepartmentStaff(dept, retryCount = 0) {
+            console.log(`Loading staff for department: ${dept}, retry count: ${retryCount}`);
+            
+            // Show loading state
+            const staffContainer = document.getElementById('staffContainer');
+            const hodContainer = document.getElementById('hodContainer');
+            
+            if (staffContainer) {
+                staffContainer.innerHTML = '<div class="loading-message">Loading staff members...</div>';
+            }
+            if (hodContainer) {
+                hodContainer.innerHTML = '<div class="loading-message">Loading HOD...</div>';
+            }
+            
+            if (!supabaseClient) {
+                console.warn('No database connection, showing default message');
+                displayNoStaffMessage();
+                return;
+            }
+
+            try {
+                // Get department ID
+                const deptInfo = departmentMap[dept];
+                if (!deptInfo) {
+                    throw new Error(`Department ${dept} not found in department map`);
+                }
+
+                // Add small delay to prevent race conditions
+                await new Promise(resolve => setTimeout(resolve, 200));
+
+                // Fetch profiles with department information
+                const { data: profiles, error } = await supabaseClient
+                    .from('profiles')
+                    .select(`
+                        profile_id,
+                        name,
+                        designation,
+                        experience,
+                        research_papers,
+                        achievements,
+                        profile_image,
+                        custom_fields,
+                        department,
+                        is_published
+                    `)
+                    .eq('department', deptInfo.id)
+                    .eq('is_published', true)
+                    .order('designation', { ascending: true })
+                    .order('name', { ascending: true });
+
+                if (error) {
+                    console.error('Database query error:', error);
+                    throw error;
+                }
+
+                console.log(`Found ${profiles?.length || 0} profiles for department ${dept}`);
+
+                // Get department name for display
+                const { data: deptData, error: deptError } = await supabaseClient
+                    .from('departments')
+                    .select('dept_name, dept_short_name')
+                    .eq('dept_id', deptInfo.id)
+                    .single();
+
+                let departmentName = deptInfo.name; // fallback
+                if (!deptError && deptData) {
+                    departmentName = deptData.dept_name;
+                }
+
+                // Update page title
+                document.getElementById('deptTitle').textContent = departmentName;
+
+                // Process and display profiles
+                if (profiles && profiles.length > 0) {
+                    // Separate HOD and other staff
+                    const hodProfiles = profiles.filter(p => p.designation === 'HOD');
+                    const otherStaff = profiles.filter(p => p.designation !== 'HOD');
+
+                    // Display HOD
+                    displayHOD(hodProfiles, departmentName);
+                    
+                    // Display other staff members
+                    displayStaffMembers(otherStaff, departmentName);
+                    
+                } else {
+                    // No profiles found
+                    displayNoStaffMessage();
+                }
+
+            } catch (error) {
+                console.error('Error loading department staff:', error);
+                
+                // Retry mechanism
+                if (retryCount < 2) {
+                    console.log(`Retrying in 1 second... (attempt ${retryCount + 1})`);
+                    setTimeout(() => {
+                        loadDepartmentStaff(dept, retryCount + 1);
+                    }, 1000);
+                    return;
+                }
+                
+                // Max retries reached, show error message
+                displayErrorMessage(error.message);
+            }
+        }
+
+        // Helper function to display staff members
+        // REPLACE the staff card image part in both functions
+function displayStaffMembers(staffProfiles, departmentName) {
+    const staffContainer = document.getElementById('staffContainer');
+    if (!staffContainer) return;
+
+    if (staffProfiles.length > 0) {
+        staffContainer.innerHTML = staffProfiles.map(profile => `
+            <div class="staff-card" onclick="showProfileView('${profile.profile_id}')">
+                <div class="staff-img">${profile.profile_image ? 
+                    `<img src="${profile.profile_image}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                    '👤'}</div>
+                <div class="staff-info">
+                    <div class="staff-name">${profile.name}</div>
+                    <div class="staff-designation">${profile.designation}</div>
+                    <div class="staff-experience">${profile.experience} years experience</div>
+                </div>
+            </div>
+        `).join('');
+    } else {
+        staffContainer.innerHTML = `
+            <div class="staff-card no-click">
+                <div class="staff-img">👤</div>
+                <div class="staff-info">
+                    <div class="staff-name">No staff members yet</div>
+                    <div class="staff-designation">Be the first to create a profile!</div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// SAME UPDATE for displayHOD function
+function displayHOD(hodProfiles, departmentName) {
+    const hodContainer = document.getElementById('hodContainer');
+    if (!hodContainer) return;
+
+    if (hodProfiles.length > 0) {
+        const hod = hodProfiles[0];
+        hodContainer.innerHTML = `
+            <div class="staff-card" onclick="showProfileView('${hod.profile_id}')">
+                <div class="staff-img">${hod.profile_image ? 
+                    `<img src="${hod.profile_image}" alt="${hod.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                    '👤'}</div>
+                <div class="staff-info">
+                    <div class="staff-name">${hod.name}</div>
+                    <div class="staff-designation">${hod.designation}</div>
+                    <div class="staff-experience">${hod.experience} years experience</div>
+                </div>
+            </div>
+        `;
+    } else {
+        hodContainer.innerHTML = `
+            <div class="staff-card no-click">
+                <div class="staff-img">👤</div>
+                <div class="staff-info">
+                    <div class="staff-name">Head of Department</div>
+                    <div class="staff-designation">Profile not created yet</div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+
+        // ADD this function to profiles.html
+// REPLACE goBack function and event listener
+function goBack() {
+    // Clear history and go to specific page
+    window.history.replaceState(null, null, window.location.href);
+    
+    const params = new URLSearchParams(window.location.search);
+    const isStaffProfile = window.location.pathname.includes('staff-profile.html');
+    const isProfilesPage = window.location.pathname.includes('profiles.html');
+    
+    if (isStaffProfile) {
+        // From staff profile, go back to department profiles page
+        const dept = sessionStorage.getItem('currentDept');
+        if (dept) {
+            window.location.replace(`profiles.html?dept=${dept}`);
+        } else {
+            window.location.replace('index.html');
+        }
+    } else if (isProfilesPage) {
+        // From profiles page, go back to home
+        window.location.replace('index.html');
+    } else {
+        // Default: go to home
+        window.location.replace('index.html');
+    }
+}
+
+// REMOVE the popstate event listener completely
+// Don't add any popstate event listener
+
+
+// ADD this event listener to profiles.html
+window.addEventListener('popstate', function(event) {
+    goBack();
+});
+
+
+        // Helper function to display no staff message
+        function displayNoStaffMessage() {
+            const staffContainer = document.getElementById('staffContainer');
+            const hodContainer = document.getElementById('hodContainer');
+            
+            if (hodContainer) {
+                hodContainer.innerHTML = `
+                    <div class="staff-card no-click">
+                        <div class="staff-img">👤</div>
+                        <div class="staff-info">
+                            <div class="staff-name">Head of Department</div>
+                            <div class="staff-designation">Profile not created yet</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            if (staffContainer) {
+                staffContainer.innerHTML = `
+                    <div class="staff-card no-click">
+                        <div class="staff-img">👤</div>
+                        <div class="staff-info">
+                            <div class="staff-name">Staff members</div>
+                            <div class="staff-designation">Register to create profiles</div>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Helper function to display error message
+        function displayErrorMessage(errorMessage) {
+            const staffContainer = document.getElementById('staffContainer');
+            const hodContainer = document.getElementById('hodContainer');
+            
+            const errorHtml = `
+                <div class="staff-card no-click error-card">
+                    <div class="staff-img">⚠️</div>
+                    <div class="staff-info">
+                        <div class="staff-name">Error loading profiles</div>
+                        <div class="staff-designation">Please try refreshing the page</div>
+                    </div>
+                </div>
+            `;
+            
+            if (hodContainer) hodContainer.innerHTML = errorHtml;
+            if (staffContainer) staffContainer.innerHTML = errorHtml;
+        }
+
+        // Load TPO profile
+        async function loadTPOProfile() {
+            try {
+                document.getElementById('deptTitle').textContent = 'Training & Placement Officer';
+                
+                // Hide HOD section for TPO
+                const hodSection = document.querySelector('.section-title');
+                const hodContainer = document.getElementById('hodContainer');
+                if (hodSection) hodSection.style.display = 'none';
+                if (hodContainer) hodContainer.style.display = 'none';
+                
+                // Update staff section title
+                document.querySelector('.section-title:last-of-type').textContent = 'TPO Profile';
+                
+                const { data: tpo, error } = await supabaseClient
+                    .from('tpo')
+                    .select('*')
+                    .eq('is_active', true)
+                    .single();
+                
+                if (error || !tpo) {
+                    document.getElementById('staffContainer').innerHTML = `
+                        <div class="staff-card no-click">
+                            <div class="staff-img">👤</div>
+                            <div class="staff-info">
+                                <div class="staff-name">TPO Profile</div>
+                                <div class="staff-designation">Not available yet</div>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                document.getElementById('staffContainer').innerHTML = `
+                    <div class="staff-card" onclick="showTPOProfile('${tpo.tpo_id}')">
+                        <div class="staff-img">${tpo.profile_image ? 
+                            `<img src="${tpo.profile_image}" alt="${tpo.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
+                            '👤'}</div>
+                        <div class="staff-info">
+                            <div class="staff-name">${tpo.name}</div>
+                            <div class="staff-designation">${tpo.designation}</div>
+                            <div class="staff-experience">Training & Placement Officer</div>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error loading TPO:', error);
+                displayErrorMessage('Failed to load TPO profile');
+            }
+        }
+        
+        // REPLACE the showTPOProfile function  
+function showTPOProfile(tpoId) {
+    window.location.href = `staff-profile.html?tpo=${tpoId}`;
+}
+
+
+        // Initialize page based on URL parameters
+        function initializePage() {
+            const params = new URLSearchParams(window.location.search);
+            const dept = params.get('dept');
+            const tpo = params.get('tpo');
+            
+            if (tpo) {
+                loadTPOProfile();
+            } else if (dept) {
+                loadDepartmentStaff(dept);
+            } else {
+                // Redirect back to index if no valid parameters
+                location.href = 'staffprof.html';
+            }
+        }
+        
+        // Start loading when page loads
+        initializePage();
+    </script>
+</body>
+</html>
