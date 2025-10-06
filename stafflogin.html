@@ -1236,8 +1236,23 @@ document.getElementById('profileForm').onsubmit = async (e) => {
 
         
         function updateAuthText() {
-            document.getElementById('authText').textContent = currentUser ? 'Logout' : 'Login';
-        }
+    const authText = document.getElementById('authText');
+    const loginIcon = document.getElementById('loginIcon');
+    const logoutIcon = document.getElementById('logoutIcon');
+    
+    if (currentUser) {
+        // User is logged in - show logout
+        if (authText) authText.textContent = 'Logout';
+        if (loginIcon) loginIcon.style.display = 'none';
+        if (logoutIcon) logoutIcon.style.display = 'block';
+    } else {
+        // User is not logged in - show login
+        if (authText) authText.textContent = 'Login';
+        if (loginIcon) loginIcon.style.display = 'block';
+        if (logoutIcon) logoutIcon.style.display = 'none';
+    }
+}
+
         
         // Initialize
         const params = new URLSearchParams(location.search);
