@@ -8,236 +8,319 @@
     <meta name="theme-color" content="#8B5CF6">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #fff; color: #000; padding-bottom: 80px;
-        }
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-        .header { text-align: center; padding: 30px 0; border-bottom: 2px solid #8B5CF6; position: relative; }
-        .header h1 { font-size: 28px; color: #8B5CF6; margin-bottom: 10px; }
-        .developer-btn { position: absolute; top: 20px; right: 20px; background: #8B5CF6; color: #fff; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 14px; }
-        .developer-btn:hover { opacity: 0.9; }
-        .logo-section { text-align: center; margin: 30px 0; }
-        .logo-section img { width: 120px; height: auto; }
-        .logo-section p { margin-top: 15px; color: #666; font-size: 16px; }
-        
-        .leadership { margin: 40px 0; }
-        .leadership h2 { text-align: center; color: #8B5CF6; margin-bottom: 30px; font-size: 24px; }
-        .leadership-grid { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
-        .leader-card { text-align: center; width: 200px; }
-        .leader-card img { width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #8B5CF6; }
-        .leader-card .name { font-weight: 600; margin-top: 15px; font-size: 16px; }
-        .leader-card .position { color: #666; font-size: 14px; margin-top: 5px; }
-        
-        .dept-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 40px 0; }
-        .dept-btn { 
-            background: #fff; border: 2px solid #8B5CF6; padding: 30px 20px; 
-            text-align: center; cursor: pointer; border-radius: 10px; transition: all 0.3s;
-        }
-        .dept-btn:hover { background: #8B5CF6; color: #fff; transform: translateY(-5px); }
-        .dept-btn small { display: block; margin-top: 8px; font-size: 13px; opacity: 0.8; }
-        
-        .taskbar { 
-            position: fixed; bottom: 0; left: 0; right: 0; background: #fff; 
-            border-top: 2px solid #8B5CF6; display: flex; justify-content: space-around; padding: 10px 0;
-        }
-        .taskbar button { 
-            background: none; border: none; cursor: pointer; padding: 8px 20px; 
-            font-size: 13px; color: #000; transition: color 0.3s;
-        }
-        .taskbar button:hover { color: #8B5CF6; }
-        .taskbar .icon { font-size: 20px; margin-bottom: 5px; }
-        
-        .pwa-popup { 
-            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            z-index: 1000; max-width: 400px; border: 2px solid #8B5CF6;
-        }
-        .pwa-popup.show { display: block; }
-        .pwa-popup h3 { color: #8B5CF6; margin-bottom: 15px; }
-        .pwa-popup p { margin-bottom: 20px; color: #666; }
-        .pwa-buttons { display: flex; gap: 10px; }
-        .pwa-buttons button { 
-            flex: 1; padding: 12px; border: 2px solid #8B5CF6; background: #fff; 
-            cursor: pointer; border-radius: 8px; font-weight: 600;
-        }
-        .pwa-buttons button.install { background: #8B5CF6; color: #fff; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
-        .modal.show { display: flex; }
-        .modal-content { background: #fff; padding: 40px; border-radius: 15px; max-width: 500px; width: 90%; border: 2px solid #8B5CF6; position: relative; text-align: center; }
-        .modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 28px; cursor: pointer; color: #8B5CF6; }
-        .developer-img { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 3px solid #8B5CF6; overflow: hidden; }
-        .developer-img img { width: 100%; height: 100%; object-fit: cover; }
-        .developer-name { font-size: 24px; font-weight: 600; color: #8B5CF6; margin-bottom: 8px; }
-        .developer-title { color: #666; font-size: 16px; margin-bottom: 15px; }
-        .developer-desc { line-height: 1.6; margin-bottom: 20px; color: #333; }
-        .contact-icons { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
-        .contact-icons a { display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; background: #8B5CF6; color: #fff; text-decoration: none; font-size: 20px; transition: transform 0.3s; }
-        .contact-icons a:hover { transform: scale(1.1); }
-        
-        .tpc-section { 
-            margin: 40px 0; padding: 30px; background: #f9f9f9; 
-            border-radius: 10px; border: 2px solid #8B5CF6;
-        }
-        .tpc-section h2 { text-align: center; color: #8B5CF6; margin-bottom: 20px; }
+body { 
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #fff; color: #000; padding-bottom: 80px;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+.header { text-align: center; padding: 30px 0; border-bottom: 2px solid #8B5CF6; position: relative; }
+.header h1 { font-size: 28px; color: #8B5CF6; margin-bottom: 10px; }
+.developer-btn { 
+    position: absolute; 
+    top: 10px; 
+    right: 10px; 
+    background: #8B5CF6; 
+    color: #fff; 
+    border: none; 
+    padding: 6px 12px; 
+    border-radius: 6px; 
+    cursor: pointer; 
+    font-size: 12px;
+    z-index: 100;
+}
+.developer-btn:hover { opacity: 0.9; }
+.logo-section { text-align: center; margin: 30px 0; }
+.logo-section img { width: 120px; height: auto; }
+.logo-section p { margin-top: 15px; color: #666; font-size: 16px; }
 
-         /* Enhanced Developer Modal and Image Zoom */
-        .developer-img {
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
-        
-        .developer-img:hover {
-            transform: scale(1.05);
-        }
-        
-        .developer-img img {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 4px solid #8B5CF6;
-            transition: all 0.3s ease;
-        }
-        
-        /* Image Zoom Modal */
-        .image-zoom-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .image-zoom-modal.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .image-zoom-content {
-            position: relative;
-            max-width: 90%;
-            max-height: 90%;
-            animation: zoomIn 0.3s ease;
-        }
-        
-        .image-zoom-content img {
-            width: auto;
-            height: auto;
-            max-width: 500px;
-            max-height: 500px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
-        }
-        
-        .image-zoom-close {
-            position: absolute;
-            top: -15px;
-            right: -15px;
-            background: #8B5CF6;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
-        }
-        
-        .image-zoom-close:hover {
-            background: #7C3AED;
-            transform: scale(1.1);
-        }
-        
-        @keyframes zoomIn {
-            from {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-        
-        /* Enhanced modal styling */
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
-        }
-        
-        .modal.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 30px;
-            max-width: 500px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-            position: relative;
-            transform: translateY(50px);
-            transition: transform 0.3s ease;
-            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
-        }
-        
-        .modal.show .modal-content {
-            transform: translateY(0);
-        }
-        
-        .modal-close {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: #f0f0f0;
-            border: none;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            font-size: 18px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-            color: #666;
-        }
-        
-        .modal-close:hover {
-            background: #e0e0e0;
-            color: #333;
-            transform: scale(1.1);
-        }
+.leadership { margin: 40px 0; }
+.leadership h2 { text-align: center; color: #8B5CF6; margin-bottom: 30px; font-size: 24px; }
+.leadership-grid { 
+    display: flex; 
+    justify-content: center; 
+    gap: 20px; 
+    flex-wrap: wrap;
+    align-items: flex-start;
+}
+.leader-card { 
+    text-align: center; 
+    width: 140px;
+    flex-shrink: 0;
+}
+.leader-card img { 
+    width: 80px; 
+    height: 80px; 
+    border-radius: 50%; 
+    object-fit: cover; 
+    border: 2px solid #8B5CF6; 
+}
+.leader-card .name { font-weight: 600; margin-top: 10px; font-size: 14px; }
+.leader-card .position { color: #666; font-size: 12px; margin-top: 3px; }
+
+.dept-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 12px; 
+    margin: 40px 0;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+.dept-btn { 
+    background: #fff; 
+    border: 2px solid #8B5CF6; 
+    padding: 15px 10px; 
+    text-align: center; 
+    cursor: pointer; 
+    border-radius: 8px; 
+    transition: all 0.3s;
+    font-size: 13px;
+}
+.dept-btn:hover { background: #8B5CF6; color: #fff; transform: translateY(-3px); }
+.dept-btn small { display: block; margin-top: 5px; font-size: 11px; opacity: 0.8; }
+
+/* Make last row span correctly for 2 items */
+.dept-btn:nth-last-child(-n+2):nth-child(3n+1) {
+    grid-column: span 1;
+}
+
+.taskbar { 
+    position: fixed; bottom: 0; left: 0; right: 0; background: #fff; 
+    border-top: 2px solid #8B5CF6; display: flex; justify-content: space-around; padding: 10px 0;
+}
+.taskbar button { 
+    background: none; border: none; cursor: pointer; padding: 8px 20px; 
+    font-size: 13px; color: #000; transition: color 0.3s;
+}
+.taskbar button:hover { color: #8B5CF6; }
+.taskbar .icon { font-size: 20px; margin-bottom: 5px; }
+
+.pwa-popup { 
+    display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: #fff; padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    z-index: 1000; max-width: 400px; border: 2px solid #8B5CF6;
+}
+.pwa-popup.show { display: block; }
+.pwa-popup h3 { color: #8B5CF6; margin-bottom: 15px; }
+.pwa-popup p { margin-bottom: 20px; color: #666; }
+.pwa-buttons { display: flex; gap: 10px; }
+.pwa-buttons button { 
+    flex: 1; padding: 12px; border: 2px solid #8B5CF6; background: #fff; 
+    cursor: pointer; border-radius: 8px; font-weight: 600;
+}
+.pwa-buttons button.install { background: #8B5CF6; color: #fff; }
+
+.modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+.modal.show { display: flex; }
+.modal-content { background: #fff; padding: 40px; border-radius: 15px; max-width: 500px; width: 90%; border: 2px solid #8B5CF6; position: relative; text-align: center; }
+.modal-close { position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 28px; cursor: pointer; color: #8B5CF6; }
+.developer-img { width: 120px; height: 120px; border-radius: 50%; margin: 0 auto 20px; border: 3px solid #8B5CF6; overflow: hidden; }
+.developer-img img { width: 100%; height: 100%; object-fit: cover; }
+.developer-name { font-size: 24px; font-weight: 600; color: #8B5CF6; margin-bottom: 8px; }
+.developer-title { color: #666; font-size: 16px; margin-bottom: 15px; }
+.developer-desc { line-height: 1.6; margin-bottom: 20px; color: #333; }
+.contact-icons { display: flex; justify-content: center; gap: 15px; margin-top: 20px; }
+.contact-icons a { display: inline-flex; align-items: center; justify-content: center; width: 45px; height: 45px; border-radius: 50%; background: #8B5CF6; color: #fff; text-decoration: none; font-size: 20px; transition: transform 0.3s; }
+.contact-icons a:hover { transform: scale(1.1); }
+
+.tpc-section { 
+    margin: 40px auto; 
+    padding: 20px; 
+    background: #f9f9f9; 
+    border-radius: 10px; 
+    border: 2px solid #8B5CF6;
+    max-width: 600px;
+}
+.tpc-section h2 { text-align: center; color: #8B5CF6; margin-bottom: 15px; font-size: 20px; }
+
+/* Enhanced Developer Modal and Image Zoom */
+.developer-img {
+    position: relative;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.developer-img:hover {
+    transform: scale(1.05);
+}
+
+.developer-img img {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #8B5CF6;
+    transition: all 0.3s ease;
+}
+
+/* Image Zoom Modal */
+.image-zoom-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.image-zoom-modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.image-zoom-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+    animation: zoomIn 0.3s ease;
+}
+
+.image-zoom-content img {
+    width: auto;
+    height: auto;
+    max-width: 500px;
+    max-height: 500px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(139, 92, 246, 0.3);
+}
+
+.image-zoom-close {
+    position: absolute;
+    top: -15px;
+    right: -15px;
+    background: #8B5CF6;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4);
+}
+
+.image-zoom-close:hover {
+    background: #7C3AED;
+    transform: scale(1.1);
+}
+
+@keyframes zoomIn {
+    from {
+        transform: scale(0.5);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Enhanced modal styling */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    transform: translateY(50px);
+    transition: transform 0.3s ease;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    color: #666;
+}
+
+.modal-close:hover {
+    background: #e0e0e0;
+    color: #333;
+    transform: scale(1.1);
+}
+
+/* Mobile specific adjustments */
+@media (max-width: 480px) {
+    .dept-grid {
+        gap: 10px;
+        max-width: 100%;
+        padding: 0 10px;
+    }
+    
+    .dept-btn {
+        padding: 12px 8px;
+        font-size: 12px;
+    }
+    
+    .leader-card {
+        width: 110px;
+    }
+    
+    .leader-card img {
+        width: 70px;
+        height: 70px;
+    }
+    
+    .leadership-grid {
+        gap: 15px;
+    }
+    
+    .tpc-section {
+        margin: 30px 10px;
+        padding: 15px;
+    }
+}
     </style>
 </head>
 <body>
