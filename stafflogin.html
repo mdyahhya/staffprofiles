@@ -378,19 +378,36 @@
 
     
     <div class="taskbar">
-        <button onclick="location.href='index.html'">
-            <div class="icon">🏠</div>
-            <span>Home</span>
-        </button>
-        <button onclick="handleProfile()">
-            <div class="icon">👤</div>
-            <span>Profile</span>
-        </button>
-        <button onclick="handleAuth()">
-            <div class="icon">🚪</div>
-            <span id="authText">Login</span>
-        </button>
-    </div>
+    <button onclick="location.href='index.html'">
+        <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                <polyline points="9,22 9,12 15,12 15,22"/>
+            </svg>
+        </div>
+        <span>Home</span>
+    </button>
+    <button onclick="handleProfile()">
+        <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="12" cy="7" r="4"/>
+            </svg>
+        </div>
+        <span>Profile<br>(For Staff Only)</span>
+    </button>
+    <button onclick="handleAuth()">
+        <div class="icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16,17 21,12 16,7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+            </svg>
+        </div>
+        <span id="authText">Login</span>
+    </button>
+</div>
+
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
