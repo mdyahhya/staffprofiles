@@ -170,7 +170,514 @@
     }
 }
 
+
+
+/* ADD these new styles */
+.dynamic-row {
+    border: 2px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #f9f9f9;
+}
+
+.row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.row-header h4 {
+    color: #8B5CF6;
+    margin: 0;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.form-row .form-group {
+    margin-bottom: 0;
+}
+
+.add-btn {
+    background: #8B5CF6;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-bottom: 20px;
+    font-weight: 600;
+}
+
+.add-btn:hover {
+    background: #7C3AED;
+}
+
+.remove-btn {
+    background: #EF4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-btn:hover {
+    background: #DC2626;
+}
+
+.custom-project-field {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background: white;
+}
+
+.custom-project-field .form-row {
+    grid-template-columns: 1fr 2fr auto;
+    align-items: start;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
     
+    .custom-project-field .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Page visibility control */
+.page {
+    display: none;
+}
+
+.page.active {
+    display: block;
+}
+
+/* Ensure container is visible */
+.container {
+    min-height: calc(100vh - 70px);
+    padding-bottom: 80px;
+}
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal.show {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    max-width: 500px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 30px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+}
+
+.modal-close:hover {
+    color: #000;
+}
+
+/* Dynamic row styles */
+.dynamic-row {
+    border: 2px solid #8B5CF6;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #f9f9f9;
+}
+
+.row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.row-header h4 {
+    color: #8B5CF6;
+    margin: 0;
+}
+
+.remove-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    font-size: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.remove-btn:hover {
+    background: #dc2626;
+}
+
+.add-btn {
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    margin-bottom: 15px;
+}
+
+.add-btn:hover {
+    background: #059669;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Custom field styles */
+.custom-field {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.custom-field input {
+    flex: 1;
+}
+
+.custom-field button {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0 15px;
+    cursor: pointer;
+}
+
+.custom-field button:hover {
+    background: #dc2626;
+}
+
+.custom-project-field {
+    border: 1px solid #ddd;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+    background: white;
+}
+
+/* Post card styles */
+.post-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.post-image-container {
+    width: 100%;
+    height: 200px;
+    overflow: hidden;
+}
+
+.post-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.post-caption {
+    padding: 15px;
+    color: #333;
+}
+
+.post-actions {
+    display: flex;
+    gap: 10px;
+    padding: 0 15px 15px;
+}
+
+.edit-btn, .delete-btn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.edit-btn {
+    background: #3b82f6;
+    color: white;
+}
+
+.edit-btn:hover {
+    background: #2563eb;
+}
+
+.delete-btn {
+    background: #ef4444;
+    color: white;
+}
+
+.delete-btn:hover {
+    background: #dc2626;
+}
+
+.post-date {
+    padding: 0 15px 15px;
+    font-size: 12px;
+    color: #666;
+}
+
+/* Action buttons */
+.action-btns {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    flex-wrap: wrap;
+}
+
+.action-btn {
+    background: #8B5CF6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.action-btn:hover {
+    background: #7c3aed;
+}
+
+.action-btn.delete-btn {
+    background: #ef4444;
+}
+
+.action-btn.delete-btn:hover {
+    background: #dc2626;
+}
+
+/* Profile view styles */
+.profile-view {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.profile-header .name {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 15px 0 5px;
+}
+
+.profile-header .dept {
+    color: #666;
+    font-size: 16px;
+}
+
+.profile-field {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 4px solid #8B5CF6;
+}
+
+.profile-field-label {
+    font-weight: bold;
+    color: #8B5CF6;
+    margin-bottom: 5px;
+}
+
+.profile-field-value {
+    color: #333;
+    line-height: 1.6;
+}
+
+.posts-section {
+    margin-top: 40px;
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+/* Form styles */
+.form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #333;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #8B5CF6;
+}
+
+.form-btn {
+    width: 100%;
+    padding: 12px;
+    background: #8B5CF6;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.form-btn:hover {
+    background: #7c3aed;
+}
+
+/* Back button */
+.back-btn {
+    background: #6b7280;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 16px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+.back-btn:hover {
+    background: #4b5563;
+}
+
+/* Taskbar */
+.taskbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0;
+    z-index: 100;
+}
+
+.taskbar button {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    color: #666;
+    padding: 5px 15px;
+}
+
+.taskbar button:hover {
+    color: #8B5CF6;
+}
+
+.taskbar .icon {
+    width: 24px;
+    height: 24px;
+}
+
+.taskbar span {
+    font-size: 12px;
+}
+    
+
+
+
+
     </style>
 </head>
 <body>
@@ -260,10 +767,10 @@
                     <div class="profile-header" id="myProfileHeader"></div>
                     <div class="profile-content" id="myProfileContent"></div>
                     <div class="action-btns">
-                        <button class="action-btn" onclick="editProfile()">✏️ Edit</button>
-                        <button class="action-btn" onclick="downloadPDF()">📄 PDF</button>
-                        <button class="action-btn" onclick="downloadImage()">🖼️ Image</button>
-                        <button class="action-btn delete-btn" onclick="deleteProfile()">🗑️ Delete</button>
+                        <button class="action-btn" onclick="editProfile()">Edit Profile ✏️</button>
+                        <button class="action-btn" onclick="downloadPDF()">Download as PDF 📄</button>
+                        <button class="action-btn" onclick="downloadImage()">Download as Image 🖼️</button>
+                        <button class="action-btn delete-btn" onclick="deleteProfile()">Delete Profile 🗑️</button>
                     </div>
                     <div class="posts-section">
                         <h3 style="color:#8B5CF6;">My Posts</h3>
@@ -280,48 +787,144 @@
                 <button class="back-btn" onclick="showPage('myProfilePage')">← Back</button>
                 <h2 style="text-align:center;color:#8B5CF6;margin-bottom:30px;" id="profileFormTitle">Create Profile</h2>
                 <form id="profileForm">
-                    <div class="form-group">
-                        <label class="form-label">Full Name</label>
-                        <input type="text" class="form-input" id="profName" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Department</label>
-                        <select class="form-select" id="profDept" required></select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Designation</label>
-                        <select class="form-select" id="profDesig" required>
-                            <option value="">Select</option>
-                            <option value="HOD">Head of Department</option>
-                            <option value="Professor">Professor</option>
-                            <option value="Associate Professor">Associate Professor</option>
-                            <option value="Assistant Professor">Assistant Professor</option>
-                            <option value="Lecturer">Lecturer</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Experience (Years)</label>
-                        <input type="number" class="form-input" id="profExp" min="0" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Expertise</label>
-                        <textarea class="form-textarea" id="profResearch"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Achievements</label>
-                        <textarea class="form-textarea" id="profAchieve"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Custom Fields</label>
-                        <div id="customFields"></div>
-                        <button type="button" onclick="addCustomField()" style="margin-top:10px;padding:10px 20px;background:#8B5CF6;color:#fff;border:none;border-radius:5px;cursor:pointer;">+ Add Field</button>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Profile Image (Optional)</label>
-                        <input type="file" id="profImage" accept="image/*">
-                    </div>
-                    <button type="submit" class="form-btn">Save Profile</button>
-                </form>
+    <!-- Basic Information -->
+    <h3 style="color:#8B5CF6;margin-bottom:15px;">Basic Information</h3>
+    
+    <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input type="text" class="form-input" id="profName" required>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Date of Birth</label>
+        <input type="date" class="form-input" id="profDOB">
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Department</label>
+        <select class="form-select" id="profDept" required></select>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Designation</label>
+        <select class="form-select" id="profDesig" required>
+            <option value="">Select</option>
+            <option value="HOD">Head of Department</option>
+            <option value="Professor">Professor</option>
+            <option value="Associate Professor">Associate Professor</option>
+            <option value="Assistant Professor">Assistant Professor</option>
+            <option value="Lecturer">Lecturer</option>
+        </select>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Experience (Years)</label>
+        <input type="number" class="form-input" id="profExp" min="0" required>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Address</label>
+        <textarea class="form-textarea" id="profAddress" rows="3"></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Languages Known (comma separated)</label>
+        <input type="text" class="form-input" id="profLanguages" placeholder="English, Hindi, Marathi">
+    </div>
+
+    <!-- Educational Qualifications -->
+    <h3 style="color:#8B5CF6;margin:30px 0 15px;">Educational Qualifications</h3>
+    <div id="educationSection">
+        <button type="button" onclick="addEducationRow()" class="add-btn">+ Add Education</button>
+        <div id="educationRows"></div>
+    </div>
+
+    <!-- Experience Profile -->
+    <h3 style="color:#8B5CF6;margin:30px 0 15px;">Experience Profile</h3>
+    <div id="experienceSection">
+        <button type="button" onclick="addExperienceRow()" class="add-btn">+ Add Experience</button>
+        <div id="experienceRows"></div>
+    </div>
+
+    <!-- Technical Competencies -->
+    <h3 style="color:#8B5CF6;margin:30px 0 15px;">Technical Core Competencies</h3>
+    
+    <div class="form-group">
+        <label class="form-label">Programming Languages</label>
+        <input type="text" class="form-input" id="techLanguages" placeholder="Java, Python, C++">
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Software & Tools</label>
+        <input type="text" class="form-input" id="techSoftware" placeholder="VS Code, Eclipse, MATLAB">
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Other Skills</label>
+        <input type="text" class="form-input" id="techOthers" placeholder="Machine Learning, Database Design">
+    </div>
+
+    <!-- BTech Project -->
+    <h3 style="color:#8B5CF6;margin:30px 0 15px;">BTech Project</h3>
+    <div id="btechSection">
+        <div class="form-group">
+            <label class="form-label">Project Title</label>
+            <input type="text" class="form-input" id="btechTitle">
+        </div>
+        <button type="button" onclick="addBtechField()" class="add-btn">+ Add Custom Field</button>
+        <div id="btechFields"></div>
+    </div>
+
+    <!-- MTech Project -->
+    <h3 style="color:#8B5CF6;margin:30px 0 15px;">MTech Project</h3>
+    <div id="mtechSection">
+        <div class="form-group">
+            <label class="form-label">Project Title</label>
+            <input type="text" class="form-input" id="mtechTitle">
+        </div>
+        <button type="button" onclick="addMtechField()" class="add-btn">+ Add Custom Field</button>
+        <div id="mtechFields"></div>
+    </div>
+
+    <!-- Achievements & Activities -->
+    <h3 style="color:#8B5CF6;margin:30px 0 15px;">Achievements & Activities</h3>
+    <div id="achievementSection">
+        <button type="button" onclick="addAchievementRow()" class="add-btn">+ Add Achievement</button>
+        <div id="achievementRows"></div>
+    </div>
+
+    <!-- Publications -->
+    <h3 style="color:#8B5CF6;margin:30px 0 15px;">Publications</h3>
+    <div id="publicationSection">
+        <button type="button" onclick="addPublicationRow()" class="add-btn">+ Add Publication</button>
+        <div id="publicationRows"></div>
+    </div>
+
+    <!-- Existing fields -->
+    <div class="form-group">
+        <label class="form-label">Research & Expertise</label>
+        <textarea class="form-textarea" id="profResearch"></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">General Achievements</label>
+        <textarea class="form-textarea" id="profAchieve"></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Custom Fields</label>
+        <div id="customFields"></div>
+        <button type="button" onclick="addCustomField()" style="margin-top:10px;padding:10px 20px;background:#8B5CF6;color:#fff;border:none;border-radius:5px;cursor:pointer;">+ Add Field</button>
+    </div>
+    
+    <div class="form-group">
+        <label class="form-label">Profile Image (Optional)</label>
+        <input type="file" id="profImage" accept="image/*">
+    </div>
+    
+    <button type="submit" class="form-btn">Save Profile</button>
+</form>
+
             </div>
         </div>
     </div>
@@ -423,254 +1026,902 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-        const sb = supabase.createClient('https://nsnacwwcrszpjmanskti.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4');
-        
-        let currentUser = JSON.parse(localStorage.getItem('user'));
-        let editingProfile = false;
-        let backHistory = [];
-        
-        function showPage(pageId) {
-            backHistory.push(document.querySelector('.page.active')?.id);
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-        }
-        
-        function goBack() {
-            const prev = backHistory.pop();
-            if (prev) showPage(prev);
-            else location.href = 'staffprof.html';
-        }
-        
-        async function loadDepartment() {
-            const params = new URLSearchParams(location.search);
-            const dept = params.get('dept');
-            if (!dept) return;
-            
-            const { data: depts } = await sb.from('departments').select('*');
-            const deptInfo = depts?.find(d => d.dept_short_name === dept);
-            if (!deptInfo) return;
-            
-            document.getElementById('deptName').textContent = deptInfo.dept_name;
-            
-            const { data: profiles } = await sb.from('profiles').select('*').eq('department', deptInfo.dept_id).eq('is_published', true);
-            
-            const hods = profiles?.filter(p => p.designation === 'HOD') || [];
-            const staff = profiles?.filter(p => p.designation !== 'HOD') || [];
-            
-            document.getElementById('hodGrid').innerHTML = hods.map(renderStaffCard).join('') || '<p style="text-align:center;color:#666;">No HOD assigned</p>';
-            document.getElementById('staffGrid').innerHTML = staff.map(renderStaffCard).join('') || '<p style="text-align:center;color:#666;">No staff members</p>';
-            
-            showPage('deptPage');
-        }
-        
-        function renderStaffCard(profile) {
-            const initials = profile.name.split(' ').map(n => n[0]).join('').substring(0, 2);
-            const img = profile.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect fill='%238B5CF6' width='80' height='80'/%3E%3Ctext x='50%25' y='50%25' font-size='32' fill='white' text-anchor='middle' dy='.3em'%3E${initials}%3C/text%3E%3C/svg%3E`;
-            return `<div class="staff-card" onclick="viewProfile('${profile.profile_id}')">
-                <img src="${img}" alt="${profile.name}">
-                <div class="name">${profile.name}</div>
-                <div class="designation">${profile.designation}</div>
-            </div>`;
-        }
-        
-        async function viewProfile(id) {
-            const { data } = await sb.from('profiles').select('*').eq('profile_id', id).single();
-            if (!data) return;
-            
-            const { data: dept } = await sb.from('departments').select('dept_name').eq('dept_id', data.department).single();
-            const { data: posts } = await sb.from('posts').select('*').eq('author_id', data.user_id).eq('author_type', 'staff').eq('is_published', true).order('created_at', { ascending: false });
-            
-          // FIND this part in loadMyProfile and REPLACE it
-const initials = data.name.split(' ').map(n => n[0]).join('').substring(0, 2);
-const img = data.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%238B5CF6' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' font-size='60' fill='white' text-anchor='middle' dy='.3em'%3E${initials}%3C/text%3E%3C/svg%3E`;
 
-document.getElementById('myProfileHeader').innerHTML = `
-    <img src="${img}" alt="${data.name}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #8B5CF6;">
-    <div class="name">${data.name}</div>
-    <div class="dept">${dept?.dept_name || ''}</div>
-`;
+const sb = supabase.createClient('https://nsnacwwcrszpjmanskti.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4');
 
-            
-            document.getElementById('viewProfileContent').innerHTML = `
-                <div class="profile-field"><div class="profile-field-label">Designation</div><div class="profile-field-value">${data.designation}</div></div>
-                <div class="profile-field"><div class="profile-field-label">Experience</div><div class="profile-field-value">${data.experience} years</div></div>
-                <div class="profile-field"><div class="profile-field-label">Expertise</div><div class="profile-field-value">${data.research_papers || 'N/A'}</div></div>
-                <div class="profile-field"><div class="profile-field-label">Achievements</div><div class="profile-field-value">${data.achievements || 'N/A'}</div></div>
-                ${data.custom_fields ? Object.entries(data.custom_fields).map(([k, v]) => `<div class="profile-field"><div class="profile-field-label">${k}</div><div class="profile-field-value">${v}</div></div>`).join('') : ''}
-            `;
-            
-            if (posts?.length) {
-                document.getElementById('viewProfilePosts').style.display = 'block';
-                document.getElementById('viewPostsGrid').innerHTML = posts.map(p => `
-                    <div class="post-card">
-                        <img src="${p.image_url}" alt="Post">
-                        <div class="caption">${p.caption || ''}</div>
-                    </div>
-                `).join('');
-            }
-            
-            showPage('viewProfilePage');
-        }
-        
-        async function viewTPO() {
-            const { data: tpo } = await sb.from('tpo').select('*').eq('is_active', true).single();
-            if (!tpo) return alert('TPO profile not found');
-            
-            const { data: posts } = await sb.from('posts').select('*').eq('author_type', 'tpo').eq('is_published', true).order('created_at', { ascending: false });
-            
-            const img = tpo.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%238B5CF6' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' font-size='60' fill='white' text-anchor='middle' dy='.3em'%3E${tpo.name[0]}%3C/text%3E%3C/svg%3E`;
-            
-            document.getElementById('viewProfileHeader').innerHTML = `
-                <img src="${img}" alt="${tpo.name}">
-                <div class="name">${tpo.name}</div>
-                <div class="dept">Training & Placement Officer</div>
-            `;
-            
-            document.getElementById('viewProfileContent').innerHTML = `
-                <div class="profile-field"><div class="profile-field-label">Designation</div><div class="profile-field-value">${tpo.designation}</div></div>
-                <div class="profile-field"><div class="profile-field-label">About</div><div class="profile-field-value">${tpo.description || 'N/A'}</div></div>
-                ${tpo.contact_email ? `<div class="profile-field"><div class="profile-field-label">Email</div><div class="profile-field-value">${tpo.contact_email}</div></div>` : ''}
-                ${tpo.contact_phone ? `<div class="profile-field"><div class="profile-field-label">Phone</div><div class="profile-field-value">${tpo.contact_phone}</div></div>` : ''}
-            `;
-            
-            if (posts?.length) {
-                document.getElementById('viewProfilePosts').style.display = 'block';
-                document.getElementById('viewPostsGrid').innerHTML = posts.map(p => `
-                    <div class="post-card">
-                        <img src="${p.image_url}" alt="Post">
-                        <div class="caption">${p.caption || ''}</div>
-                    </div>
-                `).join('');
-            }
-            
-            showPage('viewProfilePage');
-        }
-        
-        document.getElementById('loginForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPassword').value;
-            
-            const { data } = await sb.from('users').select('*').eq('email', email).eq('password', pass).single();
-            if (data) {
-                localStorage.setItem('user', JSON.stringify(data));
-                currentUser = data;
-                location.href = 'stafflogin.html';
-            } else {
-                alert('Invalid credentials');
-            }
-        };
-        
-        document.getElementById('registerForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('regEmail').value;
-    const pass = document.getElementById('regPassword').value;
-    const dept = document.getElementById('regDept').value;
-    const code = document.getElementById('regCode').value;
-    
-    const { data: deptData } = await sb.from('departments').select('*').eq('dept_id', dept).single();
-    if (!deptData || deptData.dept_code !== code) {
-        return alert('Invalid department code');
+let currentUser = JSON.parse(localStorage.getItem('user'));
+let editingProfile = false;
+let backHistory = [];
+let currentEditingPost = null;
+
+// ========================================
+// PAGE NAVIGATION FUNCTIONS
+// ========================================
+
+function showPage(pageId) {
+    const currentPage = document.querySelector('.page.active');
+    if (currentPage) {
+        backHistory.push(currentPage.id);
     }
     
-    const { error } = await sb.from('users').insert({ 
-        email, 
-        password: pass, 
-        department: dept, 
-        role: 'Staff' // Changed from 'staff' to 'Staff'
-    });
-    if (error) return alert('Registration failed: ' + error.message);
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const page = document.getElementById(pageId);
+    if (page) {
+        page.classList.add('active');
+    } else {
+        console.error(`Page with id "${pageId}" not found.`);
+    }
+}
+
+function goBack() {
+    const prev = backHistory.pop();
+    if (prev) showPage(prev);
+    else location.href = 'index.html';
+}
+
+// ========================================
+// DYNAMIC FORM ROW FUNCTIONS (MUST BE DEFINED FIRST!)
+// ========================================
+
+function addEducationRow() {
+    const container = document.getElementById('educationRows');
+    const rowId = Date.now();
+    const div = document.createElement('div');
+    div.className = 'dynamic-row';
+    div.id = `education-${rowId}`;
+    div.innerHTML = `
+        <div class="row-header">
+            <h4>Education ${container.children.length + 1}</h4>
+            <button type="button" onclick="removeRow('education-${rowId}')" class="remove-btn">×</button>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Exam/Degree</label>
+                <input type="text" class="form-input" name="edu_exam" placeholder="B.Tech, M.Tech, PhD">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Board/University</label>
+                <input type="text" class="form-input" name="edu_board">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Marks %</label>
+                <input type="number" class="form-input" name="edu_marks" step="0.01" min="0" max="100">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Class Obtained</label>
+                <input type="text" class="form-input" name="edu_class" placeholder="First Class, Distinction">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Year of Passing</label>
+            <input type="number" class="form-input" name="edu_year" min="1950" max="2030">
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function addExperienceRow() {
+    const container = document.getElementById('experienceRows');
+    const rowId = Date.now();
+    const div = document.createElement('div');
+    div.className = 'dynamic-row';
+    div.id = `experience-${rowId}`;
+    div.innerHTML = `
+        <div class="row-header">
+            <h4>Experience ${container.children.length + 1}</h4>
+            <button type="button" onclick="removeRow('experience-${rowId}')" class="remove-btn">×</button>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Role/Position</label>
+                <input type="text" class="form-input" name="exp_role" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Organization</label>
+                <input type="text" class="form-input" name="exp_org" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-input" name="exp_start">
+            </div>
+            <div class="form-group">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-input" name="exp_end">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Duration</label>
+            <input type="text" class="form-input" name="exp_duration" placeholder="2 years 3 months">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Key Responsibilities</label>
+            <textarea class="form-textarea" name="exp_responsibilities" rows="3"></textarea>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function addBtechField() {
+    const container = document.getElementById('btechFields');
+    const fieldId = Date.now();
+    const div = document.createElement('div');
+    div.className = 'custom-project-field';
+    div.id = `btech-field-${fieldId}`;
+    div.innerHTML = `
+        <div class="form-row">
+            <div class="form-group">
+                <input type="text" class="form-input" name="btech_heading" placeholder="Field Name (e.g., Objective, Methodology)">
+            </div>
+            <div class="form-group">
+                <textarea class="form-textarea" name="btech_content" placeholder="Content/Answer" rows="3"></textarea>
+            </div>
+            <button type="button" onclick="removeRow('btech-field-${fieldId}')" class="remove-btn">×</button>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function addMtechField() {
+    const container = document.getElementById('mtechFields');
+    const fieldId = Date.now();
+    const div = document.createElement('div');
+    div.className = 'custom-project-field';
+    div.id = `mtech-field-${fieldId}`;
+    div.innerHTML = `
+        <div class="form-row">
+            <div class="form-group">
+                <input type="text" class="form-input" name="mtech_heading" placeholder="Field Name (e.g., Objective, Methodology)">
+            </div>
+            <div class="form-group">
+                <textarea class="form-textarea" name="mtech_content" placeholder="Content/Answer" rows="3"></textarea>
+            </div>
+            <button type="button" onclick="removeRow('mtech-field-${fieldId}')" class="remove-btn">×</button>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function addAchievementRow() {
+    const container = document.getElementById('achievementRows');
+    const rowId = Date.now();
+    const div = document.createElement('div');
+    div.className = 'dynamic-row';
+    div.id = `achievement-${rowId}`;
+    div.innerHTML = `
+        <div class="row-header">
+            <h4>Achievement ${container.children.length + 1}</h4>
+            <button type="button" onclick="removeRow('achievement-${rowId}')" class="remove-btn">×</button>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Category</label>
+                <select class="form-select" name="ach_category">
+                    <option value="achievement">Achievement</option>
+                    <option value="award">Award</option>
+                    <option value="certification">Certification</option>
+                    <option value="activity">Activity</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-input" name="ach_title" required>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Organization</label>
+                <input type="text" class="form-input" name="ach_org">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" class="form-input" name="ach_date">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" name="ach_desc" rows="3"></textarea>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function addPublicationRow() {
+    const container = document.getElementById('publicationRows');
+    const rowId = Date.now();
+    const div = document.createElement('div');
+    div.className = 'dynamic-row';
+    div.id = `publication-${rowId}`;
+    div.innerHTML = `
+        <div class="row-header">
+            <h4>Publication ${container.children.length + 1}</h4>
+            <button type="button" onclick="removeRow('publication-${rowId}')" class="remove-btn">×</button>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Type</label>
+                <select class="form-select" name="pub_type">
+                    <option value="journal">Journal Paper</option>
+                    <option value="conference">Conference Paper</option>
+                    <option value="book">Book/Chapter</option>
+                    <option value="patent">Patent</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Publication Date</label>
+                <input type="date" class="form-input" name="pub_date">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Title</label>
+            <input type="text" class="form-input" name="pub_title" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Authors</label>
+            <input type="text" class="form-input" name="pub_authors" placeholder="Author1, Author2, Author3">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Journal/Conference Name</label>
+            <input type="text" class="form-input" name="pub_journal">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Volume</label>
+                <input type="text" class="form-input" name="pub_volume">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Issue</label>
+                <input type="text" class="form-input" name="pub_issue">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Pages</label>
+                <input type="text" class="form-input" name="pub_pages">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">DOI</label>
+            <input type="text" class="form-input" name="pub_doi">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Abstract</label>
+            <textarea class="form-textarea" name="pub_abstract" rows="4"></textarea>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function removeRow(rowId) {
+    const row = document.getElementById(rowId);
+    if (row) {
+        row.remove();
+    }
+}
+
+function addCustomField() {
+    const div = document.createElement('div');
+    div.className = 'custom-field';
+    div.innerHTML = `<input type="text" placeholder="Field Name" class="form-input"><input type="text" placeholder="Field Value" class="form-input"><button type="button" onclick="this.parentElement.remove()">✕</button>`;
+    document.getElementById('customFields').appendChild(div);
+}
+
+// ========================================
+// AUTHENTICATION FUNCTIONS
+// ========================================
+
+function handleAuth() {
+    if (currentUser) {
+        if (confirm('Logout?')) {
+            localStorage.removeItem('user');
+            location.reload();
+        }
+    } else {
+        showPage('loginPage');
+    }
+}
+
+function handleProfile() {
+    if (!currentUser) return showPage('loginPage');
+    showPage('myProfilePage');
+    loadMyProfile();
+}
+
+function updateAuthText() {
+    const authText = document.getElementById('authText');
+    const loginIcon = document.getElementById('loginIcon');
+    const logoutIcon = document.getElementById('logoutIcon');
     
-    alert('Registration successful! Please login.');
-    showPage('loginPage');
-};
+    if (currentUser) {
+        if (authText) authText.textContent = 'Logout';
+        if (loginIcon) loginIcon.style.display = 'none';
+        if (logoutIcon) logoutIcon.style.display = 'block';
+    } else {
+        if (authText) authText.textContent = 'Login';
+        if (loginIcon) loginIcon.style.display = 'block';
+        if (logoutIcon) logoutIcon.style.display = 'none';
+    }
+}
 
+// ========================================
+// DEPARTMENT LOADING
+// ========================================
+
+async function loadDepartments() {
+    const { data } = await sb.from('departments').select('*').order('dept_name');
+    const html = '<option value="">Select Department</option>' + (data?.map(d => `<option value="${d.dept_id}">${d.dept_name}</option>`).join('') || '');
+    document.querySelectorAll('#regDept, #profDept').forEach(el => el.innerHTML = html);
+}
+
+// ========================================
+// PROFILE FUNCTIONS
+// ========================================
+
+async function loadMyProfile() {
+    try {
+        const { data, error } = await sb
+            .from('profiles')
+            .select('*')
+            .eq('user_id', currentUser.user_id)
+            .single();
         
-        async function loadDepartments() {
-            const { data } = await sb.from('departments').select('*').order('dept_name');
-            const html = '<option value="">Select Department</option>' + (data?.map(d => `<option value="${d.dept_id}">${d.dept_name}</option>`).join('') || '');
-            document.querySelectorAll('#regDept, #profDept').forEach(el => el.innerHTML = html);
+        if (error && error.code !== 'PGRST116') {
+            console.error('Error loading profile:', error);
         }
         
-        function handleAuth() {
-            if (currentUser) {
-                if (confirm('Logout?')) {
-                    localStorage.removeItem('user');
-                    location.reload();
+        if (!data) {
+            document.getElementById('noProfile').style.display = 'block';
+            document.getElementById('hasProfile').style.display = 'none';
+            return;
+        }
+        
+        document.getElementById('noProfile').style.display = 'none';
+        document.getElementById('hasProfile').style.display = 'block';
+        
+        // Get department info
+        const { data: dept } = await sb
+            .from('departments')
+            .select('dept_name')
+            .eq('dept_id', data.department)
+            .single();
+        
+        // Create initials and profile image
+        const initials = data.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+        const img = data.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%238B5CF6' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' font-size='60' fill='white' text-anchor='middle' dy='.3em'%3E${initials}%3C/text%3E%3C/svg%3E`;
+        
+        // Set profile header
+        document.getElementById('myProfileHeader').innerHTML = `
+            <img src="${img}" alt="${data.name}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #8B5CF6;">
+            <div class="name">${data.name}</div>
+            <div class="dept">${dept?.dept_name || ''}</div>
+        `;
+        
+        // Build profile content with basic info
+        let profileContentHTML = `
+            <div class="profile-field">
+                <div class="profile-field-label">Designation</div>
+                <div class="profile-field-value">${data.designation}</div>
+            </div>
+            <div class="profile-field">
+                <div class="profile-field-label">Experience</div>
+                <div class="profile-field-value">${data.experience} years</div>
+            </div>
+        `;
+        
+        // Add Date of Birth if exists
+        if (data.date_of_birth) {
+            profileContentHTML += `
+                <div class="profile-field">
+                    <div class="profile-field-label">Date of Birth</div>
+                    <div class="profile-field-value">${new Date(data.date_of_birth).toLocaleDateString()}</div>
+                </div>
+            `;
+        }
+        
+        // Add Languages if exists
+        if (data.languages_known && data.languages_known.length > 0) {
+            profileContentHTML += `
+                <div class="profile-field">
+                    <div class="profile-field-label">Languages Known</div>
+                    <div class="profile-field-value">${data.languages_known.join(', ')}</div>
+                </div>
+            `;
+        }
+        
+        // Add Research & Expertise if exists
+        if (data.research_papers) {
+            profileContentHTML += `
+                <div class="profile-field">
+                    <div class="profile-field-label">Research & Expertise</div>
+                    <div class="profile-field-value">${data.research_papers}</div>
+                </div>
+            `;
+        }
+        
+        // Add General Achievements if exists
+        if (data.achievements) {
+            profileContentHTML += `
+                <div class="profile-field">
+                    <div class="profile-field-label">General Achievements</div>
+                    <div class="profile-field-value">${data.achievements}</div>
+                </div>
+            `;
+        }
+        
+        // Add custom fields if exist
+        if (data.custom_fields && Object.keys(data.custom_fields).length > 0) {
+            profileContentHTML += Object.entries(data.custom_fields)
+                .map(([k, v]) => `
+                    <div class="profile-field">
+                        <div class="profile-field-label">${k}</div>
+                        <div class="profile-field-value">${v}</div>
+                    </div>
+                `).join('');
+        }
+        
+        // Load Educational Qualifications
+        const { data: educationData } = await sb
+            .from('educational_qualifications')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (educationData && educationData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Educational Qualifications</h3>`;
+            educationData.forEach((edu, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Education ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${edu.exam_name || 'N/A'}</strong><br>
+                            ${edu.board_university || 'N/A'}<br>
+                            ${edu.marks_percentage ? `Marks: ${edu.marks_percentage}%` : ''} 
+                            ${edu.class_obtained ? `(${edu.class_obtained})` : ''}<br>
+                            ${edu.year_of_passing ? `Year: ${edu.year_of_passing}` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load Experience Profile
+        const { data: experienceData } = await sb
+            .from('experience_profile')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (experienceData && experienceData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Experience Profile</h3>`;
+            experienceData.forEach((exp, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Experience ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${exp.role || 'N/A'}</strong><br>
+                            ${exp.organization || 'N/A'}<br>
+                            ${exp.duration || 'N/A'}<br>
+                            ${exp.key_responsibilities ? `<em>${exp.key_responsibilities}</em>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load Technical Competencies
+        const { data: techData } = await sb
+            .from('technical_competencies')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (techData && techData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Technical Competencies</h3>`;
+            
+            const languages = techData.filter(t => t.category === 'languages');
+            const software = techData.filter(t => t.category === 'software_tools');
+            const others = techData.filter(t => t.category === 'other_skills');
+            
+            if (languages.length > 0) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Programming Languages</div>
+                        <div class="profile-field-value">${languages.map(l => l.competency_name).join(', ')}</div>
+                    </div>
+                `;
+            }
+            
+            if (software.length > 0) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Software & Tools</div>
+                        <div class="profile-field-value">${software.map(s => s.competency_name).join(', ')}</div>
+                    </div>
+                `;
+            }
+            
+            if (others.length > 0) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Other Skills</div>
+                        <div class="profile-field-value">${others.map(o => o.competency_name).join(', ')}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load BTech Project
+        const { data: btechData } = await sb
+            .from('btech_projects')
+            .select('*')
+            .eq('profile_id', data.profile_id)
+            .single();
+        
+        if (btechData && (btechData.project_title || Object.keys(btechData.project_data || {}).length > 0)) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">BTech Project</h3>`;
+            
+            if (btechData.project_title) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Project Title</div>
+                        <div class="profile-field-value">${btechData.project_title}</div>
+                    </div>
+                `;
+            }
+            
+            if (btechData.project_data && Object.keys(btechData.project_data).length > 0) {
+                Object.entries(btechData.project_data).forEach(([key, value]) => {
+                    profileContentHTML += `
+                        <div class="profile-field">
+                            <div class="profile-field-label">${key}</div>
+                            <div class="profile-field-value">${value}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+        
+        // Load MTech Project
+        const { data: mtechData } = await sb
+            .from('mtech_projects')
+            .select('*')
+            .eq('profile_id', data.profile_id)
+            .single();
+        
+        if (mtechData && (mtechData.project_title || Object.keys(mtechData.project_data || {}).length > 0)) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">MTech Project</h3>`;
+            
+            if (mtechData.project_title) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Project Title</div>
+                        <div class="profile-field-value">${mtechData.project_title}</div>
+                    </div>
+                `;
+            }
+            
+            if (mtechData.project_data && Object.keys(mtechData.project_data).length > 0) {
+                Object.entries(mtechData.project_data).forEach(([key, value]) => {
+                    profileContentHTML += `
+                        <div class="profile-field">
+                            <div class="profile-field-label">${key}</div>
+                            <div class="profile-field-value">${value}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+        
+        // Load Achievements & Activities
+        const { data: achievementsData } = await sb
+            .from('achievements_activities')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (achievementsData && achievementsData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Achievements & Activities</h3>`;
+            achievementsData.forEach((ach, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">${ach.category} ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${ach.title}</strong><br>
+                            ${ach.organization ? `${ach.organization}<br>` : ''}
+                            ${ach.date_achieved ? `Date: ${new Date(ach.date_achieved).toLocaleDateString()}<br>` : ''}
+                            ${ach.description ? `<em>${ach.description}</em>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load Publications
+        const { data: publicationsData } = await sb
+            .from('publications')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (publicationsData && publicationsData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Publications</h3>`;
+            publicationsData.forEach((pub, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Publication ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${pub.title}</strong><br>
+                            ${pub.authors ? `Authors: ${pub.authors}<br>` : ''}
+                            ${pub.journal_conference ? `${pub.journal_conference}<br>` : ''}
+                            ${pub.publication_type ? `Type: ${pub.publication_type}<br>` : ''}
+                            ${pub.publication_date ? `Date: ${new Date(pub.publication_date).toLocaleDateString()}<br>` : ''}
+                            ${pub.doi ? `DOI: ${pub.doi}<br>` : ''}
+                            ${pub.abstract ? `<em>${pub.abstract}</em>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Set the complete profile content
+        document.getElementById('myProfileContent').innerHTML = profileContentHTML;
+        
+        // Load posts
+        const { data: posts } = await sb
+            .from('posts')
+            .select('*')
+            .eq('author_id', currentUser.user_id)
+            .eq('author_type', 'staff')
+            .order('created_at', { ascending: false });
+        
+        document.getElementById('myPosts').innerHTML = posts?.map(post => `
+            <div class="post-card" id="post-${post.post_id}">
+                <div class="post-image-container">
+                    <img src="${post.image_url}" alt="Post" class="post-img">
+                </div>
+                ${post.caption ? `<div class="post-caption">${post.caption}</div>` : ''}
+                <div class="post-actions">
+                    <button onclick="editPost(${post.post_id})" class="edit-btn" title="Edit Post">
+                        ✏️ Edit
+                    </button>
+                    <button onclick="deletePost(${post.post_id})" class="delete-btn" title="Delete Post">
+                        🗑️ Delete
+                    </button>
+                </div>
+                <div class="post-date" style="font-size:12px;color:#666;margin-top:8px;">
+                    ${new Date(post.created_at).toLocaleDateString()}
+                </div>
+            </div>
+        `).join('') || '<p style="text-align:center;color:#666;">No posts yet</p>';
+        
+    } catch (error) {
+        console.error('Profile load error:', error);
+        alert('Failed to load profile: ' + error.message);
+    }
+}
+
+function editProfile() {
+    editingProfile = true;
+    document.getElementById('profileFormTitle').textContent = 'Edit Profile';
+    
+    sb.from('profiles').select('*').eq('user_id', currentUser.user_id).single().then(async ({ data }) => {
+        if (data) {
+            // Basic info
+            document.getElementById('profName').value = data.name;
+            document.getElementById('profDOB').value = data.date_of_birth || '';
+            document.getElementById('profDept').value = data.department;
+            document.getElementById('profDesig').value = data.designation;
+            document.getElementById('profExp').value = data.experience;
+            document.getElementById('profAddress').value = data.address || '';
+            document.getElementById('profLanguages').value = data.languages_known ? data.languages_known.join(', ') : '';
+            document.getElementById('profResearch').value = data.research_papers || '';
+            document.getElementById('profAchieve').value = data.achievements || '';
+            
+           // Custom fields
+            const customFieldsDiv = document.getElementById('customFields');
+            customFieldsDiv.innerHTML = '';
+            if (data.custom_fields) {
+                Object.entries(data.custom_fields).forEach(([k, v]) => {
+                    const div = document.createElement('div');
+                    div.className = 'custom-field';
+                    div.innerHTML = `<input type="text" placeholder="Field Name" value="${k}" class="form-input"><input type="text" placeholder="Field Value" value="${v}" class="form-input"><button type="button" onclick="this.parentElement.remove()">✕</button>`;
+                    customFieldsDiv.appendChild(div);
+                });
+            }
+            
+            // Load and populate education data
+            const { data: educationData } = await sb
+                .from('educational_qualifications')
+                .select('*')
+                .eq('profile_id', data.profile_id);
+            
+            document.getElementById('educationRows').innerHTML = '';
+            if (educationData && educationData.length > 0) {
+                educationData.forEach((edu) => {
+                    addEducationRow();
+                    const lastRow = document.getElementById('educationRows').lastChild;
+                    lastRow.querySelector('[name="edu_exam"]').value = edu.exam_name || '';
+                    lastRow.querySelector('[name="edu_board"]').value = edu.board_university || '';
+                    lastRow.querySelector('[name="edu_marks"]').value = edu.marks_percentage || '';
+                    lastRow.querySelector('[name="edu_class"]').value = edu.class_obtained || '';
+                    lastRow.querySelector('[name="edu_year"]').value = edu.year_of_passing || '';
+                });
+            }
+            
+            // Load and populate experience data
+            const { data: experienceData } = await sb
+                .from('experience_profile')
+                .select('*')
+                .eq('profile_id', data.profile_id);
+            
+            document.getElementById('experienceRows').innerHTML = '';
+            if (experienceData && experienceData.length > 0) {
+                experienceData.forEach((exp) => {
+                    addExperienceRow();
+                    const lastRow = document.getElementById('experienceRows').lastChild;
+                    lastRow.querySelector('[name="exp_role"]').value = exp.role || '';
+                    lastRow.querySelector('[name="exp_org"]').value = exp.organization || '';
+                    lastRow.querySelector('[name="exp_start"]').value = exp.start_date || '';
+                    lastRow.querySelector('[name="exp_end"]').value = exp.end_date || '';
+                    lastRow.querySelector('[name="exp_duration"]').value = exp.duration || '';
+                    lastRow.querySelector('[name="exp_responsibilities"]').value = exp.key_responsibilities || '';
+                });
+            }
+            
+            // Load and populate technical competencies
+            const { data: techData } = await sb
+                .from('technical_competencies')
+                .select('*')
+                .eq('profile_id', data.profile_id);
+            
+            if (techData && techData.length > 0) {
+                const languages = techData.filter(t => t.category === 'languages').map(t => t.competency_name);
+                const software = techData.filter(t => t.category === 'software_tools').map(t => t.competency_name);
+                const others = techData.filter(t => t.category === 'other_skills').map(t => t.competency_name);
+                
+                document.getElementById('techLanguages').value = languages.join(', ');
+                document.getElementById('techSoftware').value = software.join(', ');
+                document.getElementById('techOthers').value = others.join(', ');
+            }
+            
+            // Load and populate BTech project
+            const { data: btechData } = await sb
+                .from('btech_projects')
+                .select('*')
+                .eq('profile_id', data.profile_id)
+                .single();
+            
+            document.getElementById('btechFields').innerHTML = '';
+            if (btechData) {
+                document.getElementById('btechTitle').value = btechData.project_title || '';
+                if (btechData.project_data && Object.keys(btechData.project_data).length > 0) {
+                    Object.entries(btechData.project_data).forEach(([key, value]) => {
+                        addBtechField();
+                        const lastField = document.getElementById('btechFields').lastChild;
+                        lastField.querySelector('[name="btech_heading"]').value = key;
+                        lastField.querySelector('[name="btech_content"]').value = value;
+                    });
                 }
-            } else {
-                location.href = 'stafflogin.html';
-                showPage('loginPage');
-            }
-        }
-        
-        function handleProfile() {
-            if (!currentUser) return location.href = 'stafflogin.html';
-            showPage('myProfilePage');
-            loadMyProfile();
-        }
-        
-        async function loadMyProfile() {
-            const { data } = await sb.from('profiles').select('*').eq('user_id', currentUser.user_id).single();
-            if (!data) {
-                document.getElementById('noProfile').style.display = 'block';
-                document.getElementById('hasProfile').style.display = 'none';
-                return;
             }
             
-            document.getElementById('noProfile').style.display = 'none';
-            document.getElementById('hasProfile').style.display = 'block';
+            // Load and populate MTech project
+            const { data: mtechData } = await sb
+                .from('mtech_projects')
+                .select('*')
+                .eq('profile_id', data.profile_id)
+                .single();
             
-            const { data: dept } = await sb.from('departments').select('dept_name').eq('dept_id', data.department).single();
-            const initials = data.name.split(' ').map(n => n[0]).join('').substring(0, 2);
-            const img = data.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%238B5CF6' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' font-size='60' fill='white' text-anchor='middle' dy='.3em'%3E${initials}%3C/text%3E%3C/svg%3E`;
+            document.getElementById('mtechFields').innerHTML = '';
+            if (mtechData) {
+                document.getElementById('mtechTitle').value = mtechData.project_title || '';
+                if (mtechData.project_data && Object.keys(mtechData.project_data).length > 0) {
+                    Object.entries(mtechData.project_data).forEach(([key, value]) => {
+                        addMtechField();
+                        const lastField = document.getElementById('mtechFields').lastChild;
+                        lastField.querySelector('[name="mtech_heading"]').value = key;
+                        lastField.querySelector('[name="mtech_content"]').value = value;
+                    });
+                }
+            }
             
-            document.getElementById('myProfileHeader').innerHTML = `
-                <img src="${img}" alt="${data.name}">
-                <div class="name">${data.name}</div>
-                <div class="dept">${dept?.dept_name || ''}</div>
-            `;
+            // Load and populate achievements
+            const { data: achievementsData } = await sb
+                .from('achievements_activities')
+                .select('*')
+                .eq('profile_id', data.profile_id);
             
-            document.getElementById('myProfileContent').innerHTML = `
-                <div class="profile-field"><div class="profile-field-label">Designation</div><div class="profile-field-value">${data.designation}</div></div>
-                <div class="profile-field"><div class="profile-field-label">Experience</div><div class="profile-field-value">${data.experience} years</div></div>
-                <div class="profile-field"><div class="profile-field-label">Expertise</div><div class="profile-field-value">${data.research_papers || 'N/A'}</div></div>
-                <div class="profile-field"><div class="profile-field-label">Achievements</div><div class="profile-field-value">${data.achievements || 'N/A'}</div></div>
-                ${data.custom_fields ? Object.entries(data.custom_fields).map(([k, v]) => `<div class="profile-field"><div class="profile-field-label">${k}</div><div class="profile-field-value">${v}</div></div>`).join('') : ''}
-            `;
+            document.getElementById('achievementRows').innerHTML = '';
+            if (achievementsData && achievementsData.length > 0) {
+                achievementsData.forEach((ach) => {
+                    addAchievementRow();
+                    const lastRow = document.getElementById('achievementRows').lastChild;
+                    lastRow.querySelector('[name="ach_category"]').value = ach.category || 'achievement';
+                    lastRow.querySelector('[name="ach_title"]').value = ach.title || '';
+                    lastRow.querySelector('[name="ach_org"]').value = ach.organization || '';
+                    lastRow.querySelector('[name="ach_date"]').value = ach.date_achieved || '';
+                    lastRow.querySelector('[name="ach_desc"]').value = ach.description || '';
+                });
+            }
             
-            // Replace this part in your loadMyProfile function:
-const { data: posts } = await sb.from('posts').select('*').eq('author_id', currentUser.user_id).eq('author_type', 'staff').order('created_at', { ascending: false });
+            // Load and populate publications
+            const { data: publicationsData } = await sb
+                .from('publications')
+                .select('*')
+                .eq('profile_id', data.profile_id);
+            
+            document.getElementById('publicationRows').innerHTML = '';
+            if (publicationsData && publicationsData.length > 0) {
+                publicationsData.forEach((pub) => {
+                    addPublicationRow();
+                    const lastRow = document.getElementById('publicationRows').lastChild;
+                    lastRow.querySelector('[name="pub_type"]').value = pub.publication_type || 'journal';
+                    lastRow.querySelector('[name="pub_date"]').value = pub.publication_date || '';
+                    lastRow.querySelector('[name="pub_title"]').value = pub.title || '';
+                    lastRow.querySelector('[name="pub_authors"]').value = pub.authors || '';
+                    lastRow.querySelector('[name="pub_journal"]').value = pub.journal_conference || '';
+                    lastRow.querySelector('[name="pub_volume"]').value = pub.volume || '';
+                    lastRow.querySelector('[name="pub_issue"]').value = pub.issue || '';
+                    lastRow.querySelector('[name="pub_pages"]').value = pub.pages || '';
+                    lastRow.querySelector('[name="pub_doi"]').value = pub.doi || '';
+                    lastRow.querySelector('[name="pub_abstract"]').value = pub.abstract || '';
+                });
+            }
+        }
+        showPage('createProfilePage');
+    });
+}
 
-document.getElementById('myPosts').innerHTML = posts?.map(post => `
-    <div class="post-card" id="post-${post.post_id}">
-        <div class="post-image-container">
-            <img src="${post.image_url}" alt="Post" class="post-img">
-        </div>
-        ${post.caption ? `<div class="post-caption">${post.caption}</div>` : ''}
-        <div class="post-actions">
-            <button onclick="editPost(${post.post_id})" class="edit-btn" title="Edit Post">
-                ✏️ Edit
-            </button>
-            <button onclick="deletePost(${post.post_id})" class="delete-btn" title="Delete Post">
-                🗑️ Delete
-            </button>
-        </div>
-        <div class="post-date" style="font-size:12px;color:#666;margin-top:8px;">
-            ${new Date(post.created_at).toLocaleDateString()}
-        </div>
-    </div>
-`).join('') || '<p style="text-align:center;color:#666;">No posts yet</p>';
-
+async function deleteProfile() {
+    if (!confirm('Delete your profile? This cannot be undone.')) return;
+    
+    try {
+        // Get profile_id first
+        const { data: profile } = await sb
+            .from('profiles')
+            .select('profile_id')
+            .eq('user_id', currentUser.user_id)
+            .single();
+        
+        if (profile) {
+            // Delete related data
+            await sb.from('educational_qualifications').delete().eq('profile_id', profile.profile_id);
+            await sb.from('experience_profile').delete().eq('profile_id', profile.profile_id);
+            await sb.from('technical_competencies').delete().eq('profile_id', profile.profile_id);
+            await sb.from('btech_projects').delete().eq('profile_id', profile.profile_id);
+            await sb.from('mtech_projects').delete().eq('profile_id', profile.profile_id);
+            await sb.from('achievements_activities').delete().eq('profile_id', profile.profile_id);
+            await sb.from('publications').delete().eq('profile_id', profile.profile_id);
+            
+            // Delete profile
+            await sb.from('profiles').delete().eq('user_id', currentUser.user_id);
         }
         
+        alert('Profile deleted');
+        showPage('myProfilePage');
+        loadMyProfile();
+    } catch (error) {
+        console.error('Delete error:', error);
+        alert('Failed to delete profile');
+    }
+}
 
-        let currentEditingPost = null;
+// ========================================
+// POST FUNCTIONS
+// ========================================
 
-// Open edit post modal
+function showAddPost() {
+    document.getElementById('postModal').classList.add('show');
+}
+
+function closePostModal() {
+    document.getElementById('postModal').classList.remove('show');
+    document.getElementById('postForm').reset();
+}
+
+function closeEditPostModal() {
+    document.getElementById('editPostModal').classList.remove('show');
+    document.getElementById('editPostForm').reset();
+    currentEditingPost = null;
+}
+
 async function editPost(postId) {
     try {
-        // Fetch post data
         const { data: post, error } = await sb
             .from('posts')
             .select('*')
@@ -681,20 +1932,16 @@ async function editPost(postId) {
             return alert('Post not found');
         }
         
-        // Check if user owns this post
         if (post.author_id !== currentUser.user_id) {
             return alert('You can only edit your own posts');
         }
         
-        // Store current post data
         currentEditingPost = post;
         
-        // Populate modal with current data
         document.getElementById('currentPostImage').src = post.image_url;
         document.getElementById('editPostCaption').value = post.caption || '';
-        document.getElementById('editPostImage').value = ''; // Reset file input
+        document.getElementById('editPostImage').value = '';
         
-        // Show modal
         document.getElementById('editPostModal').classList.add('show');
         
     } catch (error) {
@@ -703,111 +1950,18 @@ async function editPost(postId) {
     }
 }
 
-// Close edit post modal
-function closeEditPostModal() {
-    document.getElementById('editPostModal').classList.remove('show');
-    document.getElementById('editPostForm').reset();
-    currentEditingPost = null;
-}
-
-// Handle edit post form submission
-document.getElementById('editPostForm').onsubmit = async (e) => {
-    e.preventDefault();
-    
-    if (!currentEditingPost) {
-        return alert('No post selected for editing');
-    }
-    
-    try {
-        const newCaption = document.getElementById('editPostCaption').value;
-        const newImageFile = document.getElementById('editPostImage').files[0];
-        
-        let updateData = {
-            caption: newCaption,
-            updated_at: new Date().toISOString()
-        };
-        
-        // If user selected a new image, upload it
-        if (newImageFile) {
-            // Show loading indicator
-            const submitBtn = e.target.querySelector('button[type="submit"]');
-            const originalText = submitBtn.textContent;
-            submitBtn.textContent = 'Uploading...';
-            submitBtn.disabled = true;
-            
-            // Upload new image
-            const fileName = `${currentUser.user_id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${newImageFile.name.split('.').pop()}`;
-            
-            const { data: uploadData, error: uploadError } = await sb.storage
-                .from('posts')
-                .upload(fileName, newImageFile);
-            
-            if (uploadError) {
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-                throw uploadError;
-            }
-            
-            // Get new image URL
-            const { data: { publicUrl } } = sb.storage.from('posts').getPublicUrl(fileName);
-            updateData.image_url = publicUrl;
-            
-            // Optional: Delete old image from storage
-            try {
-                const oldFileName = currentEditingPost.image_url.split('/').pop();
-                await sb.storage.from('posts').remove([oldFileName]);
-            } catch (deleteError) {
-                console.log('Could not delete old image:', deleteError);
-                // Continue anyway, as the main update is more important
-            }
-            
-            // Reset button
-            submitBtn.textContent = originalText;
-            submitBtn.disabled = false;
-        }
-        
-        // Update post in database
-        const { error: updateError } = await sb
-            .from('posts')
-            .update(updateData)
-            .eq('post_id', currentEditingPost.post_id);
-        
-        if (updateError) throw updateError;
-        
-        alert('Post updated successfully! 🎉');
-        closeEditPostModal();
-        
-        // Refresh the posts display
-        loadMyProfile();
-        
-    } catch (error) {
-        console.error('Error updating post:', error);
-        alert('Failed to update post: ' + error.message);
-        
-        // Reset button if there was an error
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        if (submitBtn) {
-            submitBtn.textContent = 'Update Post';
-            submitBtn.disabled = false;
-        }
-    }
-};
-
-// Enhanced delete post function with confirmation
 async function deletePost(postId) {
     if (!confirm('Are you sure you want to delete this post? This action cannot be undone.')) {
         return;
     }
     
     try {
-        // Get post data first to delete image from storage
         const { data: post } = await sb
             .from('posts')
             .select('image_url')
             .eq('post_id', postId)
             .single();
         
-        // Delete post from database
         const { error: deleteError } = await sb
             .from('posts')
             .delete()
@@ -815,7 +1969,6 @@ async function deletePost(postId) {
         
         if (deleteError) throw deleteError;
         
-        // Try to delete image from storage (optional, won't fail if error)
         if (post?.image_url && !post.image_url.startsWith('data:')) {
             try {
                 const fileName = post.image_url.split('/').pop();
@@ -827,13 +1980,11 @@ async function deletePost(postId) {
         
         alert('Post deleted successfully');
         
-        // Remove post from UI immediately
         const postElement = document.getElementById(`post-${postId}`);
         if (postElement) {
             postElement.remove();
         }
         
-        // Refresh posts if no posts remain
         const postsContainer = document.getElementById('myPosts');
         if (!postsContainer.querySelector('.post-card')) {
             postsContainer.innerHTML = '<p style="text-align:center;color:#666;">No posts yet</p>';
@@ -843,213 +1994,13 @@ async function deletePost(postId) {
         console.error('Error deleting post:', error);
         alert('Failed to delete post: ' + error.message);
     }
-};
+}
 
+// ========================================
+// PDF AND IMAGE DOWNLOAD
+// ========================================
 
-        function editProfile() {
-            editingProfile = true;
-            document.getElementById('profileFormTitle').textContent = 'Edit Profile';
-            sb.from('profiles').select('*').eq('user_id', currentUser.user_id).single().then(({ data }) => {
-                if (data) {
-                    document.getElementById('profName').value = data.name;
-                    document.getElementById('profDept').value = data.department;
-                    document.getElementById('profDesig').value = data.designation;
-                    document.getElementById('profExp').value = data.experience;
-                    document.getElementById('profResearch').value = data.research_papers || '';
-                    document.getElementById('profAchieve').value = data.achievements || '';
-                    
-                    const customFieldsDiv = document.getElementById('customFields');
-                    customFieldsDiv.innerHTML = '';
-                    if (data.custom_fields) {
-                        Object.entries(data.custom_fields).forEach(([k, v]) => {
-                            const div = document.createElement('div');
-                            div.className = 'custom-field';
-                            div.innerHTML = `<input type="text" placeholder="Field Name" value="${k}" class="form-input"><input type="text" placeholder="Field Value" value="${v}" class="form-input"><button type="button" onclick="this.parentElement.remove()">✕</button>`;
-                            customFieldsDiv.appendChild(div);
-                        });
-                    }
-                }
-                showPage('createProfilePage');
-            });
-        }
-        
-        // FIND this part in your profileForm submission and REPLACE it
-document.getElementById('profileForm').onsubmit = async (e) => {
-    e.preventDefault();
-    
-    const customFieldsData = {};
-    document.querySelectorAll('#customFields .custom-field').forEach(field => {
-        const inputs = field.querySelectorAll('input');
-        if (inputs[0].value && inputs[1].value) {
-            customFieldsData[inputs[0].value] = inputs[1].value;
-        }
-    });
-    
-    let imageUrl = null;
-    const imageFile = document.getElementById('profImage').files[0];
-    
-    // REPLACE this image upload section
-    if (imageFile) {
-        try {
-            const fileName = `profiles/${currentUser.user_id}_${Date.now()}_${Math.random().toString(36).substring(7)}.${imageFile.name.split('.').pop()}`;
-            
-            const { data: uploadData, error: uploadError } = await sb.storage
-                .from('profile-images')
-                .upload(fileName, imageFile, {
-                    cacheControl: '3600',
-                    upsert: false
-                });
-            
-            if (uploadError) {
-                console.error('Upload error:', uploadError);
-                alert('Image upload failed: ' + uploadError.message);
-                return;
-            }
-            
-            const { data: { publicUrl } } = sb.storage.from('profile-images').getPublicUrl(fileName);
-            imageUrl = publicUrl;
-            
-            console.log('Image uploaded successfully:', imageUrl);
-            
-        } catch (error) {
-            console.error('Image upload error:', error);
-            alert('Image upload failed');
-            return;
-        }
-    }
-    
-    const profileData = {
-        user_id: currentUser.user_id,
-        name: document.getElementById('profName').value,
-        department: parseInt(document.getElementById('profDept').value),
-        designation: document.getElementById('profDesig').value,
-        experience: parseInt(document.getElementById('profExp').value),
-        research_papers: document.getElementById('profResearch').value,
-        achievements: document.getElementById('profAchieve').value,
-        custom_fields: customFieldsData,
-        is_published: true
-    };
-    
-    // ADD profile image if uploaded
-    if (imageUrl) {
-        profileData.profile_image = imageUrl;
-    }
-    
-    try {
-        if (editingProfile) {
-            const { error } = await sb.from('profiles').update(profileData).eq('user_id', currentUser.user_id);
-            if (error) throw error;
-        } else {
-            const { error } = await sb.from('profiles').insert(profileData);
-            if (error) throw error;
-        }
-        
-        alert('Profile saved successfully!');
-        editingProfile = false;
-        showPage('myProfilePage');
-        loadMyProfile();
-        
-    } catch (error) {
-        console.error('Profile save error:', error);
-        alert('Failed to save profile: ' + error.message);
-    }
-};
-
-        function addCustomField() {
-            const div = document.createElement('div');
-            div.className = 'custom-field';
-            div.innerHTML = `<input type="text" placeholder="Field Name" class="form-input"><input type="text" placeholder="Field Value" class="form-input"><button type="button" onclick="this.parentElement.remove()">✕</button>`;
-            document.getElementById('customFields').appendChild(div);
-        }
-        
-        async function deleteProfile() {
-            if (!confirm('Delete your profile? This cannot be undone.')) return;
-            await sb.from('profiles').delete().eq('user_id', currentUser.user_id);
-            alert('Profile deleted');
-            showPage('myProfilePage');
-            loadMyProfile();
-        }
-        
-        function showAddPost() {
-            document.getElementById('postModal').classList.add('show');
-        }
-        
-        function closePostModal() {
-            document.getElementById('postModal').classList.remove('show');
-            document.getElementById('postForm').reset();
-        }
-        
-  document.getElementById('postForm').onsubmit = async (e) => {
-    e.preventDefault();
-    
-    const imageFile = document.getElementById('postImage').files[0];
-    if (!imageFile) return alert('Please select an image');
-    
-    // Check your custom authentication
-    if (!currentUser || !currentUser.user_id) {
-        alert('Please login first');
-        return;
-    }
-    
-    try {
-        // Create unique filename
-        const fileExtension = imageFile.name.split('.').pop();
-        const fileName = `posts/${currentUser.user_id}_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
-        
-        // Upload file using FormData (bypasses some RLS issues)
-        const formData = new FormData();
-        formData.append('file', imageFile);
-        
-        // Direct API call to storage
-        const uploadResponse = await fetch(`https://nsnacwwcrszpjmanskti.supabase.co/storage/v1/object/posts/${fileName}`, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4`
-            },
-            body: formData
-        });
-        
-        if (!uploadResponse.ok) {
-            const errorText = await uploadResponse.text();
-            console.error('Upload failed:', errorText);
-            return alert('Upload failed: ' + errorText);
-        }
-        
-        // Construct public URL
-        const publicUrl = `https://nsnacwwcrszpjmanskti.supabase.co/storage/v1/object/public/posts/${fileName}`;
-        
-        // Insert post record
-        const { error: insertError } = await sb.from('posts').insert({
-            author_id: currentUser.user_id,
-            author_type: 'staff',
-            image_url: publicUrl,
-            caption: document.getElementById('postCaption').value,
-            is_published: true
-        });
-        
-        if (insertError) {
-            console.error('Insert error:', insertError);
-            return alert('Failed to create post: ' + insertError.message);
-        }
-        
-        alert('Post created successfully!');
-        closePostModal();
-        loadMyProfile();
-        
-    } catch (error) {
-        console.error('Unexpected error:', error);
-        alert('Upload failed. Please try again.');
-    }
-};
-
-
-        async function deletePost(postId) {
-            if (!confirm('Delete this post?')) return;
-            await sb.from('posts').delete().eq('post_id', postId);
-            loadMyProfile();
-        }
-        
-        async function downloadPDF() {
+async function downloadPDF() {
     try {
         const { jsPDF } = window.jspdf;
         if (!jsPDF) {
@@ -1058,7 +2009,6 @@ document.getElementById('profileForm').onsubmit = async (e) => {
         
         const doc = new jsPDF();
         
-        // Get profile data
         const profileElement = document.getElementById('myProfileContent');
         const headerElement = document.getElementById('myProfileHeader');
         
@@ -1066,25 +2016,21 @@ document.getElementById('profileForm').onsubmit = async (e) => {
             return alert('Profile data not found');
         }
         
-        // Set up PDF styling
         let yPosition = 20;
         const margin = 20;
         const pageWidth = doc.internal.pageSize.width;
         const contentWidth = pageWidth - (margin * 2);
         
-        // Add header
         doc.setFontSize(22);
-        doc.setTextColor(139, 92, 246); // Purple color
+        doc.setTextColor(139, 92, 246);
         doc.text('Staff Profile', margin, yPosition);
         yPosition += 15;
         
-        // Add a line
         doc.setLineWidth(0.5);
         doc.setDrawColor(139, 92, 246);
         doc.line(margin, yPosition, pageWidth - margin, yPosition);
         yPosition += 15;
         
-        // Get profile info
         const nameElement = headerElement.querySelector('.name');
         const deptElement = headerElement.querySelector('.dept');
         
@@ -1102,7 +2048,6 @@ document.getElementById('profileForm').onsubmit = async (e) => {
             yPosition += 15;
         }
         
-        // Add profile fields
         const fields = profileElement.querySelectorAll('.profile-field');
         
         fields.forEach(field => {
@@ -1110,19 +2055,16 @@ document.getElementById('profileForm').onsubmit = async (e) => {
             const value = field.querySelector('.profile-field-value');
             
             if (label && value && value.textContent.trim() !== 'N/A' && value.textContent.trim() !== '') {
-                // Check if we need a new page
                 if (yPosition > 250) {
                     doc.addPage();
                     yPosition = 20;
                 }
                 
-                // Add field label
                 doc.setFontSize(11);
                 doc.setTextColor(139, 92, 246);
                 doc.text(`${label.textContent}:`, margin, yPosition);
                 yPosition += 7;
                 
-                // Add field value with text wrapping
                 doc.setFontSize(10);
                 doc.setTextColor(0, 0, 0);
                 const textLines = doc.splitTextToSize(value.textContent, contentWidth);
@@ -1131,7 +2073,6 @@ document.getElementById('profileForm').onsubmit = async (e) => {
             }
         });
         
-        // Add footer
         const totalPages = doc.internal.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
             doc.setPage(i);
@@ -1141,12 +2082,10 @@ document.getElementById('profileForm').onsubmit = async (e) => {
             doc.text('Generated by VVPIET Staff Portal', margin, doc.internal.pageSize.height - 10);
         }
         
-        // Generate filename
         const profileName = nameElement ? 
             nameElement.textContent.replace(/[^a-zA-Z0-9]/g, '_') : 
             'staff_profile';
         
-        // Save the PDF
         doc.save(`${profileName}_Profile.pdf`);
         
     } catch (error) {
@@ -1155,35 +2094,30 @@ document.getElementById('profileForm').onsubmit = async (e) => {
     }
 }
 
-        
-        async function downloadImage() {
+async function downloadImage() {
     try {
         if (!window.html2canvas) {
             return alert('Image capture library not loaded. Please refresh the page.');
         }
         
-        // Target the entire profile view
         const profileElement = document.getElementById('hasProfile');
         
         if (!profileElement) {
             return alert('Profile not found');
         }
         
-        // Show loading message
         const loadingDiv = document.createElement('div');
         loadingDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);color:white;padding:20px;border-radius:10px;z-index:9999;';
         loadingDiv.textContent = 'Generating image...';
         document.body.appendChild(loadingDiv);
         
-        // Wait a moment for DOM to settle
         await new Promise(resolve => setTimeout(resolve, 500));
         
-        // Capture the element
         const canvas = await html2canvas(profileElement, {
             backgroundColor: '#ffffff',
             useCORS: true,
             allowTaint: false,
-            scale: 2, // Higher quality
+            scale: 2,
             scrollX: 0,
             scrollY: 0,
             width: profileElement.scrollWidth,
@@ -1193,15 +2127,12 @@ document.getElementById('profileForm').onsubmit = async (e) => {
             removeContainer: true
         });
         
-        // Remove loading message
         document.body.removeChild(loadingDiv);
         
-        // Convert to blob and download
         canvas.toBlob(function(blob) {
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
             
-            // Get profile name for filename
             const nameElement = document.querySelector('#myProfileHeader .name');
             const profileName = nameElement ? 
                 nameElement.textContent.replace(/[^a-zA-Z0-9]/g, '_') : 
@@ -1211,11 +2142,9 @@ document.getElementById('profileForm').onsubmit = async (e) => {
             link.download = `${profileName}_Profile.png`;
             link.style.display = 'none';
             
-            // Trigger download
             document.body.appendChild(link);
             link.click();
             
-            // Cleanup
             document.body.removeChild(link);
             URL.revokeObjectURL(url);
             
@@ -1224,7 +2153,6 @@ document.getElementById('profileForm').onsubmit = async (e) => {
     } catch (error) {
         console.error('Image download error:', error);
         
-        // Remove loading message if it exists
         const loadingDiv = document.querySelector('div[style*="position:fixed"]');
         if (loadingDiv) {
             document.body.removeChild(loadingDiv);
@@ -1234,41 +2162,441 @@ document.getElementById('profileForm').onsubmit = async (e) => {
     }
 }
 
-        
-        function updateAuthText() {
-    const authText = document.getElementById('authText');
-    const loginIcon = document.getElementById('loginIcon');
-    const logoutIcon = document.getElementById('logoutIcon');
-    
-    if (currentUser) {
-        // User is logged in - show logout
-        if (authText) authText.textContent = 'Logout';
-        if (loginIcon) loginIcon.style.display = 'none';
-        if (logoutIcon) logoutIcon.style.display = 'block';
-    } else {
-        // User is not logged in - show login
-        if (authText) authText.textContent = 'Login';
-        if (loginIcon) loginIcon.style.display = 'block';
-        if (logoutIcon) logoutIcon.style.display = 'none';
-    }
-}
+// ========================================
+// FORM EVENT HANDLERS (DEFINED AFTER ALL FUNCTIONS)
+// ========================================
 
-        
-        // Initialize
-        const params = new URLSearchParams(location.search);
-        if (params.get('dept')) {
-            loadDepartment();
-        } else if (params.get('tpo')) {
-            viewTPO();
-        } else if (currentUser) {
-            showPage('myProfilePage');
-            loadMyProfile();
-        } else {
+// Wait for DOM to be ready before attaching event handlers
+window.addEventListener('DOMContentLoaded', function() {
+    
+    // Login Form
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPassword').value;
+            
+            const { data } = await sb.from('users').select('*').eq('email', email).eq('password', pass).single();
+            if (data) {
+                localStorage.setItem('user', JSON.stringify(data));
+                currentUser = data;
+                alert('Login successful!');
+                showPage('myProfilePage');
+                loadMyProfile();
+                updateAuthText();
+            } else {
+                alert('Invalid credentials');
+            }
+        };
+    }
+    
+    // Register Form
+    const registerForm = document.getElementById('registerForm');
+    if (registerForm) {
+        registerForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('regEmail').value;
+            const pass = document.getElementById('regPassword').value;
+            const dept = document.getElementById('regDept').value;
+            const code = document.getElementById('regCode').value;
+            
+            const { data: deptData } = await sb.from('departments').select('*').eq('dept_id', dept).single();
+            if (!deptData || deptData.dept_code !== code) {
+                return alert('Invalid department code');
+            }
+            
+            const { error } = await sb.from('users').insert({ 
+                email, 
+                password: pass, 
+                department: dept, 
+                role: 'Staff'
+            });
+            if (error) return alert('Registration failed: ' + error.message);
+            
+            alert('Registration successful! Please login.');
             showPage('loginPage');
-        }
-        
-        loadDepartments();
-        updateAuthText();
-    </script>
+        };
+    }
+    
+    // Profile Form
+    const profileForm = document.getElementById('profileForm');
+    if (profileForm) {
+        profileForm.onsubmit = async (e) => {
+            e.preventDefault();
+
+            const customFieldsData = {};
+            document.querySelectorAll('#customFields .custom-field').forEach(field => {
+                const inputs = field.querySelectorAll('input');
+                if (inputs[0].value && inputs[1].value) {
+                    customFieldsData[inputs[0].value] = inputs[1].value;
+                }
+            });
+
+            let imageUrl = null;
+            const imageFile = document.getElementById('profImage').files[0];
+
+            if (imageFile) {
+                try {
+                    const fileName = `profiles/${currentUser.user_id}_${Date.now()}_${Math.random().toString(36).substring(7)}.${imageFile.name.split('.').pop()}`;
+
+                    const { data: uploadData, error: uploadError } = await sb.storage
+                        .from('profile-images')
+                        .upload(fileName, imageFile, {
+                            cacheControl: '3600',
+                            upsert: false
+                        });
+
+                    if (uploadError) {
+                        console.error('Upload error:', uploadError);
+                        alert('Image upload failed: ' + uploadError.message);
+                        return;
+                    }
+
+                    const { data: { publicUrl } } = sb.storage.from('profile-images').getPublicUrl(fileName);
+                    imageUrl = publicUrl;
+
+                } catch (error) {
+                    console.error('Image upload error:', error);
+                    alert('Image upload failed');
+                    return;
+                }
+            }
+
+            // Extract education data
+            const educationData = [];
+            document.querySelectorAll('#educationRows .dynamic-row').forEach(row => {
+                educationData.push({
+                    exam_name: row.querySelector('[name="edu_exam"]').value,
+                    board_university: row.querySelector('[name="edu_board"]').value,
+                    marks_percentage: parseFloat(row.querySelector('[name="edu_marks"]').value) || null,
+                    class_obtained: row.querySelector('[name="edu_class"]').value,
+                    year_of_passing: parseInt(row.querySelector('[name="edu_year"]').value) || null,
+                });
+            });
+
+            // Extract experience data
+            const experienceData = [];
+            document.querySelectorAll('#experienceRows .dynamic-row').forEach(row => {
+                experienceData.push({
+                    role: row.querySelector('[name="exp_role"]').value,
+                    organization: row.querySelector('[name="exp_org"]').value,
+                    duration: row.querySelector('[name="exp_duration"]').value,
+                    start_date: row.querySelector('[name="exp_start"]').value || null,
+                    end_date: row.querySelector('[name="exp_end"]').value || null,
+                    key_responsibilities: row.querySelector('[name="exp_responsibilities"]').value,
+                });
+            });
+
+            // Extract technical competencies
+            const techCompetencies = [
+                ...document.getElementById('techLanguages').value.split(',').map(v => ({ category: "languages", competency_name: v.trim() })),
+                ...document.getElementById('techSoftware').value.split(',').map(v => ({ category: "software_tools", competency_name: v.trim() })),
+                ...document.getElementById('techOthers').value.split(',').map(v => ({ category: "other_skills", competency_name: v.trim() }))
+            ].filter(v => v.competency_name);
+
+            // Extract BTech project data
+            const btechFields = {};
+            document.querySelectorAll('#btechFields .custom-project-field').forEach(field => {
+                const key = field.querySelector('[name="btech_heading"]').value;
+                const value = field.querySelector('[name="btech_content"]').value;
+                if (key) btechFields[key] = value;
+            });
+            const btechData = {
+                project_title: document.getElementById('btechTitle').value,
+                project_data: btechFields,
+            };
+
+            // Extract MTech project data
+            const mtechFields = {};
+            document.querySelectorAll('#mtechFields .custom-project-field').forEach(field => {
+                const key = field.querySelector('[name="mtech_heading"]').value;
+                const value = field.querySelector('[name="mtech_content"]').value;
+                if (key) mtechFields[key] = value;
+            });
+            const mtechData = {
+                project_title: document.getElementById('mtechTitle').value,
+                project_data: mtechFields,
+            };
+
+            // Extract achievements & activities
+            const achievementEntries = [];
+            document.querySelectorAll('#achievementRows .dynamic-row').forEach(row => {
+                achievementEntries.push({
+                    category: row.querySelector('[name="ach_category"]').value,
+                    title: row.querySelector('[name="ach_title"]').value,
+                    organization: row.querySelector('[name="ach_org"]').value,
+                    date_achieved: row.querySelector('[name="ach_date"]').value || null,
+                    description: row.querySelector('[name="ach_desc"]').value,
+                });
+            });
+
+            // Extract publications
+            const publicationEntries = [];
+            document.querySelectorAll('#publicationRows .dynamic-row').forEach(row => {
+                publicationEntries.push({
+                    publication_type: row.querySelector('[name="pub_type"]').value,
+                    title: row.querySelector('[name="pub_title"]').value,
+                    authors: row.querySelector('[name="pub_authors"]').value,
+                    journal_conference: row.querySelector('[name="pub_journal"]').value,
+                    publication_date: row.querySelector('[name="pub_date"]').value || null,
+                    doi: row.querySelector('[name="pub_doi"]').value,
+                    isbn: '',
+                    pages: row.querySelector('[name="pub_pages"]').value,
+                    volume: row.querySelector('[name="pub_volume"]').value,
+                    issue: row.querySelector('[name="pub_issue"]').value,
+                    abstract: row.querySelector('[name="pub_abstract"]').value,
+                });
+            });
+
+            // Main profile data object
+            const profileData = {
+                user_id: currentUser.user_id,
+                name: document.getElementById('profName').value,
+                department: parseInt(document.getElementById('profDept').value),
+                designation: document.getElementById('profDesig').value,
+                experience: parseInt(document.getElementById('profExp').value),
+                research_papers: document.getElementById('profResearch').value,
+                achievements: document.getElementById('profAchieve').value,
+                custom_fields: customFieldsData,
+                date_of_birth: document.getElementById('profDOB').value || null,
+                address: document.getElementById('profAddress').value || null,
+                languages_known: document.getElementById('profLanguages').value.split(',').map(l => l.trim()).filter(Boolean),
+                is_published: true
+            };
+
+            if (imageUrl) {
+                profileData.profile_image = imageUrl;
+            }
+
+            try {
+                let savedProfile;
+                if (editingProfile) {
+                    const { data, error } = await sb.from('profiles').update(profileData).eq('user_id', currentUser.user_id).select('profile_id').single();
+                    if (error) throw error;
+                    savedProfile = data;
+                } else {
+                    const { data, error } = await sb.from('profiles').insert(profileData).select('profile_id').single();
+                    if (error) throw error;
+                    savedProfile = data;
+                }
+
+                const profile_id = savedProfile.profile_id;
+
+                // Education
+                await sb.from('educational_qualifications').delete().eq('profile_id', profile_id);
+                if (educationData.length) await sb.from('educational_qualifications').insert(
+                    educationData.map(e => ({ ...e, profile_id }))
+                );
+
+                // Experience
+                await sb.from('experience_profile').delete().eq('profile_id', profile_id);
+                if (experienceData.length) await sb.from('experience_profile').insert(
+                    experienceData.map(e => ({ ...e, profile_id }))
+                );
+
+                // Technical competencies
+                await sb.from('technical_competencies').delete().eq('profile_id', profile_id);
+                if (techCompetencies.length) await sb.from('technical_competencies').insert(
+                    techCompetencies.map(e => ({ ...e, profile_id }))
+                );
+
+                // BTech project
+                await sb.from('btech_projects').delete().eq('profile_id', profile_id);
+                if (btechData.project_title || Object.keys(btechData.project_data).length) {
+                    await sb.from('btech_projects').insert([{ ...btechData, profile_id }]);
+                }
+
+                // MTech project
+                await sb.from('mtech_projects').delete().eq('profile_id', profile_id);
+                if (mtechData.project_title || Object.keys(mtechData.project_data).length) {
+                    await sb.from('mtech_projects').insert([{ ...mtechData, profile_id }]);
+                }
+
+                // Achievements & activities
+                await sb.from('achievements_activities').delete().eq('profile_id', profile_id);
+                if (achievementEntries.length) {
+                    await sb.from('achievements_activities').insert(
+                        achievementEntries.map(a => ({ ...a, profile_id }))
+                    );
+                }
+
+                // Publications
+                await sb.from('publications').delete().eq('profile_id', profile_id);
+                if (publicationEntries.length) {
+                    await sb.from('publications').insert(
+                        publicationEntries.map(p => ({ ...p, profile_id }))
+                    );
+                }
+
+                alert('Profile saved successfully!');
+                editingProfile = false;
+                showPage('myProfilePage');
+                loadMyProfile();
+
+            } catch (error) {
+                console.error('Profile save error:', error);
+                alert('Failed to save profile: ' + error.message);
+            }
+        };
+    }
+    
+    // Post Form
+    const postForm = document.getElementById('postForm');
+    if (postForm) {
+        postForm.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const imageFile = document.getElementById('postImage').files[0];
+            if (!imageFile) return alert('Please select an image');
+            
+            if (!currentUser || !currentUser.user_id) {
+                alert('Please login first');
+                return;
+            }
+            
+            try {
+                const fileExtension = imageFile.name.split('.').pop();
+                const fileName = `posts/${currentUser.user_id}_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+                
+                const formData = new FormData();
+                formData.append('file', imageFile);
+                
+                const uploadResponse = await fetch(`https://nsnacwwcrszpjmanskti.supabase.co/storage/v1/object/posts/${fileName}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4`
+                    },
+                    body: formData
+                });
+                
+                if (!uploadResponse.ok) {
+                    const errorText = await uploadResponse.text();
+                    console.error('Upload failed:', errorText);
+                    return alert('Upload failed: ' + errorText);
+                }
+                
+                const publicUrl = `https://nsnacwwcrszpjmanskti.supabase.co/storage/v1/object/public/posts/${fileName}`;
+                
+                const { error: insertError } = await sb.from('posts').insert({
+                    author_id: currentUser.user_id,
+                    author_type: 'staff',
+                    image_url: publicUrl,
+                    caption: document.getElementById('postCaption').value,
+                    is_published: true
+                });
+                
+                if (insertError) {
+                    console.error('Insert error:', insertError);
+                    return alert('Failed to create post: ' + insertError.message);
+                }
+                
+                alert('Post created successfully!');
+                closePostModal();
+                loadMyProfile();
+                
+            } catch (error) {
+                console.error('Unexpected error:', error);
+                alert('Upload failed. Please try again.');
+            }
+        };
+    }
+    
+    // Edit Post Form
+    const editPostForm = document.getElementById('editPostForm');
+    if (editPostForm) {
+        editPostForm.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            if (!currentEditingPost) {
+                return alert('No post selected for editing');
+            }
+            
+            try {
+                const newCaption = document.getElementById('editPostCaption').value;
+                const newImageFile = document.getElementById('editPostImage').files[0];
+                
+                let updateData = {
+                    caption: newCaption,
+                    updated_at: new Date().toISOString()
+                };
+                
+                if (newImageFile) {
+                    const submitBtn = e.target.querySelector('button[type="submit"]');
+                    const originalText = submitBtn.textContent;
+                    submitBtn.textContent = 'Uploading...';
+                    submitBtn.disabled = true;
+                    
+                    const fileName = `posts/${currentUser.user_id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.${newImageFile.name.split('.').pop()}`;
+                    
+                    const { data: uploadData, error: uploadError } = await sb.storage
+                        .from('posts')
+                        .upload(fileName, newImageFile);
+                    
+                    if (uploadError) {
+                        submitBtn.textContent = originalText;
+                        submitBtn.disabled = false;
+                        throw uploadError;
+                    }
+                    
+                    const { data: { publicUrl } } = sb.storage.from('posts').getPublicUrl(fileName);
+                    updateData.image_url = publicUrl;
+                    
+                    try {
+                        const oldFileName = currentEditingPost.image_url.split('/').pop();
+                        await sb.storage.from('posts').remove([oldFileName]);
+                    } catch (deleteError) {
+                        console.log('Could not delete old image:', deleteError);
+                    }
+                    
+                    submitBtn.textContent = originalText;
+                    submitBtn.disabled = false;
+                }
+                
+                const { error: updateError } = await sb
+                    .from('posts')
+                    .update(updateData)
+                    .eq('post_id', currentEditingPost.post_id);
+                
+                if (updateError) throw updateError;
+                
+                alert('Post updated successfully! 🎉');
+                closeEditPostModal();
+                loadMyProfile();
+                
+            } catch (error) {
+                console.error('Error updating post:', error);
+                alert('Failed to update post: ' + error.message);
+                
+                const submitBtn = e.target.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.textContent = 'Update Post';
+                    submitBtn.disabled = false;
+                }
+            }
+        };
+    }
+    
+    // ========================================
+    // INITIALIZE APPLICATION
+    // ========================================
+    
+    loadDepartments();
+    updateAuthText();
+    
+    const params = new URLSearchParams(location.search);
+    
+    if (params.get('dept')) {
+        // Load department view (if needed)
+    } else if (params.get('tpo')) {
+        // Load TPO view (if needed)
+    } else if (currentUser) {
+        showPage('myProfilePage');
+        loadMyProfile();
+    } else {
+        showPage('loginPage');
+    }
+});
+</script>
 </body>
 </html>
