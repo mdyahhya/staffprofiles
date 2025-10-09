@@ -264,12 +264,49 @@
     height: 180px;
     object-fit: cover;
 }
+.profile-header .profile-name {
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.profile-header .profile-designation {
+    font-size: 22px;
+    opacity: 0.9;
+}
 
 .post-caption {
-    padding: 15px;
-    color: #333;
-    line-height: 1.5;
-    flex-grow: 1;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.post-date {
+    font-size: 14px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-entry div {
+        font-size: 14px;
+    }
+    .profile-entry div strong {
+        font-size: 15px;
+    }
+    .profile-section h3 {
+        font-size: 20px;
+    }
+    .profile-header .profile-name {
+        font-size: 28px;
+    }
+    .profile-header .profile-designation {
+        font-size: 18px;
+    }
+    .post-caption {
+        font-size: 14px;
+    }
+    .post-date {
+        font-size: 12px;
+    }
 }
 
 .post-date {
