@@ -32,7 +32,7 @@
 }
 
 .profile-table th, .profile-table td {
-    padding: 6px 8px; /* Reduced padding */
+    /* padding: 6px 8px;  Reduced padding */
     word-break: break-word; /* Break long words or URLs */
     white-space: normal; /* Allow wrapping */
 }
@@ -59,6 +59,83 @@
     border-radius: 50%;
     border: 3px solid #8B5CF6;
     object-fit: cover;
+}
+
+
+
+
+.profile-section {
+    margin-bottom: 30px;
+}
+
+.profile-section h3 {
+    color: #8B5CF6;
+    border-bottom: 2px solid #8B5CF6;
+    padding-bottom: 8px;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.profile-entry {
+    background: #fafaff;
+    border-radius: 8px;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(124, 58, 237, 0.1);
+}
+
+.profile-entry div {
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.profile-entry div strong {
+    color: #7C3AED;
+}
+
+.posts-section {
+    margin-top: 40px;
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.post-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.post-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.post-caption {
+    padding: 15px;
+    color: #333;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.post-date {
+    padding: 0 15px 15px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .profile-entry div {
+        font-size: 13px;
+    }
 }
 
 
@@ -364,9 +441,7 @@
         grid-template-columns: 1fr;
     }
     
-    .profile-container {
-        padding: 15px;
-    }
+    
 }
 
 
@@ -413,179 +488,125 @@
         // window.addEventListener('popstate', function(event) { goBack(); });
 
         // Helper function to render tables
-        function renderTable(data, columns) {
-            if (!data || data.length === 0) return '<div style="color:#aaa;padding:14px;">Not Provided</div>';
-            const colKeys = columns.map(c => c.key);
-            return `
-                <table class="profile-table">
-                    <thead>
-                        <tr>${columns.map(c => `<th>${c.label}</th>`).join('')}</tr>
-                    </thead>
-                    <tbody>
-                        ${data.map(row => `
-                            <tr>${colKeys.map(key => `<td>${row[key] || ''}</td>`).join('')}</tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
+        function renderListSection(title, entries, fields) {
+    if (!entries || entries.length === 0) {
+        return `<div class="profile-section"><h3>${title}</h3><p style="color:#999;">No information provided.</p></div>`;
+    }
+    return `
+      <div class="profile-section">
+        <h3>${title}</h3>
+        ${entries.map(entry => `
+          <div class="profile-entry" style="margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px solid #ddd;">
+            ${fields.map(field => `
+              <div><strong>${field.label}:</strong> ${entry[field.key] || 'N/A'}</div>
+            `).join('')}
+          </div>
+        `).join('')}
+      </div>
+    `;
+}
+
+async function loadStaffProfile() {
+    const params = new URLSearchParams(window.location.search);
+    const profileId = params.get('id');
+
+    if (!profileId) {
+        document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
+        return;
+    }
+
+    try {
+        const { data: profile, error } = await supabaseClient.from('profiles').select('*').eq('profile_id', profileId).single();
+        if (error || !profile) {
+            document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
+            return;
         }
 
-        async function loadStaffProfile() {
-            const params = new URLSearchParams(window.location.search);
-            const profileId = params.get('id');
-            const tpoId = params.get('tpo');
-            
-            if (tpoId) {
-                // Load TPO profile
-                try {
-                    const { data: tpo, error } = await supabaseClient.from('tpo').select('*').eq('tpo_id', tpoId).single();
-                    if (error || !tpo) {
-                        document.getElementById('profileContent').innerHTML = '<div class="loading">TPO profile not found</div>';
-                        return;
-                    }
-                    // Load Posts
-                    const { data: tpoPosts } = await supabaseClient.from('posts').select('*').eq('author_type', 'tpo').eq('is_published', true).order('created_at', { ascending: false });
+        const { data: dept } = await supabaseClient.from('departments').select('dept_name').eq('dept_id', profile.department).single();
 
-                    document.getElementById('profileContent').innerHTML = `
-                    <div class="profile-header">
-                        <div class="profile-image">
-                            ${tpo.profile_image ? `<img src="${tpo.profile_image}" alt="${tpo.name}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : '👤'}
-                        </div>
-                        <div class="profile-name">${tpo.name}</div>
-                        <div class="profile-designation">${tpo.designation}</div>
-                        <div style="margin-top:10px; opacity:0.8;">Training & Placement Officer</div>
-                    </div>
-                    <div class="profile-details">
-                        ${tpo.description ? `<div class="detail-item"><div class="detail-label">About</div><div class="detail-value">${tpo.description}</div></div>` : ''}
-                        ${tpo.contact_email ? `<div class="detail-item"><div class="detail-label">Email</div><div class="detail-value"><a href="mailto:${tpo.contact_email}">${tpo.contact_email}</a></div></div>` : ''}
-                        ${tpo.contact_phone ? `<div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value"><a href="tel:${tpo.contact_phone}">${tpo.contact_phone}</a></div></div>` : ''}
-                        ${tpo.qualification ? `<div class="detail-item"><div class="detail-label">Qualification</div><div class="detail-value">${tpo.qualification}</div></div>` : ''}
-                        ${tpo.experience ? `<div class="detail-item"><div class="detail-label">Experience</div><div class="detail-value">${tpo.experience} years</div></div>` : ''}
-                        ${tpo.specialization ? `<div class="detail-item"><div class="detail-label">Specialization</div><div class="detail-value">${tpo.specialization}</div></div>` : ''}
-                    </div>
-                    ${tpoPosts && tpoPosts.length > 0 ? `
-                        <div class="posts-section" style="margin-top:30px;">
-                            <h3 style="color:#8B5CF6; margin-bottom:20px; font-size:1.3em;">Recent Posts</h3>
-                            <div class="posts-grid">
-                                ${tpoPosts.map(post => `
-                                    <div class="post-card" style="background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.1); margin-bottom:20px;">
-                                        <img src="${post.image_url}" alt="Post" style="width:100%; height:200px; object-fit:cover;">
-                                        ${post.caption ? `<div style="padding: 15px; color: #333; line-height: 1.5;">${post.caption}</div>` : ''}
-                                        <div style="padding:0 15px 15px; color:#666; font-size:0.9em;">${new Date(post.created_at).toLocaleDateString()}</div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>` : ''}
-                    `;
-                    return;
-                } catch (err) {
-                    console.error('Error loading TPO:', err);
-                    document.getElementById('profileContent').innerHTML = '<div class="loading">Error loading TPO profile</div>';
-                    return;
-                }
-            }
-            
-            if (!profileId) {
-                document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
-                return;
-            }
-            
-            try {
-                const { data: profile, error: profileError } = await supabaseClient.from('profiles').select('*').eq('profile_id', profileId).single();
-                if (profileError || !profile) {
-                    document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
-                    return;
-                }
-                
-                // Get department name
-                const { data: dept } = await supabaseClient.from('departments').select('dept_name').eq('dept_id', profile.department).single();
+        // Fetch all detail sections
+        const [
+            { data: edu },
+            { data: exp },
+            { data: tech },
+            { data: btech },
+            { data: mtech },
+            { data: achieve },
+            { data: pubs },
+            { data: posts }
+        ] = await Promise.all([
+            supabaseClient.from('educational_qualifications').select('*').eq('profile_id', profile.profile_id),
+            supabaseClient.from('experience_profile').select('*').eq('profile_id', profile.profile_id),
+            supabaseClient.from('technical_competencies').select('*').eq('profile_id', profile.profile_id),
+            supabaseClient.from('btech_projects').select('*').eq('profile_id', profile.profile_id),
+            supabaseClient.from('mtech_projects').select('*').eq('profile_id', profile.profile_id),
+            supabaseClient.from('achievements_activities').select('*').eq('profile_id', profile.profile_id),
+            supabaseClient.from('publications').select('*').eq('profile_id', profile.profile_id),
+            supabaseClient.from('posts').select('*').eq('author_id', profile.user_id).eq('author_type', 'staff').eq('is_published', true).order('created_at', { ascending: false }),
+        ]);
 
-                // Load related profile sections
-                const [
-                    { data: edu },
-                    { data: exp },
-                    { data: tech },
-                    { data: btech },
-                    { data: mtech },
-                    { data: achieve },
-                    { data: pubs },
-                    { data: posts }
-                ] = await Promise.all([
-                    supabaseClient.from('educational_qualifications').select('*').eq('profile_id', profile.profile_id),
-                    supabaseClient.from('experience_profile').select('*').eq('profile_id', profile.profile_id),
-                    supabaseClient.from('technical_competencies').select('*').eq('profile_id', profile.profile_id),
-                    supabaseClient.from('btech_projects').select('*').eq('profile_id', profile.profile_id),
-                    supabaseClient.from('mtech_projects').select('*').eq('profile_id', profile.profile_id),
-                    supabaseClient.from('achievements_activities').select('*').eq('profile_id', profile.profile_id),
-                    supabaseClient.from('publications').select('*').eq('profile_id', profile.profile_id),
-                    supabaseClient.from('posts').select('*').eq('author_id', profile.user_id).eq('author_type', 'staff').eq('is_published', true).order('created_at', { ascending: false })
-                ]);
-                
-                // Render educational qualifications HTML
-                const eduHTML = renderTable(edu, [
+        // Prepare technical skills string
+        const langSkills = tech.filter(t => t.category === "languages").map(t => t.competency_name).join(", ") || 'N/A';
+        const softSkills = tech.filter(t => t.category === "software_tools").map(t => t.competency_name).join(", ") || 'N/A';
+        const otherSkills = tech.filter(t => t.category === "other_skills").map(t => t.competency_name).join(", ") || 'N/A';
+
+        // Prepare BTech/MTech projects description lists
+        function renderProject(proj, label) {
+            if (!proj) return '';
+            let html = `<div class="profile-section"><h3>${label}</h3><div><strong>Title:</strong> ${proj.project_title || 'N/A'}</div>`;
+            if (proj.project_data && Object.keys(proj.project_data).length) {
+                html += '<ul style="margin-top:8px;">' + Object.entries(proj.project_data).map(([key, val]) =>
+                    `<li><strong>${key}:</strong> ${val}</li>`
+                ).join('') + '</ul>';
+            }
+            html += '</div></div>';
+            return html;
+        }
+
+        // Build HTML
+        document.getElementById('profileContent').innerHTML = `
+            <div class="profile-header">
+                <div class="profile-image">
+                    ${profile.profile_image ? `<img src="${profile.profile_image}" alt="${profile.name}">` : '👤'}
+                </div>
+                <div class="profile-name">${profile.name}</div>
+                <div class="profile-designation">${profile.designation}</div>
+                <div style="margin-top: 10px; opacity: 0.8;">${dept?.dept_name || ''}</div>
+                <div><strong>Date of Birth:</strong> ${profile.date_of_birth || 'N/A'}</div>
+                <div><strong>Address:</strong> ${profile.address || 'N/A'}</div>
+                <div><strong>Languages Known:</strong> ${Array.isArray(profile.languages_known) ? profile.languages_known.join(', ') : profile.languages_known || 'N/A'}</div>
+            </div>
+            <div class="profile-details">
+                ${renderListSection('Educational Qualifications', edu, [
                     { label: 'Exam/Degree', key: 'exam_name' },
                     { label: 'Board/University', key: 'board_university' },
                     { label: 'Marks %', key: 'marks_percentage' },
                     { label: 'Class Obtained', key: 'class_obtained' },
-                    { label: 'Year of Passing', key: 'year_of_passing' }
-                ]);
-                
-                // Experience HTML
-                const expHTML = renderTable(exp, [
+                    { label: 'Year of Passing', key: 'year_of_passing' },
+                ])}
+                ${renderListSection('Experience Profile', exp, [
                     { label: 'Role', key: 'role' },
                     { label: 'Organization', key: 'organization' },
                     { label: 'Duration', key: 'duration' },
-                    { label: 'Key Responsibilities', key: 'key_responsibilities' },
                     { label: 'Start Date', key: 'start_date' },
-                    { label: 'End Date', key: 'end_date' }
-                ]);
-                
-                // Technical competencies grouped by category
-                let langSkills = tech.filter(t => t.category === 'languages').map(t => t.competency_name).join(', ') || 'Not Provided';
-                let softSkills = tech.filter(t => t.category === 'software_tools').map(t => t.competency_name).join(', ') || 'Not Provided';
-                let otherSkills = tech.filter(t => t.category === 'other_skills').map(t => t.competency_name).join(', ') || 'Not Provided';
-
-                // BTech Project HTML
-                const bproj = btech.length > 0 ? btech[0] : null;
-                let btechHTML = '';
-                if(bproj) {
-                    btechHTML += `<div><h3>BTech Project</h3><div><b>Title:</b> ${bproj.project_title || 'N/A'}</div>`;
-                    if(bproj.project_data && Object.keys(bproj.project_data).length > 0) {
-                        btechHTML += '<ul>';
-                        for(const [k,v] of Object.entries(bproj.project_data)) {
-                            btechHTML += `<li><b>${k}:</b> ${v}</li>`;
-                        }
-                        btechHTML += '</ul>';
-                    }
-                    btechHTML += '</div>';
-                }
-
-                // MTech Project HTML
-                const mproj = mtech.length > 0 ? mtech[0] : null;
-                let mtechHTML = '';
-                if(mproj) {
-                    mtechHTML += `<div><h3>MTech Project</h3><div><b>Title:</b> ${mproj.project_title || 'N/A'}</div>`;
-                    if(mproj.project_data && Object.keys(mproj.project_data).length > 0) {
-                        mtechHTML += '<ul>';
-                        for(const [k,v] of Object.entries(mproj.project_data)) {
-                            mtechHTML += `<li><b>${k}:</b> ${v}</li>`;
-                        }
-                        mtechHTML += '</ul>';
-                    }
-                    mtechHTML += '</div>';
-                }
-
-                // Achievements HTML
-                const achieveHTML = renderTable(achieve, [
+                    { label: 'End Date', key: 'end_date' },
+                    { label: 'Key Responsibilities', key: 'key_responsibilities' },
+                ])}
+                <div class="profile-section"><h3>Technical Core Competencies</h3>
+                    <div><strong>Programming Languages:</strong> ${langSkills}</div>
+                    <div><strong>Software & Tools:</strong> ${softSkills}</div>
+                    <div><strong>Other Skills:</strong> ${otherSkills}</div>
+                </div>
+                ${renderProject(btech.length ? btech[0] : null, 'BTech Project')}
+                ${renderProject(mtech.length ? mtech[0] : null, 'MTech Project')}
+                ${renderListSection('Achievements & Activities', achieve, [
                     { label: 'Category', key: 'category' },
                     { label: 'Title', key: 'title' },
                     { label: 'Organization', key: 'organization' },
                     { label: 'Date Achieved', key: 'date_achieved' },
-                    { label: 'Description', key: 'description' }
-                ]);
-
-                // Publications HTML
-                const pubHTML = renderTable(pubs, [
+                    { label: 'Description', key: 'description' },
+                ])}
+                ${renderListSection('Publications', pubs, [
                     { label: 'Type', key: 'publication_type' },
                     { label: 'Title', key: 'title' },
                     { label: 'Authors', key: 'authors' },
@@ -595,64 +616,38 @@
                     { label: 'Pages', key: 'pages' },
                     { label: 'Volume', key: 'volume' },
                     { label: 'Issue', key: 'issue' },
-                    { label: 'Abstract', key: 'abstract' }
-                ]);
-
-                const initials = profile.name.split(' ').map(n => n[0]).join('').substring(0, 2);
-                const img = profile.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%238B5CF6' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' font-size='60' fill='white' text-anchor='middle' dy='.3em'%3E${initials}%3C/text%3E%3C/svg%3E`;
-
-                document.getElementById('profileContent').innerHTML = `
-                    <div class="profile-header">
-                        <div class="profile-image">${profile.profile_image ? `<img src="${profile.profile_image}" alt="${profile.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '👤'}</div>
-                        <div class="profile-name">${profile.name}</div>
-                        <div class="profile-designation">${profile.designation}</div>
-                        <div style="margin-top:10px;opacity:0.8;">${dept?.dept_name || ''}</div>
-                        <div><b>Date of Birth:</b> ${profile.date_of_birth || 'N/A'}</div>
-                        <div><b>Address:</b> ${profile.address || 'N/A'}</div>
-                        <div><b>Languages Known:</b> ${Array.isArray(profile.languages_known) ? profile.languages_known.join(', ') : profile.languages_known || 'N/A'}</div>
-                    </div>
-                    <div class="profile-details">
-                        <h3>Educational Qualifications</h3>
-                        ${eduHTML}
-                        <h3>Experience Profile</h3>
-                        ${expHTML}
-                        <h3>Technical Core Competencies</h3>
-                        <div><b>Programming Languages:</b> ${langSkills}</div>
-                        <div><b>Software & Tools:</b> ${softSkills}</div>
-                        <div><b>Other Skills:</b> ${otherSkills}</div>
-                        ${btechHTML}
-                        ${mtechHTML}
-                        <h3>Achievements & Activities</h3>
-                        ${achieveHTML}
-                        <h3>Publications</h3>
-                        ${pubHTML}
-                        <h3>Other Details</h3>
-                        <div class="detail-item">
-                            <div class="detail-label">Experience</div>
-                            <div class="detail-value">${profile.experience} years</div>
+                    { label: 'Abstract', key: 'abstract' },
+                ])}
+                <div class="profile-section">
+                    <h3>Other Details</h3>
+                    <div><strong>Experience:</strong> ${profile.experience} years</div>
+                    ${profile.research_papers ? `<div><strong>Research & Expertise:</strong> ${profile.research_papers}</div>` : ''}
+                    ${profile.achievements ? `<div><strong>Achievements:</strong> ${profile.achievements}</div>` : ''}
+                    ${profile.custom_fields && Object.keys(profile.custom_fields).length > 0 ? 
+                        `<div><h4>Custom Fields</h4>${Object.entries(profile.custom_fields).map(([k, v]) => `<div><strong>${k}:</strong> ${v}</div>`).join('')}</div>` : ''}
+                </div>
+                ${posts && posts.length > 0 ? `
+                    <div class="posts-section">
+                        <h3>Recent Posts</h3>
+                        <div class="posts-grid">
+                            ${posts.map(post => `
+                                <div class="post-card">
+                                    <img src="${post.image_url}" alt="Post">
+                                    ${post.caption ? `<div class="post-caption">${post.caption}</div>` : ''}
+                                    <div class="post-date">${new Date(post.created_at).toLocaleDateString()}</div>
+                                </div>
+                            `).join('')}
                         </div>
-                        ${profile.research_papers ? `<div class="detail-item"><div class="detail-label">Research & Expertise</div><div class="detail-value">${profile.research_papers}</div></div>` : ''}
-                        ${profile.achievements ? `<div class="detail-item"><div class="detail-label">Achievements</div><div class="detail-value">${profile.achievements}</div></div>` : ''}
-                        ${profile.custom_fields && Object.keys(profile.custom_fields).length > 0 ? Object.entries(profile.custom_fields).map(([k, v]) => `<div class="detail-item"><div class="detail-label">${k}</div><div class="detail-value">${v}</div></div>`).join('') : ''}
-                    </div>
-                    ${posts && posts.length > 0 ? `
-                        <div class="posts-section" style="margin-top:30px;">
-                            <h3 style="color:#8B5CF6; margin-bottom:20px;">Recent Posts</h3>
-                            <div class="posts-grid">
-                                ${posts.map(post => `
-                                    <div class="post-card" style="background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.1); margin-bottom:20px;">
-                                        <img src="${post.image_url}" alt="Post" style="width:100%; height:200px; object-fit:cover;">
-                                        ${post.caption ? `<div style="padding: 15px; color: #333; line-height: 1.5;">${post.caption}</div>` : ''}
-                                        <div style="padding:0 15px 15px; color:#666; font-size:0.9em;">${new Date(post.created_at).toLocaleDateString()}</div>
-                                    </div>`).join('')}
-                            </div>
-                        </div>` : ''}
-                `;
-            } catch (error) {
-                console.error('Error loading profile:', error);
-                document.getElementById('profileContent').innerHTML = '<div class="loading">Error loading profile</div>';
-            }
-        }
+                    </div>` : ''}
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error loading profile:', error);
+        document.getElementById('profileContent').innerHTML = '<div class="loading">Error loading profile</div>';
+    }
+}
+
+
 
         loadStaffProfile();
     </script>
