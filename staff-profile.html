@@ -7,95 +7,330 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .profile-container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .back-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            background: #8B5CF6;
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 25px;
-            font-weight: 600;
-            cursor: pointer;
-            z-index: 1000;
-            transition: all 0.3s ease;
-        }
-        
-        .profile-header {
-            text-align: center;
-            background: linear-gradient(135deg, #8B5CF6, #7C3AED);
-            color: white;
-            padding: 30px;
-            border-radius: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .profile-image {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            margin: 0 auto 20px;
-            border: 5px solid white;
-            overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 4em;
-            background: rgba(255,255,255,0.1);
-        }
-        
-        .profile-name {
-            font-size: 2em;
-            margin-bottom: 10px;
-            font-weight: 700;
-        }
-        
-        .profile-designation {
-            font-size: 1.2em;
-            opacity: 0.9;
-        }
-        
-        .profile-details {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-        }
-        
-        .detail-item {
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .detail-item:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-        }
-        
-        .detail-label {
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #8B5CF6;
-            margin-bottom: 8px;
-        }
-        
-        .detail-value {
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 50px;
-            color: #8B5CF6;
-        }
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.back-btn {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: #8B5CF6;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.profile-header {
+    text-align: center;
+    background: linear-gradient(135deg, #8B5CF6, #7C3AED);
+    color: white;
+    padding: 30px;
+    border-radius: 20px;
+    margin-bottom: 30px;
+}
+
+.profile-image {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    border: 5px solid white;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4em;
+    background: rgba(255,255,255,0.1);
+}
+
+.profile-name {
+    font-size: 2em;
+    margin-bottom: 10px;
+    font-weight: 700;
+}
+
+.profile-designation {
+    font-size: 1.2em;
+    opacity: 0.9;
+}
+
+.profile-details {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+.detail-item {
+    margin-bottom: 25px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.detail-label {
+    font-size: 1.1em;
+    font-weight: 600;
+    color: #8B5CF6;
+    margin-bottom: 8px;
+}
+
+.detail-value {
+    color: #333;
+    line-height: 1.6;
+}
+
+.loading {
+    text-align: center;
+    padding: 50px;
+    color: #8B5CF6;
+}
+
+.profile-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 14px;
+}
+
+.profile-table th, .profile-table td {
+    border: 1px solid #ddd;
+    padding: 10px 15px;
+    vertical-align: top;
+}
+
+.profile-table th {
+    background-color: #f4f4fa;
+    color: #7C3AED;
+    font-weight: 600;
+    text-align: left;
+}
+
+.profile-table tr:nth-child(even) {
+    background-color: #fafaff;
+}
+
+.posts-section {
+    margin-top: 40px;
+}
+
+.posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.post-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.post-card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.post-caption {
+    padding: 15px;
+    color: #333;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.post-date {
+    padding: 0 15px 15px;
+    color: #666;
+    font-size: 0.9em;
+}
+
+/* Form container styling */
+.form-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 15px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+}
+
+/* Form groups */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #7C3AED;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus {
+    border-color: #8B5CF6;
+    outline: none;
+}
+
+.form-textarea {
+    resize: vertical;
+}
+
+/* Dynamic rows and custom fields */
+.dynamic-row,
+.custom-project-field {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    background: #fafaff;
+    position: relative;
+}
+
+/* Row header with remove button */
+.row-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.row-header h4 {
+    color: #8B5CF6;
+    font-weight: 700;
+    margin: 0;
+}
+
+.remove-btn {
+    background: #EF4444;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.remove-btn:hover {
+    background: #DC2626;
+}
+
+/* Form row grid for input pairings */
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+/* Add button for dynamic rows */
+.add-btn {
+    display: inline-block;
+    background-color: #8B5CF6;
+    padding: 10px 24px;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    margin-bottom: 25px;
+    transition: background-color 0.3s;
+}
+
+.add-btn:hover {
+    background-color: #7C3AED;
+    color: white;
+}
+
+/* Modal styles - for post modals */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1500;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 70px auto;
+    padding: 20px 30px;
+    border-radius: 15px;
+    max-width: 600px;
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    font-size: 22px;
+    cursor: pointer;
+    font-weight: 600;
+    background: none;
+    border: none;
+    color: #7C3AED;
+}
+
+.current-image-section img {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+    border: 2px solid #8B5CF6;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .profile-container {
+        padding: 15px;
+    }
+}
+
+
     </style>
 </head>
 <body>
@@ -108,257 +343,280 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <script>
-        const supabaseClient = supabase.createClient('https://nsnacwwcrszpjmanskti.supabase.co', 
-            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4');
-        
-        // REPLACE goBack function and event listener
-function goBack() {
-    // Clear history and go to specific page
-    window.history.replaceState(null, null, window.location.href);
-    
-    const params = new URLSearchParams(window.location.search);
-    const isStaffProfile = window.location.pathname.includes('staff-profile.html');
-    const isProfilesPage = window.location.pathname.includes('profiles.html');
-    
-    if (isStaffProfile) {
-        // From staff profile, go back to department profiles page
-        const dept = sessionStorage.getItem('currentDept');
-        if (dept) {
-            window.location.replace(`profiles.html?dept=${dept}`);
-        } else {
-            window.location.replace('index.html');
-        }
-    } else if (isProfilesPage) {
-        // From profiles page, go back to home
-        window.location.replace('index.html');
-    } else {
-        // Default: go to home
-        window.location.replace('index.html');
-    }
-}
+        const supabaseClient = supabase.createClient(
+            'https://nsnacwwcrszpjmanskti.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4'
+        );
 
-// REMOVE the popstate event listener completely
-// Don't add any popstate event listener
-
-        
-        // Handle browser back button
-        window.addEventListener('popstate', function(event) {
-            goBack();
-        });
-        
-       async function loadStaffProfile() {
-    const params = new URLSearchParams(window.location.search);
-    const profileId = params.get('id');
-    const tpoId = params.get('tpo');
-    
-    if (tpoId) {
-        // TPO profile loading (keep existing TPO code)
-        try {
-            const { data: tpo, error } = await supabaseClient
-                .from('tpo')
-                .select('*')
-                .eq('tpo_id', tpoId)
-                .single();
+        function goBack() {
+            window.history.replaceState(null, null, window.location.href);
+            const params = new URLSearchParams(window.location.search);
+            const isStaffProfile = window.location.pathname.includes('staff-profile.html');
+            const isProfilesPage = window.location.pathname.includes('profiles.html');
             
-            if (error || !tpo) {
-                document.getElementById('profileContent').innerHTML = '<div class="loading">TPO profile not found</div>';
+            if (isStaffProfile) {
+                const dept = sessionStorage.getItem('currentDept');
+                if (dept) {
+                    window.location.replace(`profiles.html?dept=${dept}`);
+                } else {
+                    window.location.replace('index.html');
+                }
+            } else if (isProfilesPage) {
+                window.location.replace('index.html');
+            } else {
+                window.location.replace('index.html');
+            }
+        }
+
+        // Remove popstate listener per previous instructions
+        // window.addEventListener('popstate', function(event) { goBack(); });
+
+        // Helper function to render tables
+        function renderTable(data, columns) {
+            if (!data || data.length === 0) return '<div style="color:#aaa;padding:14px;">Not Provided</div>';
+            const colKeys = columns.map(c => c.key);
+            return `
+                <table class="profile-table">
+                    <thead>
+                        <tr>${columns.map(c => `<th>${c.label}</th>`).join('')}</tr>
+                    </thead>
+                    <tbody>
+                        ${data.map(row => `
+                            <tr>${colKeys.map(key => `<td>${row[key] || ''}</td>`).join('')}</tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function loadStaffProfile() {
+            const params = new URLSearchParams(window.location.search);
+            const profileId = params.get('id');
+            const tpoId = params.get('tpo');
+            
+            if (tpoId) {
+                // Load TPO profile
+                try {
+                    const { data: tpo, error } = await supabaseClient.from('tpo').select('*').eq('tpo_id', tpoId).single();
+                    if (error || !tpo) {
+                        document.getElementById('profileContent').innerHTML = '<div class="loading">TPO profile not found</div>';
+                        return;
+                    }
+                    // Load Posts
+                    const { data: tpoPosts } = await supabaseClient.from('posts').select('*').eq('author_type', 'tpo').eq('is_published', true).order('created_at', { ascending: false });
+
+                    document.getElementById('profileContent').innerHTML = `
+                    <div class="profile-header">
+                        <div class="profile-image">
+                            ${tpo.profile_image ? `<img src="${tpo.profile_image}" alt="${tpo.name}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">` : '👤'}
+                        </div>
+                        <div class="profile-name">${tpo.name}</div>
+                        <div class="profile-designation">${tpo.designation}</div>
+                        <div style="margin-top:10px; opacity:0.8;">Training & Placement Officer</div>
+                    </div>
+                    <div class="profile-details">
+                        ${tpo.description ? `<div class="detail-item"><div class="detail-label">About</div><div class="detail-value">${tpo.description}</div></div>` : ''}
+                        ${tpo.contact_email ? `<div class="detail-item"><div class="detail-label">Email</div><div class="detail-value"><a href="mailto:${tpo.contact_email}">${tpo.contact_email}</a></div></div>` : ''}
+                        ${tpo.contact_phone ? `<div class="detail-item"><div class="detail-label">Phone</div><div class="detail-value"><a href="tel:${tpo.contact_phone}">${tpo.contact_phone}</a></div></div>` : ''}
+                        ${tpo.qualification ? `<div class="detail-item"><div class="detail-label">Qualification</div><div class="detail-value">${tpo.qualification}</div></div>` : ''}
+                        ${tpo.experience ? `<div class="detail-item"><div class="detail-label">Experience</div><div class="detail-value">${tpo.experience} years</div></div>` : ''}
+                        ${tpo.specialization ? `<div class="detail-item"><div class="detail-label">Specialization</div><div class="detail-value">${tpo.specialization}</div></div>` : ''}
+                    </div>
+                    ${tpoPosts && tpoPosts.length > 0 ? `
+                        <div class="posts-section" style="margin-top:30px;">
+                            <h3 style="color:#8B5CF6; margin-bottom:20px; font-size:1.3em;">Recent Posts</h3>
+                            <div class="posts-grid">
+                                ${tpoPosts.map(post => `
+                                    <div class="post-card" style="background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.1); margin-bottom:20px;">
+                                        <img src="${post.image_url}" alt="Post" style="width:100%; height:200px; object-fit:cover;">
+                                        ${post.caption ? `<div style="padding: 15px; color: #333; line-height: 1.5;">${post.caption}</div>` : ''}
+                                        <div style="padding:0 15px 15px; color:#666; font-size:0.9em;">${new Date(post.created_at).toLocaleDateString()}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>` : ''}
+                    `;
+                    return;
+                } catch (err) {
+                    console.error('Error loading TPO:', err);
+                    document.getElementById('profileContent').innerHTML = '<div class="loading">Error loading TPO profile</div>';
+                    return;
+                }
+            }
+            
+            if (!profileId) {
+                document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
                 return;
             }
             
-            // Load TPO posts
-            const { data: tpoPosts } = await supabaseClient
-                .from('posts')
-                .select('*')
-                .eq('author_type', 'tpo')
-                .eq('is_published', true)
-                .order('created_at', { ascending: false });
-            
-            document.getElementById('profileContent').innerHTML = `
-                <div class="profile-header">
-                    <div class="profile-image">
-                        ${tpo.profile_image ? 
-                            `<img src="${tpo.profile_image}" alt="${tpo.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
-                            '👤'}
-                    </div>
-                    <div class="profile-name">${tpo.name}</div>
-                    <div class="profile-designation">${tpo.designation}</div>
-                    <div style="margin-top: 10px; opacity: 0.8;">Training & Placement Officer</div>
-                </div>
+            try {
+                const { data: profile, error: profileError } = await supabaseClient.from('profiles').select('*').eq('profile_id', profileId).single();
+                if (profileError || !profile) {
+                    document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
+                    return;
+                }
                 
-                <div class="profile-details">
-                    ${tpo.description ? `
-                        <div class="detail-item">
-                            <div class="detail-label">About</div>
-                            <div class="detail-value">${tpo.description}</div>
-                        </div>
-                    ` : ''}
-                    
-                    ${tpo.contact_email ? `
-                        <div class="detail-item">
-                            <div class="detail-label">Email</div>
-                            <div class="detail-value"><a href="mailto:${tpo.contact_email}" style="color:#8B5CF6;">${tpo.contact_email}</a></div>
-                        </div>
-                    ` : ''}
-                    
-                    ${tpo.contact_phone ? `
-                        <div class="detail-item">
-                            <div class="detail-label">Phone</div>
-                            <div class="detail-value"><a href="tel:${tpo.contact_phone}" style="color:#8B5CF6;">${tpo.contact_phone}</a></div>
-                        </div>
-                    ` : ''}
-                    
-                    
-                    
-                    ${tpo.qualification ? `
-                        <div class="detail-item">
-                            <div class="detail-label">Qualification</div>
-                            <div class="detail-value">${tpo.qualification}</div>
-                        </div>
-                    ` : ''}
-                    
-                    ${tpo.experience ? `
+                // Get department name
+                const { data: dept } = await supabaseClient.from('departments').select('dept_name').eq('dept_id', profile.department).single();
+
+                // Load related profile sections
+                const [
+                    { data: edu },
+                    { data: exp },
+                    { data: tech },
+                    { data: btech },
+                    { data: mtech },
+                    { data: achieve },
+                    { data: pubs },
+                    { data: posts }
+                ] = await Promise.all([
+                    supabaseClient.from('educational_qualifications').select('*').eq('profile_id', profile.profile_id),
+                    supabaseClient.from('experience_profile').select('*').eq('profile_id', profile.profile_id),
+                    supabaseClient.from('technical_competencies').select('*').eq('profile_id', profile.profile_id),
+                    supabaseClient.from('btech_projects').select('*').eq('profile_id', profile.profile_id),
+                    supabaseClient.from('mtech_projects').select('*').eq('profile_id', profile.profile_id),
+                    supabaseClient.from('achievements_activities').select('*').eq('profile_id', profile.profile_id),
+                    supabaseClient.from('publications').select('*').eq('profile_id', profile.profile_id),
+                    supabaseClient.from('posts').select('*').eq('author_id', profile.user_id).eq('author_type', 'staff').eq('is_published', true).order('created_at', { ascending: false })
+                ]);
+                
+                // Render educational qualifications HTML
+                const eduHTML = renderTable(edu, [
+                    { label: 'Exam/Degree', key: 'exam_name' },
+                    { label: 'Board/University', key: 'board_university' },
+                    { label: 'Marks %', key: 'marks_percentage' },
+                    { label: 'Class Obtained', key: 'class_obtained' },
+                    { label: 'Year of Passing', key: 'year_of_passing' }
+                ]);
+                
+                // Experience HTML
+                const expHTML = renderTable(exp, [
+                    { label: 'Role', key: 'role' },
+                    { label: 'Organization', key: 'organization' },
+                    { label: 'Duration', key: 'duration' },
+                    { label: 'Key Responsibilities', key: 'key_responsibilities' },
+                    { label: 'Start Date', key: 'start_date' },
+                    { label: 'End Date', key: 'end_date' }
+                ]);
+                
+                // Technical competencies grouped by category
+                let langSkills = tech.filter(t => t.category === 'languages').map(t => t.competency_name).join(', ') || 'Not Provided';
+                let softSkills = tech.filter(t => t.category === 'software_tools').map(t => t.competency_name).join(', ') || 'Not Provided';
+                let otherSkills = tech.filter(t => t.category === 'other_skills').map(t => t.competency_name).join(', ') || 'Not Provided';
+
+                // BTech Project HTML
+                const bproj = btech.length > 0 ? btech[0] : null;
+                let btechHTML = '';
+                if(bproj) {
+                    btechHTML += `<div><h3>BTech Project</h3><div><b>Title:</b> ${bproj.project_title || 'N/A'}</div>`;
+                    if(bproj.project_data && Object.keys(bproj.project_data).length > 0) {
+                        btechHTML += '<ul>';
+                        for(const [k,v] of Object.entries(bproj.project_data)) {
+                            btechHTML += `<li><b>${k}:</b> ${v}</li>`;
+                        }
+                        btechHTML += '</ul>';
+                    }
+                    btechHTML += '</div>';
+                }
+
+                // MTech Project HTML
+                const mproj = mtech.length > 0 ? mtech[0] : null;
+                let mtechHTML = '';
+                if(mproj) {
+                    mtechHTML += `<div><h3>MTech Project</h3><div><b>Title:</b> ${mproj.project_title || 'N/A'}</div>`;
+                    if(mproj.project_data && Object.keys(mproj.project_data).length > 0) {
+                        mtechHTML += '<ul>';
+                        for(const [k,v] of Object.entries(mproj.project_data)) {
+                            mtechHTML += `<li><b>${k}:</b> ${v}</li>`;
+                        }
+                        mtechHTML += '</ul>';
+                    }
+                    mtechHTML += '</div>';
+                }
+
+                // Achievements HTML
+                const achieveHTML = renderTable(achieve, [
+                    { label: 'Category', key: 'category' },
+                    { label: 'Title', key: 'title' },
+                    { label: 'Organization', key: 'organization' },
+                    { label: 'Date Achieved', key: 'date_achieved' },
+                    { label: 'Description', key: 'description' }
+                ]);
+
+                // Publications HTML
+                const pubHTML = renderTable(pubs, [
+                    { label: 'Type', key: 'publication_type' },
+                    { label: 'Title', key: 'title' },
+                    { label: 'Authors', key: 'authors' },
+                    { label: 'Journal/Conference', key: 'journal_conference' },
+                    { label: 'Date', key: 'publication_date' },
+                    { label: 'DOI', key: 'doi' },
+                    { label: 'Pages', key: 'pages' },
+                    { label: 'Volume', key: 'volume' },
+                    { label: 'Issue', key: 'issue' },
+                    { label: 'Abstract', key: 'abstract' }
+                ]);
+
+                const initials = profile.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+                const img = profile.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%238B5CF6' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' font-size='60' fill='white' text-anchor='middle' dy='.3em'%3E${initials}%3C/text%3E%3C/svg%3E`;
+
+                document.getElementById('profileContent').innerHTML = `
+                    <div class="profile-header">
+                        <div class="profile-image">${profile.profile_image ? `<img src="${profile.profile_image}" alt="${profile.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">` : '👤'}</div>
+                        <div class="profile-name">${profile.name}</div>
+                        <div class="profile-designation">${profile.designation}</div>
+                        <div style="margin-top:10px;opacity:0.8;">${dept?.dept_name || ''}</div>
+                        <div><b>Date of Birth:</b> ${profile.date_of_birth || 'N/A'}</div>
+                        <div><b>Address:</b> ${profile.address || 'N/A'}</div>
+                        <div><b>Languages Known:</b> ${Array.isArray(profile.languages_known) ? profile.languages_known.join(', ') : profile.languages_known || 'N/A'}</div>
+                    </div>
+                    <div class="profile-details">
+                        <h3>Educational Qualifications</h3>
+                        ${eduHTML}
+                        <h3>Experience Profile</h3>
+                        ${expHTML}
+                        <h3>Technical Core Competencies</h3>
+                        <div><b>Programming Languages:</b> ${langSkills}</div>
+                        <div><b>Software & Tools:</b> ${softSkills}</div>
+                        <div><b>Other Skills:</b> ${otherSkills}</div>
+                        ${btechHTML}
+                        ${mtechHTML}
+                        <h3>Achievements & Activities</h3>
+                        ${achieveHTML}
+                        <h3>Publications</h3>
+                        ${pubHTML}
+                        <h3>Other Details</h3>
                         <div class="detail-item">
                             <div class="detail-label">Experience</div>
-                            <div class="detail-value">${tpo.experience} years</div>
+                            <div class="detail-value">${profile.experience} years</div>
                         </div>
-                    ` : ''}
-                    
-                    ${tpo.specialization ? `
-                        <div class="detail-item">
-                            <div class="detail-label">Specialization</div>
-                            <div class="detail-value">${tpo.specialization}</div>
-                        </div>
-                    ` : ''}
-                </div>
-                
-                ${tpoPosts && tpoPosts.length > 0 ? `
-                    <div class="posts-section" style="margin-top: 30px;">
-                        <h3 style="color: #8B5CF6; margin-bottom: 20px; font-size: 1.3em;">Recent Posts</h3>
-                        <div class="posts-grid">
-                            ${tpoPosts.map(post => `
-                                <div class="post-card" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px;">
-                                    <img src="${post.image_url}" alt="Post" style="width: 100%; height: 200px; object-fit: cover;">
-                                    ${post.caption ? `<div style="padding: 15px; color: #333; line-height: 1.5;">${post.caption}</div>` : ''}
-                                    <div style="padding: 0 15px 15px; color: #666; font-size: 0.9em;">
-                                        ${new Date(post.created_at).toLocaleDateString()}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
+                        ${profile.research_papers ? `<div class="detail-item"><div class="detail-label">Research & Expertise</div><div class="detail-value">${profile.research_papers}</div></div>` : ''}
+                        ${profile.achievements ? `<div class="detail-item"><div class="detail-label">Achievements</div><div class="detail-value">${profile.achievements}</div></div>` : ''}
+                        ${profile.custom_fields && Object.keys(profile.custom_fields).length > 0 ? Object.entries(profile.custom_fields).map(([k, v]) => `<div class="detail-item"><div class="detail-label">${k}</div><div class="detail-value">${v}</div></div>`).join('') : ''}
                     </div>
-                ` : ''}
-            `;
-            
-        } catch (error) {
-            console.error('Error loading TPO:', error);
-            document.getElementById('profileContent').innerHTML = '<div class="loading">Error loading TPO profile</div>';
-        }
-        return;
-    }
-    
-    // Load Staff Profile
-    if (!profileId) {
-        document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
-        return;
-    }
-    
-    try {
-        const { data: profile, error } = await supabaseClient
-            .from('profiles')
-            .select('*')
-            .eq('profile_id', profileId)
-            .single();
-        
-        if (error || !profile) {
-            document.getElementById('profileContent').innerHTML = '<div class="loading">Profile not found</div>';
-            return;
-        }
-        
-        // Get department name
-        const { data: dept } = await supabaseClient
-            .from('departments')
-            .select('dept_name')
-            .eq('dept_id', profile.department)
-            .single();
-        
-        // Load staff posts
-        const { data: staffPosts } = await supabaseClient
-            .from('posts')
-            .select('*')
-            .eq('author_id', profile.user_id)
-            .eq('author_type', 'staff')
-            .eq('is_published', true)
-            .order('created_at', { ascending: false });
-        
-        document.getElementById('profileContent').innerHTML = `
-            <div class="profile-header">
-                <div class="profile-image">
-                    ${profile.profile_image ? 
-                        `<img src="${profile.profile_image}" alt="${profile.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">` : 
-                        '👤'}
-                </div>
-                <div class="profile-name">${profile.name}</div>
-                <div class="profile-designation">${profile.designation}</div>
-                <div style="margin-top: 10px; opacity: 0.8;">${dept?.dept_name || ''}</div>
-            </div>
-            
-            <div class="profile-details">
-                <div class="detail-item">
-                    <div class="detail-label">Experience</div>
-                    <div class="detail-value">${profile.experience} years</div>
-                </div>
-                
-                ${profile.research_papers ? `
-                    <div class="detail-item">
-                        <div class="detail-label">Research & Expertise</div>
-                        <div class="detail-value">${profile.research_papers}</div>
-                    </div>
-                ` : ''}
-                
-                ${profile.achievements ? `
-                    <div class="detail-item">
-                        <div class="detail-label">Achievements</div>
-                        <div class="detail-value">${profile.achievements}</div>
-                    </div>
-                ` : ''}
-                
-                ${profile.custom_fields && Object.keys(profile.custom_fields).length > 0 ? 
-                    Object.entries(profile.custom_fields).map(([key, value]) => `
-                        <div class="detail-item">
-                            <div class="detail-label">${key}</div>
-                            <div class="detail-value">${value}</div>
-                        </div>
-                    `).join('') : ''
-                }
-            </div>
-            
-            ${staffPosts && staffPosts.length > 0 ? `
-                <div class="posts-section" style="margin-top: 30px;">
-                    <h3 style="color: #8B5CF6; margin-bottom: 20px; font-size: 1.3em;">Recent Posts</h3>
-                    <div class="posts-grid">
-                        ${staffPosts.map(post => `
-                            <div class="post-card" style="background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px;">
-                                <img src="${post.image_url}" alt="Post" style="width: 100%; height: 200px; object-fit: cover;">
-                                ${post.caption ? `<div style="padding: 15px; color: #333; line-height: 1.5;">${post.caption}</div>` : ''}
-                                <div style="padding: 0 15px 15px; color: #666; font-size: 0.9em;">
-                                    ${new Date(post.created_at).toLocaleDateString()}
-                                </div>
+                    ${posts && posts.length > 0 ? `
+                        <div class="posts-section" style="margin-top:30px;">
+                            <h3 style="color:#8B5CF6; margin-bottom:20px;">Recent Posts</h3>
+                            <div class="posts-grid">
+                                ${posts.map(post => `
+                                    <div class="post-card" style="background:white; border-radius:12px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.1); margin-bottom:20px;">
+                                        <img src="${post.image_url}" alt="Post" style="width:100%; height:200px; object-fit:cover;">
+                                        ${post.caption ? `<div style="padding: 15px; color: #333; line-height: 1.5;">${post.caption}</div>` : ''}
+                                        <div style="padding:0 15px 15px; color:#666; font-size:0.9em;">${new Date(post.created_at).toLocaleDateString()}</div>
+                                    </div>`).join('')}
                             </div>
-                        `).join('')}
-                    </div>
-                </div>
-            ` : ''}
-        `;
-        
-    } catch (error) {
-        console.error('Error loading profile:', error);
-        document.getElementById('profileContent').innerHTML = '<div class="loading">Error loading profile</div>';
-    }
-}
-
+                        </div>` : ''}
+                `;
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                document.getElementById('profileContent').innerHTML = '<div class="loading">Error loading profile</div>';
+            }
+        }
 
         loadStaffProfile();
     </script>
 </body>
+
 </html>
