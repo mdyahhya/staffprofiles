@@ -96,30 +96,76 @@
     padding: 50px;
     color: #8B5CF6;
 }
+/* Container max width and padding adjustment for smaller screens */
+@media (max-width: 768px) {
+    .profile-container {
+        max-width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+    }
 
+    .form-row {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Tables adjustments for mobile */
 .profile-table {
     width: 100%;
     border-collapse: collapse;
-    margin: 20px 0;
-    font-size: 14px;
+    overflow-x: auto;
+    display: block;
+    max-width: 100%;
 }
 
-.profile-table th, .profile-table td {
+.profile-table thead,
+.profile-table tbody,
+.profile-table th,
+.profile-table td,
+.profile-table tr {
+    display: block;
+}
+
+.profile-table thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+}
+
+.profile-table tr {
+    margin-bottom: 15px;
     border: 1px solid #ddd;
-    padding: 10px 15px;
-    vertical-align: top;
+    border-radius: 8px;
+    padding: 10px;
+    background: #fafaff;
 }
 
-.profile-table th {
-    background-color: #f4f4fa;
-    color: #7C3AED;
-    font-weight: 600;
+.profile-table td {
+    border: none;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    padding-left: 50%;
+    white-space: normal;
     text-align: left;
 }
 
-.profile-table tr:nth-child(even) {
-    background-color: #fafaff;
+.profile-table td:before {
+    position: absolute;
+    top: 12px;
+    left: 10px;
+    width: 45%;
+    padding-right: 10px;
+    white-space: nowrap;
+    font-weight: 600;
+    color: #7c3aed;
+    content: attr(data-label);
 }
+
+/* Reset last border */
+.profile-table td:last-child {
+    border-bottom: 0;
+}
+
 
 .posts-section {
     margin-top: 40px;
