@@ -346,10 +346,11 @@ body {
     <div class="dept-grid">
 
         <!-- First Year -->
-<div class="dept-btn" onclick="handleDeptNavigation('FY')">
-    FY<br><small>First Year</small>
-</div>
+        <div class="dept-btn" onclick="handleDeptNavigation('FY')">
+            FY<br><small>First Year</small>
+        </div>
 
+        
 
         <!-- Computer Science & Engineering -->
         <div class="dept-btn" onclick="handleDeptNavigation('CSE')">
@@ -503,7 +504,7 @@ body {
         let deferredPrompt;
         
         // Cache for fast loading
-        let cachedLeadership = null;
+        
         let cachedDepartments = {};
         
         // PWA Installation
@@ -671,24 +672,29 @@ async function handleTPONavigation() {
 
 
         
-        async function loadLeadership() {
-            if (cachedLeadership) {
-                displayLeadership(cachedLeadership);
-                return;
-            }
-            
-            try {
-                const { data, error } = await sb.from('leadership').select('*').eq('is_active', true).order('display_order');
-                if (error) throw error;
-                
-                cachedLeadership = data;
-                displayLeadership(data);
-            } catch (error) {
-                console.error('Error loading leadership:', error);
-                document.getElementById('leadershipGrid').innerHTML = '<p style="text-align:center;color:#666;">Leadership data unavailable</p>';
-            }
+        // Leadership Caching
+let cachedLeadership = localStorage.getItem('leadership_cache');
+let cachedLeadershipTime = localStorage.getItem('leadership_cache_time');
+
+async function loadLeadership() {
+    // Check cache (valid for 1 hour)
+    if (cachedLeadership && cachedLeadershipTime) {
+        const age = Date.now() - parseInt(cachedLeadershipTime);
+        if (age < 3600000) { // 1 hour
+            displayLeadership(JSON.parse(cachedLeadership));
+            return;
         }
-        
+    }
+    
+    // Fetch fresh
+    const { data: tpo } = await sb.from('tpo').select('*').eq('is_published', true);
+    
+    if (tpo && tpo.length) {
+        localStorage.setItem('leadership_cache', JSON.stringify(tpo));
+        localStorage.setItem('leadership_cache_time', Date.now());
+        displayLeadership(tpo);
+    }
+}
         function displayLeadership(data) {
             const grid = document.getElementById('leadershipGrid');
             if (data && data.length > 0) {
