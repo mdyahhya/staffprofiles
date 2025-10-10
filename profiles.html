@@ -190,15 +190,17 @@
         
         // Department mapping to match your database
         const departmentMap = {
-            'CSE': { id: 1, name: 'Computer Science & Engineering' },
-            'AIDS': { id: 2, name: 'Artificial Intelligence & Data Science' },
-            'ENTC': { id: 3, name: 'Electronics & Telecommunications' },
-            'EE': { id: 4, name: 'Electrical Engineering' },
-            'ME': { id: 5, name: 'Mechanical Engineering' },
-            'CE': { id: 6, name: 'Civil Engineering' },
-            'BCA': { id: 7, name: 'Bachelor of Computer Applications' },
-            'MCA': { id: 8, name: 'Master of Computer Applications' }
-        };
+    'CSE': { id: 1, name: 'Computer Science & Engineering' },
+    'AIDS': { id: 2, name: 'Artificial Intelligence & Data Science' },
+    'ENTC': { id: 3, name: 'Electronics & Telecommunications' },
+    'EE': { id: 4, name: 'Electrical Engineering' },
+    'ME': { id: 5, name: 'Mechanical Engineering' },
+    'CE': { id: 6, name: 'Civil Engineering' },
+    'BCA': { id: 7, name: 'Bachelor of Computer Applications' },
+    'MCA': { id: 8, name: 'Master of Computer Applications' },
+    'FY': { id: 9, name: 'First Year' }  // ADD THIS LINE
+};
+
         
         // Navigate to profile view
         // REPLACE the showProfileView function
@@ -535,7 +537,7 @@ function showTPOProfile(tpoId) {
                 loadDepartmentStaff(dept);
             } else {
                 // Redirect back to index if no valid parameters
-                location.href = 'staffprof.html';
+                location.href = 'index.html';
             }
         }
         
