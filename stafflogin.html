@@ -1359,18 +1359,6 @@ async function loadDepartments() {
 // ========================================
 
 async function loadMyProfile() {
-    // Check localStorage cache first
-    const cachedProfile = localStorage.getItem(`profile_${currentUser.user_id}`);
-    const cacheTimestamp = localStorage.getItem(`profile_timestamp_${currentUser.user_id}`);
-    
-    // Use cache if available (skip database fetch)
-    if (cachedProfile && cacheTimestamp) {
-        const cachedData = JSON.parse(cachedProfile);
-        displayCachedProfile(cachedData);
-        return;
-    }
-    
-    // Fetch fresh from database
     try {
         const { data, error } = await sb
             .from('profiles')
@@ -1398,47 +1386,309 @@ async function loadMyProfile() {
             .eq('dept_id', data.department)
             .single();
         
-        // Fetch all related data in parallel
-        const [
-            { data: educationData },
-            { data: experienceData },
-            { data: techData },
-            { data: btechData },
-            { data: mtechData },
-            { data: achievementsData },
-            { data: publicationsData },
-            { data: posts }
-        ] = await Promise.all([
-            sb.from('educational_qualifications').select('*').eq('profile_id', data.profile_id),
-            sb.from('experience_profile').select('*').eq('profile_id', data.profile_id),
-            sb.from('technical_competencies').select('*').eq('profile_id', data.profile_id),
-            sb.from('btech_projects').select('*').eq('profile_id', data.profile_id).single(),
-            sb.from('mtech_projects').select('*').eq('profile_id', data.profile_id).single(),
-            sb.from('achievements_activities').select('*').eq('profile_id', data.profile_id),
-            sb.from('publications').select('*').eq('profile_id', data.profile_id),
-            sb.from('posts').select('*').eq('author_id', currentUser.user_id).eq('author_type', 'staff').order('created_at', { ascending: false })
-        ]);
+        // Create initials and profile image
+        const initials = data.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+        const img = data.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%238B5CF6' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' font-size='60' fill='white' text-anchor='middle' dy='.3em'%3E${initials}%3C/text%3E%3C/svg%3E`;
         
-        // Package all data for caching
-        const fullProfileData = {
-            profile: data,
-            department: dept,
-            education: educationData || [],
-            experience: experienceData || [],
-            technical: techData || [],
-            btechProject: btechData,
-            mtechProject: mtechData,
-            achievements: achievementsData || [],
-            publications: publicationsData || [],
-            posts: posts || []
-        };
+        // Set profile header
+        document.getElementById('myProfileHeader').innerHTML = `
+            <img src="${img}" alt="${data.name}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #8B5CF6;">
+            <div class="name">${data.name}</div>
+            <div class="dept">${dept?.dept_name || ''}</div>
+        `;
         
-        // Cache the complete profile
-        localStorage.setItem(`profile_${currentUser.user_id}`, JSON.stringify(fullProfileData));
-        localStorage.setItem(`profile_timestamp_${currentUser.user_id}`, Date.now().toString());
+        // Build profile content with basic info
+        let profileContentHTML = `
+            <div class="profile-field">
+                <div class="profile-field-label">Designation</div>
+                <div class="profile-field-value">${data.designation}</div>
+            </div>
+            <div class="profile-field">
+                <div class="profile-field-label">Experience</div>
+                <div class="profile-field-value">${data.experience} years</div>
+            </div>
+        `;
         
-        // Display the profile
-        displayCachedProfile(fullProfileData);
+        // Add Date of Birth if exists
+        if (data.date_of_birth) {
+            profileContentHTML += `
+                <div class="profile-field">
+                    <div class="profile-field-label">Date of Birth</div>
+                    <div class="profile-field-value">${new Date(data.date_of_birth).toLocaleDateString()}</div>
+                </div>
+            `;
+        }
+        
+        // Add Languages if exists
+        if (data.languages_known && data.languages_known.length > 0) {
+            profileContentHTML += `
+                <div class="profile-field">
+                    <div class="profile-field-label">Languages Known</div>
+                    <div class="profile-field-value">${data.languages_known.join(', ')}</div>
+                </div>
+            `;
+        }
+        
+        // Add Research & Expertise if exists
+        if (data.research_papers) {
+            profileContentHTML += `
+                <div class="profile-field">
+                    <div class="profile-field-label">Research & Expertise</div>
+                    <div class="profile-field-value">${data.research_papers}</div>
+                </div>
+            `;
+        }
+        
+        // Add General Achievements if exists
+        if (data.achievements) {
+            profileContentHTML += `
+                <div class="profile-field">
+                    <div class="profile-field-label">General Achievements</div>
+                    <div class="profile-field-value">${data.achievements}</div>
+                </div>
+            `;
+        }
+        
+        // Add custom fields if exist
+        if (data.custom_fields && Object.keys(data.custom_fields).length > 0) {
+            profileContentHTML += Object.entries(data.custom_fields)
+                .map(([k, v]) => `
+                    <div class="profile-field">
+                        <div class="profile-field-label">${k}</div>
+                        <div class="profile-field-value">${v}</div>
+                    </div>
+                `).join('');
+        }
+        
+        // Load Educational Qualifications
+        const { data: educationData } = await sb
+            .from('educational_qualifications')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (educationData && educationData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Educational Qualifications</h3>`;
+            educationData.forEach((edu, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Education ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${edu.exam_name || 'N/A'}</strong><br>
+                            ${edu.board_university || 'N/A'}<br>
+                            ${edu.marks_percentage ? `Marks: ${edu.marks_percentage}%` : ''} 
+                            ${edu.class_obtained ? `(${edu.class_obtained})` : ''}<br>
+                            ${edu.year_of_passing ? `Year: ${edu.year_of_passing}` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load Experience Profile
+        const { data: experienceData } = await sb
+            .from('experience_profile')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (experienceData && experienceData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Experience Profile</h3>`;
+            experienceData.forEach((exp, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Experience ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${exp.role || 'N/A'}</strong><br>
+                            ${exp.organization || 'N/A'}<br>
+                            ${exp.duration || 'N/A'}<br>
+                            ${exp.key_responsibilities ? `<em>${exp.key_responsibilities}</em>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load Technical Competencies
+        const { data: techData } = await sb
+            .from('technical_competencies')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (techData && techData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Technical Competencies</h3>`;
+            
+            const languages = techData.filter(t => t.category === 'languages');
+            const software = techData.filter(t => t.category === 'software_tools');
+            const others = techData.filter(t => t.category === 'other_skills');
+            
+            if (languages.length > 0) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Programming Languages</div>
+                        <div class="profile-field-value">${languages.map(l => l.competency_name).join(', ')}</div>
+                    </div>
+                `;
+            }
+            
+            if (software.length > 0) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Software & Tools</div>
+                        <div class="profile-field-value">${software.map(s => s.competency_name).join(', ')}</div>
+                    </div>
+                `;
+            }
+            
+            if (others.length > 0) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Other Skills</div>
+                        <div class="profile-field-value">${others.map(o => o.competency_name).join(', ')}</div>
+                    </div>
+                `;
+            }
+        }
+        
+        // Load BTech Project
+        const { data: btechData } = await sb
+            .from('btech_projects')
+            .select('*')
+            .eq('profile_id', data.profile_id)
+            .single();
+        
+        if (btechData && (btechData.project_title || Object.keys(btechData.project_data || {}).length > 0)) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">BTech Project</h3>`;
+            
+            if (btechData.project_title) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Project Title</div>
+                        <div class="profile-field-value">${btechData.project_title}</div>
+                    </div>
+                `;
+            }
+            
+            if (btechData.project_data && Object.keys(btechData.project_data).length > 0) {
+                Object.entries(btechData.project_data).forEach(([key, value]) => {
+                    profileContentHTML += `
+                        <div class="profile-field">
+                            <div class="profile-field-label">${key}</div>
+                            <div class="profile-field-value">${value}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+        
+        // Load MTech Project
+        const { data: mtechData } = await sb
+            .from('mtech_projects')
+            .select('*')
+            .eq('profile_id', data.profile_id)
+            .single();
+        
+        if (mtechData && (mtechData.project_title || Object.keys(mtechData.project_data || {}).length > 0)) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">MTech Project</h3>`;
+            
+            if (mtechData.project_title) {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Project Title</div>
+                        <div class="profile-field-value">${mtechData.project_title}</div>
+                    </div>
+                `;
+            }
+            
+            if (mtechData.project_data && Object.keys(mtechData.project_data).length > 0) {
+                Object.entries(mtechData.project_data).forEach(([key, value]) => {
+                    profileContentHTML += `
+                        <div class="profile-field">
+                            <div class="profile-field-label">${key}</div>
+                            <div class="profile-field-value">${value}</div>
+                        </div>
+                    `;
+                });
+            }
+        }
+        
+        // Load Achievements & Activities
+        const { data: achievementsData } = await sb
+            .from('achievements_activities')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (achievementsData && achievementsData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Achievements & Activities</h3>`;
+            achievementsData.forEach((ach, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">${ach.category} ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${ach.title}</strong><br>
+                            ${ach.organization ? `${ach.organization}<br>` : ''}
+                            ${ach.date_achieved ? `Date: ${new Date(ach.date_achieved).toLocaleDateString()}<br>` : ''}
+                            ${ach.description ? `<em>${ach.description}</em>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Load Publications
+        const { data: publicationsData } = await sb
+            .from('publications')
+            .select('*')
+            .eq('profile_id', data.profile_id);
+        
+        if (publicationsData && publicationsData.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Publications</h3>`;
+            publicationsData.forEach((pub, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Publication ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${pub.title}</strong><br>
+                            ${pub.authors ? `Authors: ${pub.authors}<br>` : ''}
+                            ${pub.journal_conference ? `${pub.journal_conference}<br>` : ''}
+                            ${pub.publication_type ? `Type: ${pub.publication_type}<br>` : ''}
+                            ${pub.publication_date ? `Date: ${new Date(pub.publication_date).toLocaleDateString()}<br>` : ''}
+                            ${pub.doi ? `DOI: ${pub.doi}<br>` : ''}
+                            ${pub.abstract ? `<em>${pub.abstract}</em>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+        
+        // Set the complete profile content
+        document.getElementById('myProfileContent').innerHTML = profileContentHTML;
+        
+        // Load posts
+        const { data: posts } = await sb
+            .from('posts')
+            .select('*')
+            .eq('author_id', currentUser.user_id)
+            .eq('author_type', 'staff')
+            .order('created_at', { ascending: false });
+        
+        document.getElementById('myPosts').innerHTML = posts?.map(post => `
+            <div class="post-card" id="post-${post.post_id}">
+                <div class="post-image-container">
+                    <img src="${post.image_url}" alt="Post" class="post-img">
+                </div>
+                ${post.caption ? `<div class="post-caption">${post.caption}</div>` : ''}
+                <div class="post-actions">
+                    <button onclick="editPost(${post.post_id})" class="edit-btn" title="Edit Post">
+                        ✏️ Edit
+                    </button>
+                    <button onclick="deletePost(${post.post_id})" class="delete-btn" title="Delete Post">
+                        🗑️ Delete
+                    </button>
+                </div>
+                <div class="post-date" style="font-size:12px;color:#666;margin-top:8px;">
+                    ${new Date(post.created_at).toLocaleDateString()}
+                </div>
+            </div>
+        `).join('') || '<p style="text-align:center;color:#666;">No posts yet</p>';
         
     } catch (error) {
         console.error('Profile load error:', error);
@@ -1446,291 +1696,6 @@ async function loadMyProfile() {
     }
 }
 
-function displayCachedProfile(fullProfileData) {
-    const data = fullProfileData.profile;
-    const dept = fullProfileData.department;
-    const educationData = fullProfileData.education;
-    const experienceData = fullProfileData.experience;
-    const techData = fullProfileData.technical;
-    const btechData = fullProfileData.btechProject;
-    const mtechData = fullProfileData.mtechProject;
-    const achievementsData = fullProfileData.achievements;
-    const publicationsData = fullProfileData.publications;
-    const posts = fullProfileData.posts;
-    
-    document.getElementById('noProfile').style.display = 'none';
-    document.getElementById('hasProfile').style.display = 'block';
-    
-    // Create initials and profile image
-    const initials = data.name.split(' ').map(n => n[0]).join('').substring(0, 2);
-    const img = data.profile_image || `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Crect fill='%238B5CF6' width='150' height='150'/%3E%3Ctext x='50%25' y='50%25' font-size='60' fill='white' text-anchor='middle' dy='.3em'%3E${initials}%3C/text%3E%3C/svg%3E`;
-    
-    // Set profile header
-    document.getElementById('myProfileHeader').innerHTML = `
-        <img src="${img}" alt="${data.name}" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid #8B5CF6;">
-        <div class="name">${data.name}</div>
-        <div class="dept">${dept?.dept_name || ''}</div>
-    `;
-    
-    // Build profile content with basic info
-    let profileContentHTML = `
-        <div class="profile-field">
-            <div class="profile-field-label">Designation</div>
-            <div class="profile-field-value">${data.designation}</div>
-        </div>
-        <div class="profile-field">
-            <div class="profile-field-label">Experience</div>
-            <div class="profile-field-value">${data.experience} years</div>
-        </div>
-    `;
-    
-    // Add Date of Birth if exists
-    if (data.date_of_birth) {
-        profileContentHTML += `
-            <div class="profile-field">
-                <div class="profile-field-label">Date of Birth</div>
-                <div class="profile-field-value">${new Date(data.date_of_birth).toLocaleDateString()}</div>
-            </div>
-        `;
-    }
-    
-    // Add Address if exists
-    if (data.address) {
-        profileContentHTML += `
-            <div class="profile-field">
-                <div class="profile-field-label">Address</div>
-                <div class="profile-field-value">${data.address}</div>
-            </div>
-        `;
-    }
-    
-    // Add Languages if exists
-    if (data.languages_known && data.languages_known.length > 0) {
-        profileContentHTML += `
-            <div class="profile-field">
-                <div class="profile-field-label">Languages Known</div>
-                <div class="profile-field-value">${data.languages_known.join(', ')}</div>
-            </div>
-        `;
-    }
-    
-    // Add Research & Expertise if exists
-    if (data.research_papers) {
-        profileContentHTML += `
-            <div class="profile-field">
-                <div class="profile-field-label">Research & Expertise</div>
-                <div class="profile-field-value">${data.research_papers}</div>
-            </div>
-        `;
-    }
-    
-    // Add General Achievements if exists
-    if (data.achievements) {
-        profileContentHTML += `
-            <div class="profile-field">
-                <div class="profile-field-label">General Achievements</div>
-                <div class="profile-field-value">${data.achievements}</div>
-            </div>
-        `;
-    }
-    
-    // Add custom fields if exist
-    if (data.custom_fields && Object.keys(data.custom_fields).length > 0) {
-        profileContentHTML += Object.entries(data.custom_fields)
-            .map(([k, v]) => `
-                <div class="profile-field">
-                    <div class="profile-field-label">${k}</div>
-                    <div class="profile-field-value">${v}</div>
-                </div>
-            `).join('');
-    }
-    
-    // Educational Qualifications
-    if (educationData && educationData.length > 0) {
-        profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Educational Qualifications</h3>`;
-        educationData.forEach((edu, index) => {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Education ${index + 1}</div>
-                    <div class="profile-field-value">
-                        <strong>${edu.exam_name || 'N/A'}</strong><br>
-                        ${edu.board_university || 'N/A'}<br>
-                        ${edu.marks_percentage ? `Marks: ${edu.marks_percentage}%` : ''} 
-                        ${edu.class_obtained ? `(${edu.class_obtained})` : ''}<br>
-                        ${edu.year_of_passing ? `Year: ${edu.year_of_passing}` : ''}
-                    </div>
-                </div>
-            `;
-        });
-    }
-    
-    // Experience Profile
-    if (experienceData && experienceData.length > 0) {
-        profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Experience Profile</h3>`;
-        experienceData.forEach((exp, index) => {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Experience ${index + 1}</div>
-                    <div class="profile-field-value">
-                        <strong>${exp.role || 'N/A'}</strong><br>
-                        ${exp.organization || 'N/A'}<br>
-                        ${exp.duration || 'N/A'}<br>
-                        ${exp.key_responsibilities ? `<em>${exp.key_responsibilities}</em>` : ''}
-                    </div>
-                </div>
-            `;
-        });
-    }
-    
-    // Technical Competencies
-    if (techData && techData.length > 0) {
-        profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Technical Competencies</h3>`;
-        
-        const languages = techData.filter(t => t.category === 'languages');
-        const software = techData.filter(t => t.category === 'software_tools');
-        const others = techData.filter(t => t.category === 'other_skills');
-        
-        if (languages.length > 0) {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Programming Languages</div>
-                    <div class="profile-field-value">${languages.map(l => l.competency_name).join(', ')}</div>
-                </div>
-            `;
-        }
-        
-        if (software.length > 0) {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Software & Tools</div>
-                    <div class="profile-field-value">${software.map(s => s.competency_name).join(', ')}</div>
-                </div>
-            `;
-        }
-        
-        if (others.length > 0) {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Other Skills</div>
-                    <div class="profile-field-value">${others.map(o => o.competency_name).join(', ')}</div>
-                </div>
-            `;
-        }
-    }
-    
-    // BTech Project
-    if (btechData && (btechData.project_title || Object.keys(btechData.project_data || {}).length > 0)) {
-        profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">BTech Project</h3>`;
-        
-        if (btechData.project_title) {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Project Title</div>
-                    <div class="profile-field-value">${btechData.project_title}</div>
-                </div>
-            `;
-        }
-        
-        if (btechData.project_data && Object.keys(btechData.project_data).length > 0) {
-            Object.entries(btechData.project_data).forEach(([key, value]) => {
-                profileContentHTML += `
-                    <div class="profile-field">
-                        <div class="profile-field-label">${key}</div>
-                        <div class="profile-field-value">${value}</div>
-                    </div>
-                `;
-            });
-        }
-    }
-    
-    // MTech Project
-    if (mtechData && (mtechData.project_title || Object.keys(mtechData.project_data || {}).length > 0)) {
-        profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">MTech Project</h3>`;
-        
-        if (mtechData.project_title) {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Project Title</div>
-                    <div class="profile-field-value">${mtechData.project_title}</div>
-                </div>
-            `;
-        }
-        
-        if (mtechData.project_data && Object.keys(mtechData.project_data).length > 0) {
-            Object.entries(mtechData.project_data).forEach(([key, value]) => {
-                profileContentHTML += `
-                    <div class="profile-field">
-                        <div class="profile-field-label">${key}</div>
-                        <div class="profile-field-value">${value}</div>
-                    </div>
-                `;
-            });
-        }
-    }
-    
-    // Achievements & Activities
-    if (achievementsData && achievementsData.length > 0) {
-        profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Achievements & Activities</h3>`;
-        achievementsData.forEach((ach, index) => {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">${ach.category} ${index + 1}</div>
-                    <div class="profile-field-value">
-                        <strong>${ach.title}</strong><br>
-                        ${ach.organization ? `${ach.organization}<br>` : ''}
-                        ${ach.date_achieved ? `Date: ${new Date(ach.date_achieved).toLocaleDateString()}<br>` : ''}
-                        ${ach.description ? `<em>${ach.description}</em>` : ''}
-                    </div>
-                </div>
-            `;
-        });
-    }
-    
-    // Publications
-    if (publicationsData && publicationsData.length > 0) {
-        profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Publications</h3>`;
-        publicationsData.forEach((pub, index) => {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Publication ${index + 1}</div>
-                    <div class="profile-field-value">
-                        <strong>${pub.title}</strong><br>
-                        ${pub.authors ? `Authors: ${pub.authors}<br>` : ''}
-                        ${pub.journal_conference ? `${pub.journal_conference}<br>` : ''}
-                        ${pub.publication_type ? `Type: ${pub.publication_type}<br>` : ''}
-                        ${pub.publication_date ? `Date: ${new Date(pub.publication_date).toLocaleDateString()}<br>` : ''}
-                        ${pub.doi ? `DOI: ${pub.doi}<br>` : ''}
-                        ${pub.abstract ? `<em>${pub.abstract}</em>` : ''}
-                    </div>
-                </div>
-            `;
-        });
-    }
-    
-    // Set the complete profile content
-    document.getElementById('myProfileContent').innerHTML = profileContentHTML;
-    
-    // Display posts
-    document.getElementById('myPosts').innerHTML = posts?.map(post => `
-        <div class="post-card" id="post-${post.post_id}">
-            <div class="post-image-container">
-                <img src="${post.image_url}" alt="Post" class="post-img">
-            </div>
-            ${post.caption ? `<div class="post-caption">${post.caption}</div>` : ''}
-            <div class="post-actions">
-                <button onclick="editPost(${post.post_id})" class="edit-btn" title="Edit Post">
-                    ✏️ Edit
-                </button>
-                <button onclick="deletePost(${post.post_id})" class="delete-btn" title="Delete Post">
-                    🗑️ Delete
-                </button>
-            </div>
-            <div class="post-date" style="font-size:12px;color:#666;margin-top:8px;">
-                ${new Date(post.created_at).toLocaleDateString()}
-            </div>
-        </div>
-    `).join('') || '<p style="text-align:center;color:#666;">No posts yet</p>';
-}
 function editProfile() {
     editingProfile = true;
     document.getElementById('profileFormTitle').textContent = 'Edit Profile';
@@ -1748,7 +1713,7 @@ function editProfile() {
             document.getElementById('profResearch').value = data.research_papers || '';
             document.getElementById('profAchieve').value = data.achievements || '';
             
-            // Custom fields
+           // Custom fields
             const customFieldsDiv = document.getElementById('customFields');
             customFieldsDiv.innerHTML = '';
             if (data.custom_fields) {
@@ -1902,7 +1867,6 @@ function editProfile() {
     });
 }
 
-
 async function deleteProfile() {
     if (!confirm('Delete your profile? This cannot be undone.')) return;
     
@@ -1915,43 +1879,25 @@ async function deleteProfile() {
             .single();
         
         if (profile) {
-            // Delete related data in parallel
-            await Promise.all([
-                sb.from('educational_qualifications').delete().eq('profile_id', profile.profile_id),
-                sb.from('experience_profile').delete().eq('profile_id', profile.profile_id),
-                sb.from('technical_competencies').delete().eq('profile_id', profile.profile_id),
-                sb.from('btech_projects').delete().eq('profile_id', profile.profile_id),
-                sb.from('mtech_projects').delete().eq('profile_id', profile.profile_id),
-                sb.from('achievements_activities').delete().eq('profile_id', profile.profile_id),
-                sb.from('publications').delete().eq('profile_id', profile.profile_id),
-                sb.from('posts').delete().eq('author_id', currentUser.user_id).eq('author_type', 'staff')
-            ]);
+            // Delete related data
+            await sb.from('educational_qualifications').delete().eq('profile_id', profile.profile_id);
+            await sb.from('experience_profile').delete().eq('profile_id', profile.profile_id);
+            await sb.from('technical_competencies').delete().eq('profile_id', profile.profile_id);
+            await sb.from('btech_projects').delete().eq('profile_id', profile.profile_id);
+            await sb.from('mtech_projects').delete().eq('profile_id', profile.profile_id);
+            await sb.from('achievements_activities').delete().eq('profile_id', profile.profile_id);
+            await sb.from('publications').delete().eq('profile_id', profile.profile_id);
             
             // Delete profile
             await sb.from('profiles').delete().eq('user_id', currentUser.user_id);
         }
         
-        // ✅ CLEAR PROFILE CACHE
-        localStorage.removeItem(`profile_${currentUser.user_id}`);
-        localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
-        
-        alert('Profile deleted successfully');
+        alert('Profile deleted');
         showPage('myProfilePage');
-        
-        // Reload to show "Create Profile" button
-        await loadMyProfile();
-        
+        loadMyProfile();
     } catch (error) {
         console.error('Delete error:', error);
-        alert('Failed to delete profile: ' + error.message);
-    }
-}
-
-// Helper function to clear cache (use in profile form submit too)
-function clearProfileCache() {
-    if (currentUser && currentUser.user_id) {
-        localStorage.removeItem(`profile_${currentUser.user_id}`);
-        localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
+        alert('Failed to delete profile');
     }
 }
 
@@ -2002,11 +1948,6 @@ async function editPost(postId) {
         console.error('Error fetching post:', error);
         alert('Failed to load post data');
     }
-    // After successful update:
-    localStorage.removeItem(`profile_${currentUser.user_id}`);
-    localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
-    
-    loadMyProfile();
 }
 
 async function deletePost(postId) {
@@ -2053,11 +1994,6 @@ async function deletePost(postId) {
         console.error('Error deleting post:', error);
         alert('Failed to delete post: ' + error.message);
     }
-    // After successful deletion:
-    localStorage.removeItem(`profile_${currentUser.user_id}`);
-    localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
-    
-    loadMyProfile();
 }
 
 // ========================================
@@ -2070,19 +2006,6 @@ async function downloadPDF() {
         if (!jsPDF) {
             return alert('PDF library not loaded. Please refresh the page.');
         }
-        
-        // Hide elements we don't want in the PDF
-        const actionBtns = document.querySelector('.action-btns');
-        const postsSection = document.querySelector('.posts-section');
-        const addPostBtn = document.querySelector('button[onclick*="showAddPostModal"]');
-        
-        const originalActionDisplay = actionBtns ? actionBtns.style.display : '';
-        const originalPostsDisplay = postsSection ? postsSection.style.display : '';
-        const originalAddPostDisplay = addPostBtn ? addPostBtn.style.display : '';
-        
-        if (actionBtns) actionBtns.style.display = 'none';
-        if (postsSection) postsSection.style.display = 'none';
-        if (addPostBtn) addPostBtn.style.display = 'none';
         
         const doc = new jsPDF();
         
@@ -2098,24 +2021,9 @@ async function downloadPDF() {
         const pageWidth = doc.internal.pageSize.width;
         const contentWidth = pageWidth - (margin * 2);
         
-        // Add college logo at top right
-        try {
-            const logoImg = new Image();
-            logoImg.src = 'vvplogo.jpeg';
-            await new Promise((resolve, reject) => {
-                logoImg.onload = resolve;
-                logoImg.onerror = reject;
-                setTimeout(reject, 3000); // 3 second timeout
-            });
-            doc.addImage(logoImg, 'JPEG', pageWidth - 40, 10, 20, 20);
-        } catch (e) {
-            console.log('Logo not loaded, skipping');
-        }
-        
-        // Header
         doc.setFontSize(22);
         doc.setTextColor(139, 92, 246);
-        doc.text('VVPIET Staff Profile', margin, yPosition);
+        doc.text('Staff Profile', margin, yPosition);
         yPosition += 15;
         
         doc.setLineWidth(0.5);
@@ -2140,7 +2048,6 @@ async function downloadPDF() {
             yPosition += 15;
         }
         
-        // Profile fields
         const fields = profileElement.querySelectorAll('.profile-field');
         
         fields.forEach(field => {
@@ -2166,20 +2073,13 @@ async function downloadPDF() {
             }
         });
         
-        // Add footer to all pages
         const totalPages = doc.internal.getNumberOfPages();
         for (let i = 1; i <= totalPages; i++) {
             doc.setPage(i);
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
             doc.text(`Page ${i} of ${totalPages}`, pageWidth - 40, doc.internal.pageSize.height - 10);
-            
-            // Footer text
-            doc.setFontSize(9);
-            doc.setTextColor(139, 92, 246);
-            const footerText = 'VVPIET Staff Profile at vvpstaff.netlify.app by Continental Base';
-            const footerWidth = doc.getTextWidth(footerText);
-            doc.text(footerText, (pageWidth - footerWidth) / 2, doc.internal.pageSize.height - 10);
+            doc.text('Generated by VVPIET Staff Portal', margin, doc.internal.pageSize.height - 10);
         }
         
         const profileName = nameElement ? 
@@ -2188,25 +2088,11 @@ async function downloadPDF() {
         
         doc.save(`${profileName}_Profile.pdf`);
         
-        // Restore hidden elements
-        if (actionBtns) actionBtns.style.display = originalActionDisplay;
-        if (postsSection) postsSection.style.display = originalPostsDisplay;
-        if (addPostBtn) addPostBtn.style.display = originalAddPostDisplay;
-        
     } catch (error) {
         console.error('PDF generation error:', error);
         alert('PDF generation failed. Please try again.');
-        
-        // Restore on error
-        const actionBtns = document.querySelector('.action-btns');
-        const postsSection = document.querySelector('.posts-section');
-        const addPostBtn = document.querySelector('button[onclick*="showAddPostModal"]');
-        if (actionBtns) actionBtns.style.display = '';
-        if (postsSection) postsSection.style.display = '';
-        if (addPostBtn) addPostBtn.style.display = '';
     }
 }
-
 
 async function downloadImage() {
     try {
@@ -2214,41 +2100,12 @@ async function downloadImage() {
             return alert('Image capture library not loaded. Please refresh the page.');
         }
         
-        // Hide elements we don't want in the image
-        const actionBtns = document.querySelector('.action-btns');
-        const postsSection = document.querySelector('.posts-section');
-        const addPostBtn = document.querySelector('button[onclick*="showAddPostModal"]');
-        
-        const originalActionDisplay = actionBtns ? actionBtns.style.display : '';
-        const originalPostsDisplay = postsSection ? postsSection.style.display : '';
-        const originalAddPostDisplay = addPostBtn ? addPostBtn.style.display : '';
-        
-        if (actionBtns) actionBtns.style.display = 'none';
-        if (postsSection) postsSection.style.display = 'none';
-        if (addPostBtn) addPostBtn.style.display = 'none';
-        
-        // Add logo and footer temporarily
         const profileElement = document.getElementById('hasProfile');
         
         if (!profileElement) {
             return alert('Profile not found');
         }
         
-        const logo = document.createElement('div');
-        logo.id = 'temp-logo';
-        logo.style.cssText = 'position:absolute;top:20px;right:20px;z-index:1000;';
-        logo.innerHTML = `<img src="vvplogo.jpeg" style="width:80px;height:80px;border-radius:8px;" alt="College Logo">`;
-        
-        const footer = document.createElement('div');
-        footer.id = 'temp-footer';
-        footer.style.cssText = 'text-align:center;margin-top:30px;padding:20px;border-top:2px solid #8B5CF6;color:#8B5CF6;font-size:14px;font-weight:600;background:white;';
-        footer.innerHTML = 'VVPIET Staff Profile at vvpstaff.netlify.app by Continental Base';
-        
-        profileElement.style.position = 'relative';
-        profileElement.insertBefore(logo, profileElement.firstChild);
-        profileElement.appendChild(footer);
-        
-        // Show loading
         const loadingDiv = document.createElement('div');
         loadingDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);color:white;padding:20px;border-radius:10px;z-index:9999;';
         loadingDiv.textContent = 'Generating image...';
@@ -2271,15 +2128,6 @@ async function downloadImage() {
         });
         
         document.body.removeChild(loadingDiv);
-        
-        // Remove temporary elements
-        logo.remove();
-        footer.remove();
-        
-        // Restore hidden elements
-        if (actionBtns) actionBtns.style.display = originalActionDisplay;
-        if (postsSection) postsSection.style.display = originalPostsDisplay;
-        if (addPostBtn) addPostBtn.style.display = originalAddPostDisplay;
         
         canvas.toBlob(function(blob) {
             const link = document.createElement('a');
@@ -2306,23 +2154,9 @@ async function downloadImage() {
         console.error('Image download error:', error);
         
         const loadingDiv = document.querySelector('div[style*="position:fixed"]');
-        if (loadingDiv && document.body.contains(loadingDiv)) {
+        if (loadingDiv) {
             document.body.removeChild(loadingDiv);
         }
-        
-        // Clean up temp elements
-        const tempLogo = document.getElementById('temp-logo');
-        const tempFooter = document.getElementById('temp-footer');
-        if (tempLogo) tempLogo.remove();
-        if (tempFooter) tempFooter.remove();
-        
-        // Restore
-        const actionBtns = document.querySelector('.action-btns');
-        const postsSection = document.querySelector('.posts-section');
-        const addPostBtn = document.querySelector('button[onclick*="showAddPostModal"]');
-        if (actionBtns) actionBtns.style.display = '';
-        if (postsSection) postsSection.style.display = '';
-        if (addPostBtn) addPostBtn.style.display = '';
         
         alert('Image download failed. Please try again.');
     }
