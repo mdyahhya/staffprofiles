@@ -1357,6 +1357,7 @@ async function loadDepartments() {
 // ========================================
 // PROFILE FUNCTIONS
 // ========================================
+
 async function loadMyProfile() {
     // Check localStorage cache first
     const cachedProfile = localStorage.getItem(`profile_${currentUser.user_id}`);
@@ -1730,8 +1731,6 @@ function displayCachedProfile(fullProfileData) {
         </div>
     `).join('') || '<p style="text-align:center;color:#666;">No posts yet</p>';
 }
-
-
 function editProfile() {
     editingProfile = true;
     document.getElementById('profileFormTitle').textContent = 'Edit Profile';
@@ -1749,7 +1748,7 @@ function editProfile() {
             document.getElementById('profResearch').value = data.research_papers || '';
             document.getElementById('profAchieve').value = data.achievements || '';
             
-           // Custom fields
+            // Custom fields
             const customFieldsDiv = document.getElementById('customFields');
             customFieldsDiv.innerHTML = '';
             if (data.custom_fields) {
@@ -1903,6 +1902,7 @@ function editProfile() {
     });
 }
 
+
 async function deleteProfile() {
     if (!confirm('Delete your profile? This cannot be undone.')) return;
     
@@ -1915,25 +1915,43 @@ async function deleteProfile() {
             .single();
         
         if (profile) {
-            // Delete related data
-            await sb.from('educational_qualifications').delete().eq('profile_id', profile.profile_id);
-            await sb.from('experience_profile').delete().eq('profile_id', profile.profile_id);
-            await sb.from('technical_competencies').delete().eq('profile_id', profile.profile_id);
-            await sb.from('btech_projects').delete().eq('profile_id', profile.profile_id);
-            await sb.from('mtech_projects').delete().eq('profile_id', profile.profile_id);
-            await sb.from('achievements_activities').delete().eq('profile_id', profile.profile_id);
-            await sb.from('publications').delete().eq('profile_id', profile.profile_id);
+            // Delete related data in parallel
+            await Promise.all([
+                sb.from('educational_qualifications').delete().eq('profile_id', profile.profile_id),
+                sb.from('experience_profile').delete().eq('profile_id', profile.profile_id),
+                sb.from('technical_competencies').delete().eq('profile_id', profile.profile_id),
+                sb.from('btech_projects').delete().eq('profile_id', profile.profile_id),
+                sb.from('mtech_projects').delete().eq('profile_id', profile.profile_id),
+                sb.from('achievements_activities').delete().eq('profile_id', profile.profile_id),
+                sb.from('publications').delete().eq('profile_id', profile.profile_id),
+                sb.from('posts').delete().eq('author_id', currentUser.user_id).eq('author_type', 'staff')
+            ]);
             
             // Delete profile
             await sb.from('profiles').delete().eq('user_id', currentUser.user_id);
         }
         
-        alert('Profile deleted');
+        // ✅ CLEAR PROFILE CACHE
+        localStorage.removeItem(`profile_${currentUser.user_id}`);
+        localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
+        
+        alert('Profile deleted successfully');
         showPage('myProfilePage');
-        loadMyProfile();
+        
+        // Reload to show "Create Profile" button
+        await loadMyProfile();
+        
     } catch (error) {
         console.error('Delete error:', error);
-        alert('Failed to delete profile');
+        alert('Failed to delete profile: ' + error.message);
+    }
+}
+
+// Helper function to clear cache (use in profile form submit too)
+function clearProfileCache() {
+    if (currentUser && currentUser.user_id) {
+        localStorage.removeItem(`profile_${currentUser.user_id}`);
+        localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
     }
 }
 
@@ -1984,11 +2002,6 @@ async function editPost(postId) {
         console.error('Error fetching post:', error);
         alert('Failed to load post data');
     }
-    // Clear profile cache to reload with new post
-    localStorage.removeItem(`profile_${currentUser.user_id}`);
-    localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
-    
-    loadMyProfile();
 }
 
 async function deletePost(postId) {
@@ -2035,11 +2048,6 @@ async function deletePost(postId) {
         console.error('Error deleting post:', error);
         alert('Failed to delete post: ' + error.message);
     }
-    // Clear cache
-    localStorage.removeItem(`profile_${currentUser.user_id}`);
-    localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
-    
-    loadMyProfile();
 }
 
 // ========================================
@@ -2047,89 +2055,268 @@ async function deletePost(postId) {
 // ========================================
 
 async function downloadPDF() {
-    // Hide action buttons and posts section before generating
-    const actionBtns = document.querySelector('.action-btns');
-    const postsSection = document.querySelector('.posts-section');
-    const addPostBtn = document.querySelector('.posts-section button');
-    
-    const originalActionDisplay = actionBtns.style.display;
-    const originalPostsDisplay = postsSection?.style.display;
-    const originalAddPostDisplay = addPostBtn?.style.display;
-    
-    actionBtns.style.display = 'none';
-    if (postsSection) postsSection.style.display = 'none';
-    if (addPostBtn) addPostBtn.style.display = 'none';
-    
-    // Add college logo and footer
-    const profileView = document.querySelector('.profile-view');
-    const logo = document.createElement('div');
-    logo.innerHTML = `<img src="vvplogo.jpeg" style="position:absolute;top:20px;right:20px;width:80px;height:80px;" alt="College Logo">`;
-    const footer = document.createElement('div');
-    footer.style.cssText = 'text-align:center;margin-top:30px;padding:20px;border-top:2px solid #8B5CF6;color:#666;font-size:14px;';
-    footer.innerHTML = 'VVPIET Staff Profile at vvpstaff.netlify.app by Continental Base';
-    
-    profileView.insertBefore(logo, profileView.firstChild);
-    profileView.appendChild(footer);
-    
-    // Generate PDF using html2pdf
-    const opt = {
-        margin: 10,
-        filename: `${currentUser.name || 'profile'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-    };
-    
-    await html2pdf().set(opt).from(profileView).save();
-    
-    // Restore original display
-    actionBtns.style.display = originalActionDisplay;
-    if (postsSection) postsSection.style.display = originalPostsDisplay;
-    if (addPostBtn) addPostBtn.style.display = originalAddPostDisplay;
-    logo.remove();
-    footer.remove();
+    try {
+        const { jsPDF } = window.jspdf;
+        if (!jsPDF) {
+            return alert('PDF library not loaded. Please refresh the page.');
+        }
+        
+        // Hide elements we don't want in the PDF
+        const actionBtns = document.querySelector('.action-btns');
+        const postsSection = document.querySelector('.posts-section');
+        const addPostBtn = document.querySelector('button[onclick*="showAddPostModal"]');
+        
+        const originalActionDisplay = actionBtns ? actionBtns.style.display : '';
+        const originalPostsDisplay = postsSection ? postsSection.style.display : '';
+        const originalAddPostDisplay = addPostBtn ? addPostBtn.style.display : '';
+        
+        if (actionBtns) actionBtns.style.display = 'none';
+        if (postsSection) postsSection.style.display = 'none';
+        if (addPostBtn) addPostBtn.style.display = 'none';
+        
+        const doc = new jsPDF();
+        
+        const profileElement = document.getElementById('myProfileContent');
+        const headerElement = document.getElementById('myProfileHeader');
+        
+        if (!profileElement || !headerElement) {
+            return alert('Profile data not found');
+        }
+        
+        let yPosition = 20;
+        const margin = 20;
+        const pageWidth = doc.internal.pageSize.width;
+        const contentWidth = pageWidth - (margin * 2);
+        
+        // Add college logo at top right
+        try {
+            const logoImg = new Image();
+            logoImg.src = 'vvplogo.jpeg';
+            await new Promise((resolve, reject) => {
+                logoImg.onload = resolve;
+                logoImg.onerror = reject;
+                setTimeout(reject, 3000); // 3 second timeout
+            });
+            doc.addImage(logoImg, 'JPEG', pageWidth - 40, 10, 20, 20);
+        } catch (e) {
+            console.log('Logo not loaded, skipping');
+        }
+        
+        // Header
+        doc.setFontSize(22);
+        doc.setTextColor(139, 92, 246);
+        doc.text('VVPIET Staff Profile', margin, yPosition);
+        yPosition += 15;
+        
+        doc.setLineWidth(0.5);
+        doc.setDrawColor(139, 92, 246);
+        doc.line(margin, yPosition, pageWidth - margin, yPosition);
+        yPosition += 15;
+        
+        const nameElement = headerElement.querySelector('.name');
+        const deptElement = headerElement.querySelector('.dept');
+        
+        if (nameElement) {
+            doc.setFontSize(18);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`${nameElement.textContent}`, margin, yPosition);
+            yPosition += 12;
+        }
+        
+        if (deptElement) {
+            doc.setFontSize(12);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Department: ${deptElement.textContent}`, margin, yPosition);
+            yPosition += 15;
+        }
+        
+        // Profile fields
+        const fields = profileElement.querySelectorAll('.profile-field');
+        
+        fields.forEach(field => {
+            const label = field.querySelector('.profile-field-label');
+            const value = field.querySelector('.profile-field-value');
+            
+            if (label && value && value.textContent.trim() !== 'N/A' && value.textContent.trim() !== '') {
+                if (yPosition > 250) {
+                    doc.addPage();
+                    yPosition = 20;
+                }
+                
+                doc.setFontSize(11);
+                doc.setTextColor(139, 92, 246);
+                doc.text(`${label.textContent}:`, margin, yPosition);
+                yPosition += 7;
+                
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                const textLines = doc.splitTextToSize(value.textContent, contentWidth);
+                doc.text(textLines, margin + 5, yPosition);
+                yPosition += (textLines.length * 4) + 8;
+            }
+        });
+        
+        // Add footer to all pages
+        const totalPages = doc.internal.getNumberOfPages();
+        for (let i = 1; i <= totalPages; i++) {
+            doc.setPage(i);
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.text(`Page ${i} of ${totalPages}`, pageWidth - 40, doc.internal.pageSize.height - 10);
+            
+            // Footer text
+            doc.setFontSize(9);
+            doc.setTextColor(139, 92, 246);
+            const footerText = 'VVPIET Staff Profile at vvpstaff.netlify.app by Continental Base';
+            const footerWidth = doc.getTextWidth(footerText);
+            doc.text(footerText, (pageWidth - footerWidth) / 2, doc.internal.pageSize.height - 10);
+        }
+        
+        const profileName = nameElement ? 
+            nameElement.textContent.replace(/[^a-zA-Z0-9]/g, '_') : 
+            'staff_profile';
+        
+        doc.save(`${profileName}_Profile.pdf`);
+        
+        // Restore hidden elements
+        if (actionBtns) actionBtns.style.display = originalActionDisplay;
+        if (postsSection) postsSection.style.display = originalPostsDisplay;
+        if (addPostBtn) addPostBtn.style.display = originalAddPostDisplay;
+        
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        alert('PDF generation failed. Please try again.');
+        
+        // Restore on error
+        const actionBtns = document.querySelector('.action-btns');
+        const postsSection = document.querySelector('.posts-section');
+        const addPostBtn = document.querySelector('button[onclick*="showAddPostModal"]');
+        if (actionBtns) actionBtns.style.display = '';
+        if (postsSection) postsSection.style.display = '';
+        if (addPostBtn) addPostBtn.style.display = '';
+    }
 }
+
 
 async function downloadImage() {
-    // Hide action buttons and posts section
-    const actionBtns = document.querySelector('.action-btns');
-    const postsSection = document.querySelector('.posts-section');
-    const addPostBtn = document.querySelector('.posts-section button');
-    
-    const originalActionDisplay = actionBtns.style.display;
-    const originalPostsDisplay = postsSection?.style.display;
-    const originalAddPostDisplay = addPostBtn?.style.display;
-    
-    actionBtns.style.display = 'none';
-    if (postsSection) postsSection.style.display = 'none';
-    if (addPostBtn) addPostBtn.style.display = 'none';
-    
-    // Add logo and footer
-    const profileView = document.querySelector('.profile-view');
-    const logo = document.createElement('div');
-    logo.innerHTML = `<img src="vvplogo.jpeg" style="position:absolute;top:20px;right:20px;width:80px;height:80px;" alt="College Logo">`;
-    const footer = document.createElement('div');
-    footer.style.cssText = 'text-align:center;margin-top:30px;padding:20px;border-top:2px solid #8B5CF6;color:#666;font-size:14px;';
-    footer.innerHTML = 'VVPIET Staff Profile at vvpstaff.netlify.app by Continental Base';
-    
-    profileView.insertBefore(logo, profileView.firstChild);
-    profileView.appendChild(footer);
-    
-    // Generate image using html2canvas
-    const canvas = await html2canvas(profileView, { scale: 2 });
-    const link = document.createElement('a');
-    link.download = `${currentUser.name || 'profile'}.png`;
-    link.href = canvas.toDataURL();
-    link.click();
-    
-    // Restore
-    actionBtns.style.display = originalActionDisplay;
-    if (postsSection) postsSection.style.display = originalPostsDisplay;
-    if (addPostBtn) addPostBtn.style.display = originalAddPostDisplay;
-    logo.remove();
-    footer.remove();
+    try {
+        if (!window.html2canvas) {
+            return alert('Image capture library not loaded. Please refresh the page.');
+        }
+        
+        // Hide elements we don't want in the image
+        const actionBtns = document.querySelector('.action-btns');
+        const postsSection = document.querySelector('.posts-section');
+        const addPostBtn = document.querySelector('button[onclick*="showAddPostModal"]');
+        
+        const originalActionDisplay = actionBtns ? actionBtns.style.display : '';
+        const originalPostsDisplay = postsSection ? postsSection.style.display : '';
+        const originalAddPostDisplay = addPostBtn ? addPostBtn.style.display : '';
+        
+        if (actionBtns) actionBtns.style.display = 'none';
+        if (postsSection) postsSection.style.display = 'none';
+        if (addPostBtn) addPostBtn.style.display = 'none';
+        
+        // Add logo and footer temporarily
+        const profileElement = document.getElementById('hasProfile');
+        
+        if (!profileElement) {
+            return alert('Profile not found');
+        }
+        
+        const logo = document.createElement('div');
+        logo.id = 'temp-logo';
+        logo.style.cssText = 'position:absolute;top:20px;right:20px;z-index:1000;';
+        logo.innerHTML = `<img src="vvplogo.jpeg" style="width:80px;height:80px;border-radius:8px;" alt="College Logo">`;
+        
+        const footer = document.createElement('div');
+        footer.id = 'temp-footer';
+        footer.style.cssText = 'text-align:center;margin-top:30px;padding:20px;border-top:2px solid #8B5CF6;color:#8B5CF6;font-size:14px;font-weight:600;background:white;';
+        footer.innerHTML = 'VVPIET Staff Profile at vvpstaff.netlify.app by Continental Base';
+        
+        profileElement.style.position = 'relative';
+        profileElement.insertBefore(logo, profileElement.firstChild);
+        profileElement.appendChild(footer);
+        
+        // Show loading
+        const loadingDiv = document.createElement('div');
+        loadingDiv.style.cssText = 'position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,0.8);color:white;padding:20px;border-radius:10px;z-index:9999;';
+        loadingDiv.textContent = 'Generating image...';
+        document.body.appendChild(loadingDiv);
+        
+        await new Promise(resolve => setTimeout(resolve, 500));
+        
+        const canvas = await html2canvas(profileElement, {
+            backgroundColor: '#ffffff',
+            useCORS: true,
+            allowTaint: false,
+            scale: 2,
+            scrollX: 0,
+            scrollY: 0,
+            width: profileElement.scrollWidth,
+            height: profileElement.scrollHeight,
+            logging: false,
+            imageTimeout: 15000,
+            removeContainer: true
+        });
+        
+        document.body.removeChild(loadingDiv);
+        
+        // Remove temporary elements
+        logo.remove();
+        footer.remove();
+        
+        // Restore hidden elements
+        if (actionBtns) actionBtns.style.display = originalActionDisplay;
+        if (postsSection) postsSection.style.display = originalPostsDisplay;
+        if (addPostBtn) addPostBtn.style.display = originalAddPostDisplay;
+        
+        canvas.toBlob(function(blob) {
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const nameElement = document.querySelector('#myProfileHeader .name');
+            const profileName = nameElement ? 
+                nameElement.textContent.replace(/[^a-zA-Z0-9]/g, '_') : 
+                'staff_profile';
+            
+            link.href = url;
+            link.download = `${profileName}_Profile.png`;
+            link.style.display = 'none';
+            
+            document.body.appendChild(link);
+            link.click();
+            
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+        }, 'image/png', 1.0);
+        
+    } catch (error) {
+        console.error('Image download error:', error);
+        
+        const loadingDiv = document.querySelector('div[style*="position:fixed"]');
+        if (loadingDiv && document.body.contains(loadingDiv)) {
+            document.body.removeChild(loadingDiv);
+        }
+        
+        // Clean up temp elements
+        const tempLogo = document.getElementById('temp-logo');
+        const tempFooter = document.getElementById('temp-footer');
+        if (tempLogo) tempLogo.remove();
+        if (tempFooter) tempFooter.remove();
+        
+        // Restore
+        const actionBtns = document.querySelector('.action-btns');
+        const postsSection = document.querySelector('.posts-section');
+        const addPostBtn = document.querySelector('button[onclick*="showAddPostModal"]');
+        if (actionBtns) actionBtns.style.display = '';
+        if (postsSection) postsSection.style.display = '';
+        if (addPostBtn) addPostBtn.style.display = '';
+        
+        alert('Image download failed. Please try again.');
+    }
 }
-
 
 // ========================================
 // FORM EVENT HANDLERS (DEFINED AFTER ALL FUNCTIONS)
