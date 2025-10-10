@@ -126,14 +126,14 @@
 }
 
 .edit-btn {
-    background: #8B5CF6;
-    color: white;
+    background: transparent;
+    color: black;
 }
 
 
 .delete-btn {
-    background: #EF4444;
-    color: white;
+    background: transparent;
+    color: black;
 }
 
 
@@ -460,23 +460,7 @@
     font-size: 14px;
 }
 
-.edit-btn {
-    background: #3b82f6;
-    color: white;
-}
 
-.edit-btn:hover {
-    background: #2563eb;
-}
-
-.delete-btn {
-    background: #ef4444;
-    color: white;
-}
-
-.delete-btn:hover {
-    background: #dc2626;
-}
 
 .post-date {
     padding: 0 15px 15px;
@@ -1678,10 +1662,10 @@ async function loadMyProfile() {
                 ${post.caption ? `<div class="post-caption">${post.caption}</div>` : ''}
                 <div class="post-actions">
                     <button onclick="editPost(${post.post_id})" class="edit-btn" title="Edit Post">
-                        ✏️ Edit
+                        Edit ✏️ 
                     </button>
                     <button onclick="deletePost(${post.post_id})" class="delete-btn" title="Delete Post">
-                        🗑️ Delete
+                        Delete 🗑️
                     </button>
                 </div>
                 <div class="post-date" style="font-size:12px;color:#666;margin-top:8px;">
