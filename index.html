@@ -504,7 +504,7 @@ body {
         let deferredPrompt;
         
         // Cache for fast loading
-        
+        let cachedLeadership = null;
         let cachedDepartments = {};
         
         // PWA Installation
@@ -672,29 +672,68 @@ async function handleTPONavigation() {
 
 
         
-        // Leadership Caching
-let cachedLeadership = localStorage.getItem('leadership_cache');
-let cachedLeadershipTime = localStorage.getItem('leadership_cache_time');
-
-async function loadLeadership() {
-    // Check cache (valid for 1 hour)
-    if (cachedLeadership && cachedLeadershipTime) {
-        const age = Date.now() - parseInt(cachedLeadershipTime);
-        if (age < 3600000) { // 1 hour
-            displayLeadership(JSON.parse(cachedLeadership));
+        async function loadLeadership() {
+    // Check localStorage cache first
+    const cachedData = localStorage.getItem('leadership_cache');
+    const cacheTimestamp = localStorage.getItem('leadership_cache_time');
+    
+    // Use cache if available and still fresh (within 1 hour)
+    if (cachedData && cacheTimestamp) {
+        const cacheAge = Date.now() - parseInt(cacheTimestamp);
+        const oneHour = 3600000; // 1 hour in milliseconds
+        
+        if (cacheAge < oneHour) {
+            cachedLeadership = JSON.parse(cachedData);
+            displayLeadership(cachedLeadership);
             return;
         }
     }
     
-    // Fetch fresh
-    const { data: tpo } = await sb.from('tpo').select('*').eq('is_published', true);
-    
-    if (tpo && tpo.length) {
-        localStorage.setItem('leadership_cache', JSON.stringify(tpo));
-        localStorage.setItem('leadership_cache_time', Date.now());
-        displayLeadership(tpo);
+    // Fetch fresh from database
+    try {
+        const { data, error } = await sb
+            .from('leadership')
+            .select('*')
+            .eq('is_active', true)
+            .order('display_order');
+            
+        if (error) throw error;
+        
+        // Cache the data in both memory and localStorage
+        cachedLeadership = data;
+        localStorage.setItem('leadership_cache', JSON.stringify(data));
+        localStorage.setItem('leadership_cache_time', Date.now().toString());
+        
+        displayLeadership(data);
+    } catch (error) {
+        console.error('Error loading leadership:', error);
+        document.getElementById('leadershipGrid').innerHTML = '<p style="text-align:center;color:#666;">Leadership data unavailable</p>';
     }
 }
+
+function displayLeadership(data) {
+    if (!data || data.length === 0) {
+        document.getElementById('leadershipGrid').innerHTML = '<p style="text-align:center;color:#666;">No leadership data available</p>';
+        return;
+    }
+    
+    document.getElementById('leadershipGrid').innerHTML = data.map(leader => `
+        <div class="staff-card" onclick="window.location.href='staff-profile.html?tpo=${leader.tpo_id}'">
+            <img src="${leader.profile_image || 'default-avatar.png'}" alt="${leader.name}">
+            <div class="name">${leader.name}</div>
+            <div class="designation">${leader.designation}</div>
+        </div>
+    `).join('');
+}
+
+// Clear leadership cache when data is updated (call this after adding/editing leadership)
+function clearLeadershipCache() {
+    cachedLeadership = null;
+    localStorage.removeItem('leadership_cache');
+    localStorage.removeItem('leadership_cache_time');
+}
+
+        
         function displayLeadership(data) {
             const grid = document.getElementById('leadershipGrid');
             if (data && data.length > 0) {
