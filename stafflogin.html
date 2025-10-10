@@ -2002,6 +2002,11 @@ async function editPost(postId) {
         console.error('Error fetching post:', error);
         alert('Failed to load post data');
     }
+    // After successful update:
+    localStorage.removeItem(`profile_${currentUser.user_id}`);
+    localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
+    
+    loadMyProfile();
 }
 
 async function deletePost(postId) {
@@ -2048,6 +2053,11 @@ async function deletePost(postId) {
         console.error('Error deleting post:', error);
         alert('Failed to delete post: ' + error.message);
     }
+    // After successful deletion:
+    localStorage.removeItem(`profile_${currentUser.user_id}`);
+    localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
+    
+    loadMyProfile();
 }
 
 // ========================================
