@@ -456,14 +456,14 @@ body {
 
     
     <!-- PWA Popup -->
-    <!-- <div class="pwa-popup" id="pwaPopup">
+    <div class="pwa-popup" id="pwaPopup">
         <h3>Install VVPIET App</h3>
         <p>Access staff profiles anytime with our app!</p>
         <div class="pwa-buttons">
             <button class="install" onclick="installPWA()">Install</button>
             <button onclick="hidePWA()">Later</button>
         </div>
-    </div> -->
+    </div>
     
     <!-- Enhanced Developer Modal -->
     <div class="modal" id="developerModal">
@@ -504,133 +504,35 @@ body {
             'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4');
         
         let deferredPrompt;
-let installNotificationShown = false;
-
-// Capture the beforeinstallprompt event
-window.addEventListener('beforeinstallprompt', (e) => {
-    e.preventDefault();
-    deferredPrompt = e;
-    
-    // Show install notification after 5 seconds
-    setTimeout(() => {
-        if (!installNotificationShown) {
-            showInstallNotification();
-        }
-    }, 5000);
-});
-
-function showInstallNotification() {
-    // Check if already installed or notification dismissed
-    if (window.matchMedia('(display-mode: standalone)').matches) {
-        return; // Already installed
-    }
-    
-    // Check if user previously clicked "Later"
-    if (localStorage.getItem('pwa_install_later') === 'true') {
-        return;
-    }
-    
-    installNotificationShown = true;
-    
-    // Create persistent modal notification
-    const modal = document.createElement('div');
-    modal.id = 'pwaInstallModal';
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.7);
-        z-index: 9999;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    `;
-    
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        background: white;
-        border-radius: 15px;
-        padding: 25px;
-        max-width: 400px;
-        width: 90%;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-        text-align: center;
-    `;
-    
-    notification.innerHTML = `
-        <div style="font-size: 48px; margin-bottom: 15px;">📱</div>
-        <h2 style="color: #8B5CF6; margin-bottom: 10px; font-size: 22px;">Install Our App</h2>
-        <p style="color: #666; margin-bottom: 25px; line-height: 1.5;">
-            Install this app on your device for a better experience. 
-            Quick access, offline support, and more!
-        </p>
-        <div style="display: flex; gap: 10px; justify-content: center;">
-            <button id="pwaInstallBtn" style="
-                background: #8B5CF6;
-                color: white;
-                border: none;
-                padding: 12px 30px;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-            ">Install Now</button>
-            <button id="pwaLaterBtn" style="
-                background: #E5E7EB;
-                color: #374151;
-                border: none;
-                padding: 12px 30px;
-                border-radius: 8px;
-                font-size: 16px;
-                font-weight: 600;
-                cursor: pointer;
-            ">Later</button>
-        </div>
-    `;
-    
-    modal.appendChild(notification);
-    document.body.appendChild(modal);
-    
-    // Install button handler
-    document.getElementById('pwaInstallBtn').addEventListener('click', async () => {
-        if (!deferredPrompt) {
-            alert('Installation not available on this device/browser');
-            return;
+        
+        // Cache for fast loading
+        let cachedLeadership = null;
+        let cachedDepartments = {};
+        
+        // PWA Installation
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (!localStorage.getItem('pwaInstalled')) {
+                document.getElementById('pwaPopup').classList.add('show');
+            }
+        });
+        
+        async function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    localStorage.setItem('pwaInstalled', 'true');
+                }
+                deferredPrompt = null;
+            }
+            hidePWA();
         }
         
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        
-        if (outcome === 'accepted') {
-            console.log('PWA installed');
+        function hidePWA() {
+            document.getElementById('pwaPopup').classList.remove('show');
         }
-        
-        deferredPrompt = null;
-        document.getElementById('pwaInstallModal').remove();
-    });
-    
-    // Later button handler
-    document.getElementById('pwaLaterBtn').addEventListener('click', () => {
-        localStorage.setItem('pwa_install_later', 'true');
-        document.getElementById('pwaInstallModal').remove();
-    });
-    
-    // Prevent closing on outside click - remove this if you want
-    // modal.addEventListener('click', (e) => {
-    //     if (e.target === modal) {
-    //         // Do nothing - prevents closing
-    //     }
-    // });
-}
-
-// Listen for app installed event
-window.addEventListener('appinstalled', () => {
-    console.log('PWA was installed');
-    localStorage.removeItem('pwa_install_later');
-});
-
         
         // Developer Modal Functions
         function showDeveloperModal() {
