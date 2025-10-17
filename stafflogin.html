@@ -823,6 +823,80 @@
         <div id="educationRows"></div>
     </div>
 
+
+    <!-- PhD Details Section -->
+<div class="form-section">
+    <h3>PhD Details</h3>
+    <div class="form-group">
+        <label>PhD Status(Don't select anything if not applicable)</label>
+    
+        <select id="phdStatus" class="form-select">
+            
+            <option value="Completed">Completed</option>
+            <option value="Pursuing">Pursuing</option>
+            <option value="Submitted">Submitted</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>PhD Title</label>
+        <input type="text" id="phdTitle" class="form-input" placeholder="Thesis title">
+    </div>
+    <div class="form-row">
+        <div class="form-group">
+            <label>University</label>
+            <input type="text" id="phdUniversity" class="form-input" placeholder="University name">
+        </div>
+        <div class="form-group">
+            <label>Year</label>
+            <input type="number" id="phdYear" class="form-input" placeholder="2020">
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Research Guide</label>
+        <input type="text" id="phdGuide" class="form-input" placeholder="Guide name">
+    </div>
+    <div class="form-group">
+        <label>Specialization</label>
+        <input type="text" id="phdSpecialization" class="form-input" placeholder="Area of research">
+    </div>
+</div>
+
+<!-- Patents Section -->
+<div class="form-section">
+    <h3>Patents</h3>
+    <button type="button" class="add-btn" onclick="addPatentRow()">+ Add Patent</button>
+    <div id="patentRows"></div>
+</div>
+
+<!-- NPTEL Certificates Section -->
+<div class="form-section">
+    <h3>NPTEL Certificates</h3>
+    <button type="button" class="add-btn" onclick="addNPTELRow()">+ Add Certificate</button>
+    <div id="nptelRows"></div>
+</div>
+
+<!-- Professional Memberships Section -->
+<div class="form-section">
+    <h3>Professional Memberships</h3>
+    <button type="button" class="add-btn" onclick="addMembershipRow()">+ Add Membership</button>
+    <div id="membershipRows"></div>
+</div>
+
+<!-- Contributions Section -->
+<div class="form-section">
+    <h3>Contributions (Institute/University/Other)</h3>
+    <button type="button" class="add-btn" onclick="addContributionRow()">+ Add Contribution</button>
+    <div id="contributionRows"></div>
+</div>
+
+<!-- Special Achievements Section -->
+<div class="form-section">
+    <h3>Special Achievements</h3>
+    <button type="button" class="add-btn" onclick="addSpecialAchievementRow()">+ Add Achievement</button>
+    <div id="specialAchievementRows"></div>
+</div>
+
+
     <!-- Experience Profile -->
     <h3 style="color:#8B5CF6;margin:30px 0 15px;">Experience Profile</h3>
     <div id="experienceSection">
@@ -1012,6 +1086,16 @@
     <script>
 
 const sb = supabase.createClient('https://nsnacwwcrszpjmanskti.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5zbmFjd3djcnN6cGptYW5za3RpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTI5MTg2MTIsImV4cCI6MjA2ODQ5NDYxMn0.W01JADzAuGFvcAHAN6LPRIxc75J7A9Q76HIxvxkJDn4');
+
+// ✅ Add helper function
+    function hasValue(value) {
+        if (value === null || value === undefined) return false;
+        if (typeof value === 'string' && (value.trim() === '' || value === 'N/A' || value === 'No data')) return false;
+        if (Array.isArray(value) && value.length === 0) return false;
+        if (typeof value === 'object' && Object.keys(value).length === 0) return false;
+        return true;
+    }
+
 
 let currentUser = JSON.parse(localStorage.getItem('user'));
 let editingProfile = false;
@@ -1277,6 +1361,223 @@ function addPublicationRow() {
     container.appendChild(div);
 }
 
+// Patent Functions
+function addPatentRow() {
+    const div = document.createElement('div');
+    div.className = 'dynamic-row';
+    div.innerHTML = `
+        <div class="row-header">
+            <h4>Patent Entry</h4>
+            <button type="button" class="remove-btn" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Patent Title *</label>
+            <input type="text" name="patent_title" class="form-input" required>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Patent Number</label>
+                <input type="text" name="patent_number" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Status</label>
+                <select name="patent_status" class="form-select">
+                    <option value="Filed">Filed</option>
+                    <option value="Published">Published</option>
+                    <option value="Granted">Granted</option>
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Filing Date</label>
+                <input type="date" name="filing_date" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Grant Date</label>
+                <input type="date" name="grant_date" class="form-input">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Inventors</label>
+            <input type="text" name="inventors" class="form-input" placeholder="Comma-separated names">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea name="patent_description" class="form-textarea" rows="3"></textarea>
+        </div>
+    `;
+    document.getElementById('patentRows').appendChild(div);
+}
+
+// NPTEL Functions
+function addNPTELRow() {
+    const div = document.createElement('div');
+    div.className = 'dynamic-row';
+    div.innerHTML = `
+        <div class="row-header">
+            <h4>NPTEL Certificate</h4>
+            <button type="button" class="remove-btn" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Course Name *</label>
+            <input type="text" name="nptel_course" class="form-input" required>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Domain *</label>
+                <input type="text" name="nptel_domain" class="form-input" placeholder="e.g., Machine Learning" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Completion Date</label>
+                <input type="date" name="nptel_date" class="form-input">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Score/Grade</label>
+                <input type="text" name="nptel_score" class="form-input" placeholder="85%">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Certificate URL</label>
+                <input type="url" name="nptel_url" class="form-input">
+            </div>
+        </div>
+    `;
+    document.getElementById('nptelRows').appendChild(div);
+}
+
+// Membership Functions
+function addMembershipRow() {
+    const div = document.createElement('div');
+    div.className = 'dynamic-row';
+    div.innerHTML = `
+        <div class="row-header">
+            <h4>Professional Membership</h4>
+            <button type="button" class="remove-btn" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Organization Name *</label>
+            <input type="text" name="membership_org" class="form-input" placeholder="e.g., IEEE, ACM" required>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Membership Type</label>
+                <input type="text" name="membership_type" class="form-input" placeholder="e.g., Senior Member">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Membership Number</label>
+                <input type="text" name="membership_number" class="form-input">
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Start Date</label>
+                <input type="date" name="membership_start" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">End Date</label>
+                <input type="date" name="membership_end" class="form-input">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Status</label>
+            <select name="membership_status" class="form-select">
+                <option value="Active">Active</option>
+                <option value="Expired">Expired</option>
+                <option value="Lifetime">Lifetime</option>
+            </select>
+        </div>
+    `;
+    document.getElementById('membershipRows').appendChild(div);
+}
+
+// Contribution Functions
+function addContributionRow() {
+    const div = document.createElement('div');
+    div.className = 'dynamic-row';
+    div.innerHTML = `
+        <div class="row-header">
+            <h4>Contribution</h4>
+            <button type="button" class="remove-btn" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Level *</label>
+                <select name="contribution_level" class="form-select" required>
+                    <option value="institute">Institute Level</option>
+                    <option value="university">University Level</option>
+                    <option value="other">Other Level</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Type *</label>
+                <input type="text" name="contribution_type" class="form-input" placeholder="Committee, Event, etc." required>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Title *</label>
+            <input type="text" name="contribution_title" class="form-input" required>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea name="contribution_desc" class="form-textarea" rows="3"></textarea>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">From Date</label>
+                <input type="date" name="contribution_from" class="form-input">
+            </div>
+            <div class="form-group">
+                <label class="form-label">To Date</label>
+                <input type="date" name="contribution_to" class="form-input">
+            </div>
+        </div>
+    `;
+    document.getElementById('contributionRows').appendChild(div);
+}
+
+// Special Achievement Functions
+function addSpecialAchievementRow() {
+    const div = document.createElement('div');
+    div.className = 'dynamic-row';
+    div.innerHTML = `
+        <div class="row-header">
+            <h4>Special Achievement</h4>
+            <button type="button" class="remove-btn" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Achievement Title *</label>
+            <input type="text" name="special_ach_title" class="form-input" required>
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label class="form-label">Type</label>
+                <select name="special_ach_type" class="form-select">
+                    <option value="award">Award</option>
+                    <option value="recognition">Recognition</option>
+                    <option value="milestone">Milestone</option>
+                    <option value="honor">Honor</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Date</label>
+                <input type="date" name="special_ach_date" class="form-input">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Awarding Body</label>
+            <input type="text" name="special_ach_body" class="form-input">
+        </div>
+        <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea name="special_ach_desc" class="form-textarea" rows="3"></textarea>
+        </div>
+    `;
+    document.getElementById('specialAchievementRows').appendChild(div);
+}
+
 function removeRow(rowId) {
     const row = document.getElementById(rowId);
     if (row) {
@@ -1339,7 +1640,7 @@ async function loadDepartments() {
 }
 
 // ========================================
-// PROFILE FUNCTIONS
+// PROFILE FUNCTIONS  
 // ========================================
 
 async function loadMyProfile() {
@@ -1382,67 +1683,141 @@ async function loadMyProfile() {
         `;
         
         // Build profile content with basic info
-        let profileContentHTML = `
+        // Build profile content with basic info
+let profileContentHTML = `
+    <div class="profile-field">
+        <div class="profile-field-label">Designation</div>
+        <div class="profile-field-value">${data.designation}</div>
+    </div>
+    <div class="profile-field">
+        <div class="profile-field-label">Experience</div>
+        <div class="profile-field-value">${data.experience} years</div>
+    </div>
+`;
+
+// ✅ Only show Date of Birth if it exists
+if (hasValue(data.date_of_birth)) {
+    profileContentHTML += `
+        <div class="profile-field">
+            <div class="profile-field-label">Date of Birth</div>
+            <div class="profile-field-value">${new Date(data.date_of_birth).toLocaleDateString()}</div>
+        </div>
+    `;
+}
+
+// ✅ Only show Address if it exists
+if (hasValue(data.address)) {
+    profileContentHTML += `
+        <div class="profile-field">
+            <div class="profile-field-label">Address</div>
+            <div class="profile-field-value">${data.address}</div>
+        </div>
+    `;
+}
+
+// ✅ Only show Languages if it exists
+if (hasValue(data.languages_known)) {
+    profileContentHTML += `
+        <div class="profile-field">
+            <div class="profile-field-label">Languages Known</div>
+            <div class="profile-field-value">${data.languages_known.join(', ')}</div>
+        </div>
+    `;
+}
+
+// ✅ PhD SECTION - Only show if ANY field has data
+if (hasValue(data.phd_title) || hasValue(data.phd_university) || hasValue(data.phd_year) || 
+    hasValue(data.phd_guide) || hasValue(data.phd_specialization)) {
+    
+    profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">PhD Details</h3>`;
+    
+    if (hasValue(data.phd_status)) {
+        profileContentHTML += `
             <div class="profile-field">
-                <div class="profile-field-label">Designation</div>
-                <div class="profile-field-value">${data.designation}</div>
-            </div>
-            <div class="profile-field">
-                <div class="profile-field-label">Experience</div>
-                <div class="profile-field-value">${data.experience} years</div>
+                <div class="profile-field-label">Status</div>
+                <div class="profile-field-value">${data.phd_status}</div>
             </div>
         `;
-        
-        // Add Date of Birth if exists
-        if (data.date_of_birth) {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Date of Birth</div>
-                    <div class="profile-field-value">${new Date(data.date_of_birth).toLocaleDateString()}</div>
-                </div>
-            `;
-        }
-        
-        // Add Languages if exists
-        if (data.languages_known && data.languages_known.length > 0) {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Languages Known</div>
-                    <div class="profile-field-value">${data.languages_known.join(', ')}</div>
-                </div>
-            `;
-        }
-        
-        // Add Research & Expertise if exists
-        if (data.research_papers) {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">Research & Expertise</div>
-                    <div class="profile-field-value">${data.research_papers}</div>
-                </div>
-            `;
-        }
-        
-        // Add General Achievements if exists
-        if (data.achievements) {
-            profileContentHTML += `
-                <div class="profile-field">
-                    <div class="profile-field-label">General Achievements</div>
-                    <div class="profile-field-value">${data.achievements}</div>
-                </div>
-            `;
-        }
-        
-        // Add custom fields if exist
-        if (data.custom_fields && Object.keys(data.custom_fields).length > 0) {
-            profileContentHTML += Object.entries(data.custom_fields)
-                .map(([k, v]) => `
-                    <div class="profile-field">
-                        <div class="profile-field-label">${k}</div>
-                        <div class="profile-field-value">${v}</div>
-                    </div>
-                `).join('');
-        }
+    }
+    
+    if (hasValue(data.phd_title)) {
+        profileContentHTML += `
+            <div class="profile-field">
+                <div class="profile-field-label">Thesis Title</div>
+                <div class="profile-field-value">${data.phd_title}</div>
+            </div>
+        `;
+    }
+    
+    if (hasValue(data.phd_university)) {
+        profileContentHTML += `
+            <div class="profile-field">
+                <div class="profile-field-label">University</div>
+                <div class="profile-field-value">${data.phd_university}</div>
+            </div>
+        `;
+    }
+    
+    if (hasValue(data.phd_year)) {
+        profileContentHTML += `
+            <div class="profile-field">
+                <div class="profile-field-label">Year</div>
+                <div class="profile-field-value">${data.phd_year}</div>
+            </div>
+        `;
+    }
+    
+    if (hasValue(data.phd_guide)) {
+        profileContentHTML += `
+            <div class="profile-field">
+                <div class="profile-field-label">Research Guide</div>
+                <div class="profile-field-value">${data.phd_guide}</div>
+            </div>
+        `;
+    }
+    
+    if (hasValue(data.phd_specialization)) {
+        profileContentHTML += `
+            <div class="profile-field">
+                <div class="profile-field-label">Specialization</div>
+                <div class="profile-field-value">${data.phd_specialization}</div>
+            </div>
+        `;
+    }
+}
+
+// ✅ Only show Research & Expertise if it exists
+if (hasValue(data.research_papers)) {
+    profileContentHTML += `
+        <div class="profile-field">
+            <div class="profile-field-label">Research & Expertise</div>
+            <div class="profile-field-value">${data.research_papers}</div>
+        </div>
+    `;
+}
+
+// ✅ Only show General Achievements if it exists
+if (hasValue(data.achievements)) {
+    profileContentHTML += `
+        <div class="profile-field">
+            <div class="profile-field-label">General Achievements</div>
+            <div class="profile-field-value">${data.achievements}</div>
+        </div>
+    `;
+}
+
+// ✅ Only show custom fields if they exist
+if (hasValue(data.custom_fields)) {
+    profileContentHTML += Object.entries(data.custom_fields)
+        .filter(([k, v]) => hasValue(k) && hasValue(v))
+        .map(([k, v]) => `
+            <div class="profile-field">
+                <div class="profile-field-label">${k}</div>
+                <div class="profile-field-value">${v}</div>
+            </div>
+        `).join('');
+}
+
         
         // Load Educational Qualifications
         const { data: educationData } = await sb
@@ -1593,6 +1968,112 @@ async function loadMyProfile() {
                 });
             }
         }
+
+        // ✅ LOAD NEW TABLES: Patents, NPTEL, Memberships, Contributions, Special Achievements
+        const [
+            { data: patents },
+            { data: nptel },
+            { data: memberships },
+            { data: contributions },
+            { data: specialAchievements }
+        ] = await Promise.all([
+            sb.from('patents').select('*').eq('profile_id', data.profile_id),
+            sb.from('nptel_certificates').select('*').eq('profile_id', data.profile_id),
+            sb.from('professional_memberships').select('*').eq('profile_id', data.profile_id),
+            sb.from('contributions').select('*').eq('profile_id', data.profile_id),
+            sb.from('special_achievements').select('*').eq('profile_id', data.profile_id)
+        ]);
+
+        // Display Patents
+        if (patents && patents.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Patents</h3>`;
+            patents.forEach((patent, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Patent ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${patent.patent_title}</strong><br>
+                            ${patent.patent_number ? `Number: ${patent.patent_number}<br>` : ''}
+                            ${patent.patent_status ? `Status: ${patent.patent_status}<br>` : ''}
+                            ${patent.inventors ? `Inventors: ${patent.inventors}<br>` : ''}
+                            ${patent.description ? `<em>${patent.description}</em>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Display NPTEL Certificates
+        if (nptel && nptel.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">NPTEL Certificates</h3>`;
+            nptel.forEach((cert, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Certificate ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${cert.course_name}</strong><br>
+                            Domain: ${cert.domain}<br>
+                            ${cert.score ? `Score: ${cert.score}<br>` : ''}
+                            ${cert.completion_date ? `Completed: ${new Date(cert.completion_date).toLocaleDateString()}` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Display Professional Memberships
+        if (memberships && memberships.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Professional Memberships</h3>`;
+            memberships.forEach((mem, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Membership ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${mem.organization_name}</strong><br>
+                            ${mem.membership_type ? `Type: ${mem.membership_type}<br>` : ''}
+                            ${mem.status ? `Status: ${mem.status}<br>` : ''}
+                            ${mem.membership_number ? `Number: ${mem.membership_number}` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Display Contributions
+        if (contributions && contributions.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Contributions</h3>`;
+            contributions.forEach((contrib, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Contribution ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${contrib.title}</strong><br>
+                            Level: ${contrib.contribution_level}<br>
+                            Type: ${contrib.contribution_type}<br>
+                            ${contrib.description ? `<em>${contrib.description}</em>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // Display Special Achievements
+        if (specialAchievements && specialAchievements.length > 0) {
+            profileContentHTML += `<h3 style="color:#8B5CF6;margin-top:30px;">Special Achievements</h3>`;
+            specialAchievements.forEach((ach, index) => {
+                profileContentHTML += `
+                    <div class="profile-field">
+                        <div class="profile-field-label">Achievement ${index + 1}</div>
+                        <div class="profile-field-value">
+                            <strong>${ach.achievement_title}</strong><br>
+                            ${ach.achievement_type ? `Type: ${ach.achievement_type}<br>` : ''}
+                            ${ach.awarding_body ? `By: ${ach.awarding_body}<br>` : ''}
+                            ${ach.description ? `<em>${ach.description}</em>` : ''}
+                        </div>
+                    </div>
+                `;
+            });
+        }
         
         // Load Achievements & Activities
         const { data: achievementsData } = await sb
@@ -1662,10 +2143,10 @@ async function loadMyProfile() {
                 ${post.caption ? `<div class="post-caption">${post.caption}</div>` : ''}
                 <div class="post-actions">
                     <button onclick="editPost(${post.post_id})" class="edit-btn" title="Edit Post">
-                        Edit ✏️ 
+                        ✏️ Edit
                     </button>
                     <button onclick="deletePost(${post.post_id})" class="delete-btn" title="Delete Post">
-                        Delete 🗑️
+                        🗑️ Delete
                     </button>
                 </div>
                 <div class="post-date" style="font-size:12px;color:#666;margin-top:8px;">
@@ -1696,6 +2177,14 @@ function editProfile() {
             document.getElementById('profLanguages').value = data.languages_known ? data.languages_known.join(', ') : '';
             document.getElementById('profResearch').value = data.research_papers || '';
             document.getElementById('profAchieve').value = data.achievements || '';
+            
+            // ✅ POPULATE PhD FIELDS
+            if (document.getElementById('phdStatus')) document.getElementById('phdStatus').value = data.phd_status || '';
+            if (document.getElementById('phdTitle')) document.getElementById('phdTitle').value = data.phd_title || '';
+            if (document.getElementById('phdUniversity')) document.getElementById('phdUniversity').value = data.phd_university || '';
+            if (document.getElementById('phdYear')) document.getElementById('phdYear').value = data.phd_year || '';
+            if (document.getElementById('phdGuide')) document.getElementById('phdGuide').value = data.phd_guide || '';
+            if (document.getElementById('phdSpecialization')) document.getElementById('phdSpecialization').value = data.phd_specialization || '';
             
            // Custom fields
             const customFieldsDiv = document.getElementById('customFields');
@@ -1846,10 +2335,91 @@ function editProfile() {
                     lastRow.querySelector('[name="pub_abstract"]').value = pub.abstract || '';
                 });
             }
+
+                        // ✅ LOAD NEW FIELDS FOR EDITING
+            // Load Patents
+            const { data: patents } = await sb.from('patents').select('*').eq('profile_id', data.profile_id);
+            document.getElementById('patentRows').innerHTML = '';
+            if (patents && patents.length > 0) {
+                patents.forEach((pat) => {
+                    addPatentRow();
+                    const lastRow = document.getElementById('patentRows').lastChild;
+                    lastRow.querySelector('[name="patent_title"]').value = pat.patent_title || '';
+                    lastRow.querySelector('[name="patent_number"]').value = pat.patent_number || '';
+                    lastRow.querySelector('[name="filing_date"]').value = pat.filing_date || '';
+                    lastRow.querySelector('[name="grant_date"]').value = pat.grant_date || '';
+                    lastRow.querySelector('[name="inventors"]').value = pat.inventors || '';
+                    lastRow.querySelector('[name="patent_status"]').value = pat.patent_status || 'Filed';
+                    lastRow.querySelector('[name="patent_description"]').value = pat.description || '';
+                });
+            }
+
+            // Load NPTEL Certificates
+            const { data: nptel } = await sb.from('nptel_certificates').select('*').eq('profile_id', data.profile_id);
+            document.getElementById('nptelRows').innerHTML = '';
+            if (nptel && nptel.length > 0) {
+                nptel.forEach((cert) => {
+                    addNPTELRow();
+                    const lastRow = document.getElementById('nptelRows').lastChild;
+                    lastRow.querySelector('[name="nptel_course"]').value = cert.course_name || '';
+                    lastRow.querySelector('[name="nptel_domain"]').value = cert.domain || '';
+                    lastRow.querySelector('[name="nptel_date"]').value = cert.completion_date || '';
+                    lastRow.querySelector('[name="nptel_score"]').value = cert.score || '';
+                    lastRow.querySelector('[name="nptel_url"]').value = cert.certificate_url || '';
+                });
+            }
+
+            // Load Professional Memberships
+            const { data: memberships } = await sb.from('professional_memberships').select('*').eq('profile_id', data.profile_id);
+            document.getElementById('membershipRows').innerHTML = '';
+            if (memberships && memberships.length > 0) {
+                memberships.forEach((mem) => {
+                    addMembershipRow();
+                    const lastRow = document.getElementById('membershipRows').lastChild;
+                    lastRow.querySelector('[name="membership_org"]').value = mem.organization_name || '';
+                    lastRow.querySelector('[name="membership_type"]').value = mem.membership_type || '';
+                    lastRow.querySelector('[name="membership_number"]').value = mem.membership_number || '';
+                    lastRow.querySelector('[name="membership_start"]').value = mem.start_date || '';
+                    lastRow.querySelector('[name="membership_end"]').value = mem.end_date || '';
+                    lastRow.querySelector('[name="membership_status"]').value = mem.status || 'Active';
+                });
+            }
+
+            // Load Contributions
+            const { data: contributions } = await sb.from('contributions').select('*').eq('profile_id', data.profile_id);
+            document.getElementById('contributionRows').innerHTML = '';
+            if (contributions && contributions.length > 0) {
+                contributions.forEach((contrib) => {
+                    addContributionRow();
+                    const lastRow = document.getElementById('contributionRows').lastChild;
+                    lastRow.querySelector('[name="contribution_level"]').value = contrib.contribution_level || 'institute';
+                    lastRow.querySelector('[name="contribution_type"]').value = contrib.contribution_type || '';
+                    lastRow.querySelector('[name="contribution_title"]').value = contrib.title || '';
+                    lastRow.querySelector('[name="contribution_desc"]').value = contrib.description || '';
+                    lastRow.querySelector('[name="contribution_from"]').value = contrib.date_from || '';
+                    lastRow.querySelector('[name="contribution_to"]').value = contrib.date_to || '';
+                });
+            }
+
+            // Load Special Achievements
+            const { data: specialAchievements } = await sb.from('special_achievements').select('*').eq('profile_id', data.profile_id);
+            document.getElementById('specialAchievementRows').innerHTML = '';
+            if (specialAchievements && specialAchievements.length > 0) {
+                specialAchievements.forEach((ach) => {
+                    addSpecialAchievementRow();
+                    const lastRow = document.getElementById('specialAchievementRows').lastChild;
+                    lastRow.querySelector('[name="special_ach_title"]').value = ach.achievement_title || '';
+                    lastRow.querySelector('[name="special_ach_type"]').value = ach.achievement_type || 'award';
+                    lastRow.querySelector('[name="special_ach_date"]').value = ach.achievement_date || '';
+                    lastRow.querySelector('[name="special_ach_body"]').value = ach.awarding_body || '';
+                    lastRow.querySelector('[name="special_ach_desc"]').value = ach.description || '';
+                });
+            }
         }
         showPage('createProfilePage');
     });
 }
+
 
 async function deleteProfile() {
     if (!confirm('Delete your profile? This cannot be undone.')) return;
@@ -1863,25 +2433,41 @@ async function deleteProfile() {
             .single();
         
         if (profile) {
-            // Delete related data
-            await sb.from('educational_qualifications').delete().eq('profile_id', profile.profile_id);
-            await sb.from('experience_profile').delete().eq('profile_id', profile.profile_id);
-            await sb.from('technical_competencies').delete().eq('profile_id', profile.profile_id);
-            await sb.from('btech_projects').delete().eq('profile_id', profile.profile_id);
-            await sb.from('mtech_projects').delete().eq('profile_id', profile.profile_id);
-            await sb.from('achievements_activities').delete().eq('profile_id', profile.profile_id);
-            await sb.from('publications').delete().eq('profile_id', profile.profile_id);
+            // ✅ UPDATED: Delete all related data including new tables
+            await Promise.all([
+                sb.from('educational_qualifications').delete().eq('profile_id', profile.profile_id),
+                sb.from('experience_profile').delete().eq('profile_id', profile.profile_id),
+                sb.from('technical_competencies').delete().eq('profile_id', profile.profile_id),
+                sb.from('btech_projects').delete().eq('profile_id', profile.profile_id),
+                sb.from('mtech_projects').delete().eq('profile_id', profile.profile_id),
+                sb.from('achievements_activities').delete().eq('profile_id', profile.profile_id),
+                sb.from('publications').delete().eq('profile_id', profile.profile_id),
+                sb.from('posts').delete().eq('author_id', currentUser.user_id).eq('author_type', 'staff'),
+                // ✅ DELETE NEW TABLES
+                sb.from('patents').delete().eq('profile_id', profile.profile_id),
+                sb.from('nptel_certificates').delete().eq('profile_id', profile.profile_id),
+                sb.from('professional_memberships').delete().eq('profile_id', profile.profile_id),
+                sb.from('contributions').delete().eq('profile_id', profile.profile_id),
+                sb.from('special_achievements').delete().eq('profile_id', profile.profile_id)
+            ]);
             
-            // Delete profile
+            // Delete main profile
             await sb.from('profiles').delete().eq('user_id', currentUser.user_id);
         }
         
-        alert('Profile deleted');
+        // ✅ CLEAR PROFILE CACHE
+        localStorage.removeItem(`profile_${currentUser.user_id}`);
+        localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
+        
+        alert('Profile deleted successfully');
         showPage('myProfilePage');
-        loadMyProfile();
+        
+        // Reload to show "Create Profile" button
+        await loadMyProfile();
+        
     } catch (error) {
         console.error('Delete error:', error);
-        alert('Failed to delete profile');
+        alert('Failed to delete profile: ' + error.message);
     }
 }
 
@@ -2254,6 +2840,7 @@ async function downloadImage() {
 // ========================================
 
 // Wait for DOM to be ready before attaching event handlers
+// Wait for DOM to be ready before attaching event handlers
 window.addEventListener('DOMContentLoaded', function() {
     
     // Login Form
@@ -2280,40 +2867,40 @@ window.addEventListener('DOMContentLoaded', function() {
     
     // Register Form
     document.getElementById('registerForm').onsubmit = async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('regEmail').value;
-    const pass = document.getElementById('regPassword').value;
-    const dept = document.getElementById('regDept').value;
-    const code = document.getElementById('regCode').value;
-    
-    // Validate department code
-    const { data: deptData } = await sb.from('departments').select('*').eq('dept_id', dept).single();
-    if (!deptData || deptData.dept_code !== code) {
-        return alert('Invalid department code');
-    }
-    
-    // Check if email already exists
-    const { data: existingUser } = await sb.from('users').select('email').eq('email', email).single();
-    if (existingUser) {
-        return alert('This email is already registered. Please login or use a different email.');
-    }
-    
-    // Register new user
-    const { error } = await sb.from('users').insert({ 
-        email, 
-        password: pass, 
-        department: dept, 
-        role: 'Staff'
-    });
-    
-    if (error) {
-        console.error('Registration error:', error);
-        return alert('Registration failed: ' + error.message);
-    }
-    
-    alert('Registration successful! Please login.');
-    showPage('loginPage');
-};
+        e.preventDefault();
+        const email = document.getElementById('regEmail').value;
+        const pass = document.getElementById('regPassword').value;
+        const dept = document.getElementById('regDept').value;
+        const code = document.getElementById('regCode').value;
+        
+        // Validate department code
+        const { data: deptData } = await sb.from('departments').select('*').eq('dept_id', dept).single();
+        if (!deptData || deptData.dept_code !== code) {
+            return alert('Invalid department code');
+        }
+        
+        // Check if email already exists
+        const { data: existingUser } = await sb.from('users').select('email').eq('email', email).single();
+        if (existingUser) {
+            return alert('This email is already registered. Please login or use a different email.');
+        }
+        
+        // Register new user
+        const { error } = await sb.from('users').insert({ 
+            email, 
+            password: pass, 
+            department: dept, 
+            role: 'Staff'
+        });
+        
+        if (error) {
+            console.error('Registration error:', error);
+            return alert('Registration failed: ' + error.message);
+        }
+        
+        alert('Registration successful! Please login.');
+        showPage('loginPage');
+    };
 
     // Profile Form
     const profileForm = document.getElementById('profileForm');
@@ -2445,6 +3032,71 @@ window.addEventListener('DOMContentLoaded', function() {
                 });
             });
 
+            // ✅ EXTRACT NEW FIELDS DATA
+            // Extract Patents
+            const patentsData = [];
+            document.querySelectorAll('#patentRows .dynamic-row').forEach(row => {
+                patentsData.push({
+                    patent_title: row.querySelector('[name="patent_title"]').value,
+                    patent_number: row.querySelector('[name="patent_number"]').value || null,
+                    filing_date: row.querySelector('[name="filing_date"]').value || null,
+                    grant_date: row.querySelector('[name="grant_date"]').value || null,
+                    inventors: row.querySelector('[name="inventors"]').value || null,
+                    patent_status: row.querySelector('[name="patent_status"]').value || null,
+                    description: row.querySelector('[name="patent_description"]').value || null
+                });
+            });
+
+            // Extract NPTEL Certificates
+            const nptelData = [];
+            document.querySelectorAll('#nptelRows .dynamic-row').forEach(row => {
+                nptelData.push({
+                    course_name: row.querySelector('[name="nptel_course"]').value,
+                    domain: row.querySelector('[name="nptel_domain"]').value,
+                    completion_date: row.querySelector('[name="nptel_date"]').value || null,
+                    score: row.querySelector('[name="nptel_score"]').value || null,
+                    certificate_url: row.querySelector('[name="nptel_url"]').value || null
+                });
+            });
+
+            // Extract Professional Memberships
+            const membershipsData = [];
+            document.querySelectorAll('#membershipRows .dynamic-row').forEach(row => {
+                membershipsData.push({
+                    organization_name: row.querySelector('[name="membership_org"]').value,
+                    membership_type: row.querySelector('[name="membership_type"]').value || null,
+                    membership_number: row.querySelector('[name="membership_number"]').value || null,
+                    start_date: row.querySelector('[name="membership_start"]').value || null,
+                    end_date: row.querySelector('[name="membership_end"]').value || null,
+                    status: row.querySelector('[name="membership_status"]').value || 'Active'
+                });
+            });
+
+            // Extract Contributions
+            const contributionsData = [];
+            document.querySelectorAll('#contributionRows .dynamic-row').forEach(row => {
+                contributionsData.push({
+                    contribution_level: row.querySelector('[name="contribution_level"]').value,
+                    contribution_type: row.querySelector('[name="contribution_type"]').value,
+                    title: row.querySelector('[name="contribution_title"]').value,
+                    description: row.querySelector('[name="contribution_desc"]').value || null,
+                    date_from: row.querySelector('[name="contribution_from"]').value || null,
+                    date_to: row.querySelector('[name="contribution_to"]').value || null
+                });
+            });
+
+            // Extract Special Achievements
+            const specialAchievementsData = [];
+            document.querySelectorAll('#specialAchievementRows .dynamic-row').forEach(row => {
+                specialAchievementsData.push({
+                    achievement_title: row.querySelector('[name="special_ach_title"]').value,
+                    achievement_type: row.querySelector('[name="special_ach_type"]').value || null,
+                    awarding_body: row.querySelector('[name="special_ach_body"]').value || null,
+                    achievement_date: row.querySelector('[name="special_ach_date"]').value || null,
+                    description: row.querySelector('[name="special_ach_desc"]').value || null
+                });
+            });
+
             // Main profile data object
             const profileData = {
                 user_id: currentUser.user_id,
@@ -2458,7 +3110,15 @@ window.addEventListener('DOMContentLoaded', function() {
                 date_of_birth: document.getElementById('profDOB').value || null,
                 address: document.getElementById('profAddress').value || null,
                 languages_known: document.getElementById('profLanguages').value.split(',').map(l => l.trim()).filter(Boolean),
-                is_published: true
+                is_published: true,
+                
+                // ✅ ADD PhD FIELDS
+                phd_status: document.getElementById('phdStatus')?.value || null,
+                phd_title: document.getElementById('phdTitle')?.value || null,
+                phd_university: document.getElementById('phdUniversity')?.value || null,
+                phd_year: document.getElementById('phdYear')?.value ? parseInt(document.getElementById('phdYear').value) : null,
+                phd_guide: document.getElementById('phdGuide')?.value || null,
+                phd_specialization: document.getElementById('phdSpecialization')?.value || null
             };
 
             if (imageUrl) {
@@ -2525,6 +3185,51 @@ window.addEventListener('DOMContentLoaded', function() {
                     );
                 }
 
+                // ✅ SAVE NEW TABLES
+                // Patents
+                await sb.from('patents').delete().eq('profile_id', profile_id);
+                if (patentsData.length) {
+                    await sb.from('patents').insert(
+                        patentsData.map(p => ({ ...p, profile_id }))
+                    );
+                }
+
+                // NPTEL Certificates
+                await sb.from('nptel_certificates').delete().eq('profile_id', profile_id);
+                if (nptelData.length) {
+                    await sb.from('nptel_certificates').insert(
+                        nptelData.map(n => ({ ...n, profile_id }))
+                    );
+                }
+
+                // Professional Memberships
+                await sb.from('professional_memberships').delete().eq('profile_id', profile_id);
+                if (membershipsData.length) {
+                    await sb.from('professional_memberships').insert(
+                        membershipsData.map(m => ({ ...m, profile_id }))
+                    );
+                }
+
+                // Contributions
+                await sb.from('contributions').delete().eq('profile_id', profile_id);
+                if (contributionsData.length) {
+                    await sb.from('contributions').insert(
+                        contributionsData.map(c => ({ ...c, profile_id }))
+                    );
+                }
+
+                // Special Achievements
+                await sb.from('special_achievements').delete().eq('profile_id', profile_id);
+                if (specialAchievementsData.length) {
+                    await sb.from('special_achievements').insert(
+                        specialAchievementsData.map(s => ({ ...s, profile_id }))
+                    );
+                }
+
+                // ✅ Clear cache
+                localStorage.removeItem(`profile_${currentUser.user_id}`);
+                localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
+
                 alert('Profile saved successfully!');
                 editingProfile = false;
                 showPage('myProfilePage');
@@ -2586,6 +3291,10 @@ window.addEventListener('DOMContentLoaded', function() {
                     console.error('Insert error:', insertError);
                     return alert('Failed to create post: ' + insertError.message);
                 }
+                
+                // ✅ Clear cache after post creation
+                localStorage.removeItem(`profile_${currentUser.user_id}`);
+                localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
                 
                 alert('Post created successfully!');
                 closePostModal();
@@ -2656,6 +3365,10 @@ window.addEventListener('DOMContentLoaded', function() {
                 
                 if (updateError) throw updateError;
                 
+                // ✅ Clear cache after post update
+                localStorage.removeItem(`profile_${currentUser.user_id}`);
+                localStorage.removeItem(`profile_timestamp_${currentUser.user_id}`);
+                
                 alert('Post updated successfully! 🎉');
                 closeEditPostModal();
                 loadMyProfile();
@@ -2672,6 +3385,8 @@ window.addEventListener('DOMContentLoaded', function() {
             }
         };
     }
+
+
     
     // ========================================
     // INITIALIZE APPLICATION
